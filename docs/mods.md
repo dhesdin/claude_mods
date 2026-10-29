@@ -74,6 +74,7 @@ Sets the display language of every installed mod in one command. No options.
 
 - `/langmod fr` (or `en`, `ja`, `zh`): switches every mod.
 - `/langmod`: shows each mod's current language.
+- The choice is kept on this machine: at each start, mods installed since (for example synced from your claude.ai account later) are switched to it too. Run it once per machine.
 
 ## project-hours
 
