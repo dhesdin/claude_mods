@@ -40,7 +40,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | sysmon | yes | laptop yes; GPU [to validate] | yes |
 | langmod | yes | not yet | yes |
 | teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
-| project-hours | yes | not yet | yes |
+| project-hours | yes | yes | yes |
 
 ## Build order
 

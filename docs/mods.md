@@ -84,7 +84,7 @@ Time spent per project and per week, to see whether a priority project is being 
 | `idleMinutes` | `10` | a pause longer than this ends the active period |
 | `aliases` | empty | display names, `;`-separated: `path prefix or repo name=name`. Example: `~/code/sip/edge=sip/edge; k4u-erp=ERP` |
 | `priorityProjects` | empty | projects to watch, `;`-separated: `name=weeks`. Example: `sip/edge=3` shows an alert line after 3 weeks with no time on it |
-| `toolingProjects` | `claude-mods` | projects marked `← tooling` (time on tools rather than on the substance), `;`-separated |
+| `toolingProjects` | `claude_mods; claude-mods` | projects marked `← tooling` (time on tools rather than on the substance), `;`-separated |
 | `dataFolder` | empty | where the hours are stored; empty = `~/.claude/mod-data/project-hours`. See below |
 | `openOnStart` | `false` | open the Hours panel in every session |
 

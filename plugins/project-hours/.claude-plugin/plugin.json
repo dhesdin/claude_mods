@@ -38,7 +38,7 @@
       "type": "string",
       "title": "Tooling projects",
       "description": "Projects flagged as tooling (time on tools rather than on the substance), separated by ';'",
-      "default": "claude-mods"
+      "default": "claude_mods; claude-mods"
     },
     "dataFolder": {
       "type": "string",

@@ -58,7 +58,7 @@ Each session writes only its own file, after each reply and at the end of the se
 | `idleMinutes` | 10 | a pause longer than this ends the active period |
 | `aliases` | empty | `path prefix or repo name=display name`, separated by `;`. Example: `~/code/sip/edge=sip/edge; k4u-erp=ERP` |
 | `priorityProjects` | empty | `name=weeks`, separated by `;`. Example: `sip/edge=3` alerts after 3 weeks without time on it |
-| `toolingProjects` | `claude-mods` | names flagged as tooling, separated by `;` |
+| `toolingProjects` | `claude_mods; claude-mods` | names flagged as tooling, separated by `;` |
 | `dataFolder` | empty | where the hours are stored (absolute or `~/...`); empty = `~/.claude/mod-data/project-hours` |
 | `openOnStart` | false | open the Hours panel in every session |
 

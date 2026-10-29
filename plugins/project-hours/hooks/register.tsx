@@ -38,7 +38,7 @@ export const register: Register = (on, options) => {
       .map(([name, weeks]) => [name, Math.max(1, Math.trunc(Number(weeks)) || 3)] as const)
       .filter(([name]) => name !== ''),
   )
-  const tooling = new Set(parsePairs(String(options.toolingProjects ?? 'claude-mods')).keys())
+  const tooling = new Set(parsePairs(String(options.toolingProjects ?? 'claude_mods; claude-mods')).keys())
   const openOnStart = Boolean(options.openOnStart ?? false)
   const dataFolder = String(options.dataFolder ?? '').trim()
   // Weeks to read for the alerts: the longest priority limit, plus the week it starts in.
