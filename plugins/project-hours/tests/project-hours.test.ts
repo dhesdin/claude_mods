@@ -30,7 +30,8 @@ test('weeks, aliases and priority alerts', () => {
   expect(projectName('/h/w/k4u-erp', '/h/w/k4u-erp', aliases, '/h')).toBe('ERP')
   const seg = [{ id: 'a', machine: 'm', project: 'sip/edge', start: T0, end: T0 + MIN }]
   expect(alerts(seg, new Map([['sip/edge', 3]]), T0 + 22 * 24 * 60 * MIN)).toEqual([{ project: 'sip/edge', weeks: 3 }])
-  expect(alerts([], new Map([['x', 3]]), T0)).toEqual([{ project: 'x', weeks: null }])
+  expect(alerts(seg, new Map([['sip/edge', 3]]), T0 + 20 * 24 * 60 * MIN)).toEqual([])
+  expect(alerts([], new Map([['x', 3]]), T0)).toEqual([{ project: 'x', weeks: 3 }])
 })
 
 const HOME = '/h'
@@ -46,7 +47,7 @@ const PANE = {
 
 // A fake machine: files in memory, a settable clock, the session folder and its git repo.
 function machine(files: Map<string, string>, gitRoot: string | null) {
-  const state = { now: T0, panes: [] as { id: string }[], registered: true }
+  const state = { now: T0, panes: [] as { id: string }[], registered: true, listed: [] as string[] }
   const install = (on: (event: string, hook: (...args: never[]) => unknown) => void) => {
     on('session.start', ((_: unknown, e: { cwd: string }) => ({ cwd: e.cwd })) as never)
     on('session.cwd', (() => ({ value: '/h/code/app/src' })) as never)
@@ -67,6 +68,7 @@ function machine(files: Map<string, string>, gitRoot: string | null) {
       return { value: undefined }
     }) as never)
     on('fs.list', ((_: unknown, e: { path: string }) => {
+      state.listed.push(e.path)
       const names = new Set<string>()
       for (const f of files.keys()) if (f.startsWith(`${e.path}/`)) names.add(f.slice(e.path.length + 1).split('/')[0]!)
       if (names.size === 0) throw new Error('ENOENT')
@@ -154,12 +156,30 @@ test(
     await $.session.start(start)
     const lines = (await $.command.run(hoursCommand(''))).text!.split('\n')
     expect(lines[1]).toBe('src             0h00  ')
-    expect(lines[2]).toBe('⚠ sip/edge : aucun temps Claude Code enregistré')
+    expect(lines[2]).toBe('⚠ sip/edge : 0h depuis 3 semaines')
     const ui = await $.ui.mount(PANE)
-    expect((await ui.find({ type: 'Text', text: /^⚠/ }))?.text).toBe('⚠ sip/edge : aucun temps Claude Code enregistré')
+    expect((await ui.find({ type: 'Text', text: /^⚠/ }))?.text).toBe('⚠ sip/edge : 0h depuis 3 semaines')
     await ui.unmount()
   },
 )
+
+test('only the week folders needed are read; dataFolder moves the data', { options: { dataFolder: '~/Sync/hours/' } }, async ($, on) => {
+  const monthAgo = T0 - 30 * 24 * 60 * MIN
+  const files = new Map([
+    [
+      `${HOME}/Sync/hours/${isoWeek(monthAgo).key}/work-s0.jsonl`,
+      toJsonl([{ id: 'o-1', machine: 'work', project: 'web', start: monthAgo, end: monthAgo + MIN }]),
+    ],
+    [`${HOME}/Sync/hours/2026-W44/work-s0.jsonl`, earlier],
+  ])
+  const m = machine(files, '/h/code/app')
+  m.install(on as never)
+  await $.session.start(start)
+  expect(m.state.listed).toEqual([`${HOME}/Sync/hours/2026-W44`])
+  expect((await $.command.run(hoursCommand(''))).text).toContain('web             2h00')
+  expect(files.has(`${HOME}/Sync/hours/2026-W44/laptop-s1.jsonl`)).toBe(true)
+  expect((await $.command.run(hoursCommand('6'))).text).toContain('2h01')
+})
 
 test('degraded: the command cannot be registered, the session goes on', async ($, on) => {
   const m = machine(new Map(), '/h/code/app')

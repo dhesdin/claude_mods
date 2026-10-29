@@ -9,7 +9,7 @@ The mod only measures **active time in Claude Code**, not time spent in the edit
 ## Measurement
 - Project = Git root of the session folder (fallback: current folder).
 - Active time = sum of the intervals between session events (prompts, tool calls, replies), cutting any interval longer than the idle threshold (default 10 min).
-- Storage: one JSONL line per segment in `~/.claude/mod-data/project-hours/`, with machine, project, start, end. Local data per machine.
+- Storage: one JSONL line per segment, one file per session and week (`<week>/<machine>-<session>.jsonl`), in `~/.claude/mod-data/project-hours/` or the folder of the `dataFolder` option. Only the week folders a view needs are read.
 
 ## Display
 Collapsible pane:
@@ -27,11 +27,11 @@ claude-mods     1h10   ███   ← tooling
 
 ## Priority project alert
 - Config: list of priority projects with a maximum number of weeks without activity.
-- If exceeded: an alert line in color. No intrusive notification.
+- If exceeded (no time on it during the last N weeks, rolling): an alert line in color. No intrusive notification.
 
 ## Config
-Idle threshold, aliases (path or repo name to display name), priority projects, "tooling" projects, start of week (Monday).
+Idle threshold, aliases (path or repo name to display name), priority projects, "tooling" projects, data folder. Weeks start on Monday (ISO), not configurable.
 
 ## Out of scope for v1
-- Aggregating laptop + workstation (zero network). v2 option to discuss: manual export and merge.
+- Network aggregation of laptop + workstation (zero network). Decided on 2026-10-29 instead: the `dataFolder` option, pointed on each machine at a local folder that a sync tool the user installs (Syncthing...) shares; one file per session means no write conflicts. Manual copy of the week folders also works.
 - Charts, hour targets, export.

@@ -105,19 +105,14 @@ export function lastWeeks(now: number, count: number): string[] {
   return keys
 }
 
-export type Alert = { project: string; weeks: number | null }
+export type Alert = { project: string; weeks: number }
 
-// Priority projects idle for at least their limit: weeks since their last activity (null = never seen).
+// Priority projects with no time during their last `limit` weeks (rolling, up to `now`).
+// Only the segments of lastWeeks(now, limit + 1) are needed to decide.
 export function alerts(segments: readonly Segment[], priorities: ReadonlyMap<string, number>, now: number): Alert[] {
   const out: Alert[] = []
   for (const [project, limit] of priorities) {
-    const last = Math.max(-Infinity, ...segments.filter(s => s.project === project).map(s => s.end))
-    if (!Number.isFinite(last)) {
-      out.push({ project, weeks: null })
-      continue
-    }
-    const weeks = Math.floor((now - last) / WEEK_MS)
-    if (weeks >= limit) out.push({ project, weeks })
+    if (!segments.some(s => s.project === project && s.end >= now - limit * WEEK_MS)) out.push({ project, weeks: limit })
   }
   return out
 }

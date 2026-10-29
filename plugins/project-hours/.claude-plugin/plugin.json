@@ -40,6 +40,12 @@
       "description": "Projects flagged as tooling (time on tools rather than on the substance), separated by ';'",
       "default": "claude-mods"
     },
+    "dataFolder": {
+      "type": "string",
+      "title": "Data folder",
+      "description": "Where the hours are stored (absolute path or ~/...). Empty: ~/.claude/mod-data/project-hours. Point every machine to a folder a sync tool shares (for example Syncthing) to add their hours up",
+      "default": ""
+    },
     "openOnStart": {
       "type": "boolean",
       "title": "Open the panel on start",

@@ -10,7 +10,6 @@ export type Strings = {
   none: string
   tooling: string
   idleFor: (project: string, weeks: number) => string
-  neverSeen: (project: string) => string
   only: string
   total: string
   opened: string
@@ -28,7 +27,6 @@ const TABLES: Record<Lang, Strings> = {
     none: 'No Claude Code time recorded yet.',
     tooling: '← tooling',
     idleFor: (p, w) => `⚠ ${p}: 0h for ${w} week${w === 1 ? '' : 's'}`,
-    neverSeen: p => `⚠ ${p}: no Claude Code time recorded`,
     only: 'Active time in Claude Code only, not time spent in your editor without Claude.',
     total: 'total',
     opened: 'Hours panel opened.',
@@ -44,7 +42,6 @@ const TABLES: Record<Lang, Strings> = {
     none: 'Aucun temps Claude Code enregistré pour l’instant.',
     tooling: '← outillage',
     idleFor: (p, w) => `⚠ ${p} : 0h depuis ${w} semaine${w > 1 ? 's' : ''}`,
-    neverSeen: p => `⚠ ${p} : aucun temps Claude Code enregistré`,
     only: 'Temps actif dans Claude Code seulement, pas le temps passé dans l’éditeur sans Claude.',
     total: 'total',
     opened: 'Panneau Heures ouvert.',
@@ -60,7 +57,6 @@ const TABLES: Record<Lang, Strings> = {
     none: 'まだ Claude Code の時間は記録されていません。',
     tooling: '← ツール',
     idleFor: (p, w) => `⚠ ${p}：${w}週間 0h`,
-    neverSeen: p => `⚠ ${p}：Claude Code の時間の記録なし`,
     only: 'Claude Code 内のアクティブ時間のみ。Claude なしでエディタにいた時間は含みません。',
     total: '合計',
     opened: '時間パネルを開きました。',
@@ -76,7 +72,6 @@ const TABLES: Record<Lang, Strings> = {
     none: '尚未记录 Claude Code 时间。',
     tooling: '← 工具',
     idleFor: (p, w) => `⚠ ${p}：已 ${w} 周 0h`,
-    neverSeen: p => `⚠ ${p}：没有 Claude Code 时间记录`,
     only: '仅统计 Claude Code 中的活跃时间，不包括不用 Claude 时在编辑器中的时间。',
     total: '合计',
     opened: '时长面板已打开。',

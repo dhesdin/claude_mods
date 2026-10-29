@@ -8,7 +8,7 @@ import { alerts, bar, fromJsonl, hours, isoWeek, lastWeeks, parsePairs, projectN
 
 const PANE = 'project-hours'
 // Bump the shape tag whenever Report changes: a value stored by an older version is then discarded.
-const report = atom({ plugin: 'project-hours', key: 'report' } as const, null, { shape: 'report-1' })
+const report = atom({ plugin: 'project-hours', key: 'report' } as const, null, { shape: 'report-2' })
 
 // Names that end up in file names: letters, digits, dot, dash, underscore only.
 const safe = (s: string) => s.replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 64) || 'unknown'
@@ -40,6 +40,9 @@ export const register: Register = (on, options) => {
   )
   const tooling = new Set(parsePairs(String(options.toolingProjects ?? 'claude-mods')).keys())
   const openOnStart = Boolean(options.openOnStart ?? false)
+  const dataFolder = String(options.dataFolder ?? '').trim()
+  // Weeks to read for the alerts: the longest priority limit, plus the week it starts in.
+  const alertWeeks = Math.max(0, ...priorities.values()) + 1
 
   let machine: Machine | null = null
   let tracker: Tracker | null = null
@@ -55,18 +58,17 @@ export const register: Register = (on, options) => {
     return projectOf.name
   }
 
-  // Every segment on disk, from every session and machine copied here.
-  const loadAll = async (m: Machine): Promise<Segment[]> => {
-    const files = (
-      await Promise.all((await m.list(dir)).map(async week => (await m.list(`${dir}/${week}`)).map(f => `${dir}/${week}/${f}`)))
-    ).flat()
+  // The segments of the weeks asked for, from every session and machine whose files are here.
+  // Only those week folders are read: the cost does not grow with the history.
+  const load = async (m: Machine, weekKeys: readonly string[]): Promise<Segment[]> => {
+    const files = (await Promise.all(weekKeys.map(async key => (await m.list(`${dir}/${key}`)).map(f => `${dir}/${key}/${f}`)))).flat()
     const texts = await Promise.all(files.filter(f => f.endsWith('.jsonl')).map(f => m.read(f)))
     return fromJsonl(texts.filter((x): x is string => x !== null).join('\n'))
   }
 
   const refresh = async (m: Machine) => {
     const now = await m.now()
-    const all = await loadAll(m)
+    const all = await load(m, lastWeeks(now, alertWeeks))
     const key = isoWeek(now).key
     const rows = [...totals(all, [key])]
       .map(([project, perWeek]) => ({ project, ms: perWeek.get(key) ?? 0, isTooling: tooling.has(project) }))
@@ -115,7 +117,9 @@ export const register: Register = (on, options) => {
     try {
       home = (await $.env.get('HOME')) ?? ''
       const host = safe(((await m.read('/etc/hostname')) ?? '').trim())
-      dir = `${home}/.claude/mod-data/project-hours`
+      // dataFolder: an absolute path or ~/..., for example a folder another tool syncs between machines.
+      const chosen = dataFolder.startsWith('~/') ? `${home}${dataFolder.slice(1)}` : dataFolder
+      dir = chosen.startsWith('/') ? chosen.replace(/\/+$/, '') : `${home}/.claude/mod-data/project-hours`
       fileName = `${host}-${safe(await $.session.id())}.jsonl`
       // A reload runs session.start again: pick up what this session already wrote this week.
       const mine = fromJsonl((await m.read(`${dir}/${isoWeek(await m.now()).key}/${fileName}`)) ?? '')
@@ -172,8 +176,8 @@ export const register: Register = (on, options) => {
     if (!Number.isFinite(weeks) || weeks < 1 || weeks > 52) return { text: t.usage }
     await flush(m)
     const now = await m.now()
-    const all = await loadAll(m)
     const keys = lastWeeks(now, weeks)
+    const all = await load(m, lastWeeks(now, Math.max(weeks, alertWeeks)))
     const perProject = [...totals(all, keys)].map(([project, perWeek]) => ({
       project,
       perWeek,
@@ -190,7 +194,7 @@ export const register: Register = (on, options) => {
       const mark = tooling.has(p.project) ? `  ${t.tooling}` : ''
       lines.push(`${p.project.padEnd(width)}${cells}  ${hours(p.sum).padStart(6)}  ${bar(p.sum, max)}${mark}`)
     }
-    for (const a of alerts(all, priorities, now)) lines.push(a.weeks === null ? t.neverSeen(a.project) : t.idleFor(a.project, a.weeks))
+    for (const a of alerts(all, priorities, now)) lines.push(t.idleFor(a.project, a.weeks))
     lines.push('', t.only)
     return { text: lines.join('\n') }
   })
@@ -213,7 +217,7 @@ export const register: Register = (on, options) => {
           </Text>
         ))}
         {r.alerts.map(a => (
-          <Text color="warning">{a.weeks === null ? t.neverSeen(a.project) : t.idleFor(a.project, a.weeks)}</Text>
+          <Text color="warning">{t.idleFor(a.project, a.weeks)}</Text>
         ))}
         <Text dimColor>{t.only}</Text>
       </Box>
