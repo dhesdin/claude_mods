@@ -1,17 +1,17 @@
 import type { Register, RenderChildren, Timer } from 'claude-code'
 import { atom, read, update } from 'claude-code'
 
-import type { Disk, Gpu, GpuKind, GpuState, Ram, Snapshot, Throttle } from '../types'
+import type { Disk, Gpu, GpuKind, GpuState, MemUser, Ram, Snapshot, Throttle } from '../types'
 import type { GpuBackend, Io } from './gpu'
 import { detectGpu, sampleGpu } from './gpu'
 import { strings } from './i18n'
 import type { CpuTimes } from './system'
-import { sampleDisks, sampleSystem } from './system'
+import { sampleDisks, sampleSystem, sampleTopRam } from './system'
 
 const PANE = 'sysmon'
 const TOOL = 'mcp__sysmon__machine_status'
 // Bump the shape tag whenever Snapshot changes: a value stored by an older version is then discarded.
-const snapshot = atom({ plugin: 'sysmon', key: 'snapshot' } as const, null, { shape: 'snapshot-4' })
+const snapshot = atom({ plugin: 'sysmon', key: 'snapshot' } as const, null, { shape: 'snapshot-5' })
 
 const gib = (mib: number | null) => (mib === null ? 'n/a' : (mib / 1024).toFixed(1))
 const gibFromKiB = (kib: number) => (kib / 1024 / 1024).toFixed(1)
@@ -23,6 +23,8 @@ const round = (x: number | null) => (x === null ? 'n/a' : Math.round(x))
 const LABEL_GPU = 'GPU  '
 const LABEL_CPU = 'CPU  '
 const LABEL_RAM = 'RAM  '
+const TOP_RAM_MS = 15000
+const topText = (top: readonly MemUser[], gb: string) => top.map(p => `${p.name} ${gibFromKiB(p.kib)} ${gb}`).join(' · ')
 
 // Same scale as usage-pace: white < 50 %, yellow 50-75, orange 75-90, red >= 90.
 export function levelColor(percent: number | null): string {
@@ -65,6 +67,7 @@ export function summary(s: Snapshot): string {
     const swap = s.ram.swapTotalKiB === 0 ? 'no swap' : `swap ${gibFromKiB(s.ram.swapUsedKiB)} / ${gibFromKiB(s.ram.swapTotalKiB)} GB`
     parts.push(
       `RAM available ${gibFromKiB(s.ram.availableKiB)} / ${gibFromKiB(s.ram.totalKiB)} GB (used ${gibFromKiB(s.ram.usedKiB)}), ${swap}.`,
+      s.topRam ? `Biggest RAM users: ${s.topRam.map(p => `${JSON.stringify(p.name)} ${gibFromKiB(p.kib)} GB`).join(', ')}.` : '',
     )
   } else {
     parts.push('RAM n/a.')
@@ -74,7 +77,7 @@ export function summary(s: Snapshot): string {
       `Disk: ${s.disks.map(d => `${JSON.stringify(d.mount)} ${gbFromBytes(d.availBytes)} GB free of ${gbFromBytes(d.sizeBytes)}`).join(', ')}.`,
     )
   }
-  return parts.join(' ')
+  return parts.filter(Boolean).join(' ')
 }
 
 export const register: Register = (on, options) => {
@@ -112,6 +115,9 @@ export const register: Register = (on, options) => {
   // Disk space moves slowly: measured every diskIntervalSeconds only.
   let disks: Disk[] | null = null
   let disksAt = 0
+  // Which programs use the RAM: every TOP_RAM_MS, it moves slowly and `ps` reads every process.
+  let topRam: MemUser[] | null = null
+  let topRamAt = 0
 
   const measureGpu = async (machine: Host): Promise<GpuState> => {
     if (gpuKind === undefined) gpuKind = gpuBackend === 'auto' ? await detectGpu(machine) : gpuBackend === 'none' ? null : gpuBackend
@@ -125,15 +131,19 @@ export const register: Register = (on, options) => {
   const measure = async (machine: Host): Promise<Snapshot> => {
     const now = await machine.now()
     const isDiskDue = diskPaths.length > 0 && now - disksAt >= diskIntervalMs
-    const [gpu, sys, newDisks] = await Promise.all([
+    const isTopDue = now - topRamAt >= TOP_RAM_MS
+    const [gpu, sys, newDisks, newTop] = await Promise.all([
       measureGpu(machine),
       sampleSystem(machine, prevCpu),
       isDiskDue ? sampleDisks(machine, diskPaths) : Promise.resolve(disks),
+      isTopDue ? sampleTopRam(machine) : Promise.resolve(topRam),
     ])
     if (isDiskDue) disksAt = now
+    if (isTopDue) topRamAt = now
+    topRam = newTop
     prevCpu = sys.cpu
     disks = newDisks
-    return { gpu, cpuPercent: sys.cpuPercent, cores: sys.cores, load: sys.load, ram: sys.ram, disks }
+    return { gpu, cpuPercent: sys.cpuPercent, cores: sys.cores, load: sys.load, ram: sys.ram, topRam, disks }
   }
 
   const stop = () => {
@@ -328,6 +338,7 @@ export const register: Register = (on, options) => {
                   {swapText(s.ram)}
                 </Text>
               </Text>
+              {s.topRam ? <Text dimColor>{`${t.mostly} ${topText(s.topRam, t.gb)}`}</Text> : null}
             </>
           ) : (
             <Text dimColor>{`${LABEL_RAM}n/a`}</Text>

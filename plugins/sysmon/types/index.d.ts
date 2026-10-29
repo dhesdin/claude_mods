@@ -27,12 +27,17 @@ export type Ram = { usedKiB: number; availableKiB: number; totalKiB: number; swa
 
 export type Disk = { mount: string; sizeBytes: number; availBytes: number }
 
+// A program and the resident memory of all its processes together.
+export type MemUser = { name: string; kib: number }
+
 export type Snapshot = {
   gpu: GpuState
   cpuPercent: number | null
   cores: number | null
   load: number[] | null
   ram: Ram | null
+  // The programs using the most RAM, biggest first; null = not measured (no `ps`).
+  topRam: MemUser[] | null
   disks: Disk[] | null
 }
 

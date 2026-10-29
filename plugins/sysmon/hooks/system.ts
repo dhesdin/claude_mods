@@ -1,4 +1,4 @@
-import type { Disk, Ram } from '../types'
+import type { Disk, MemUser, Ram } from '../types'
 import type { Io } from './gpu'
 import { clean, num } from './util'
 
@@ -84,6 +84,32 @@ export async function sampleDisks(io: Io, paths: readonly string[]): Promise<Dis
     const r = await io.run(['df', '-B1', '--output=target,size,avail', '--', ...paths], { timeoutMs: 5000 })
     const disks = parseDf(r.stdout)
     return disks.length > 0 ? disks : null
+  } catch {
+    return null
+  }
+}
+
+// `ps -eo rss=,comm=` lines: resident KiB and program name. Processes of one program are added up
+// (a browser runs dozens), then the `count` biggest are kept.
+export function parsePs(text: string, count = 3): MemUser[] {
+  const byName = new Map<string, number>()
+  for (const line of text.split('\n')) {
+    const m = line.trim().match(/^(\d+)\s+(.+)$/)
+    if (!m) continue
+    const name = clean(m[2] ?? '').slice(0, 24)
+    if (name) byName.set(name, (byName.get(name) ?? 0) + Number(m[1]))
+  }
+  return [...byName]
+    .map(([name, kib]) => ({ name, kib }))
+    .sort((a, b) => b.kib - a.kib)
+    .slice(0, count)
+}
+
+export async function sampleTopRam(io: Io): Promise<MemUser[] | null> {
+  try {
+    const r = await io.run(['ps', '-eo', 'rss=,comm='], { timeoutMs: 5000 })
+    const top = r.exitCode === 0 ? parsePs(r.stdout) : []
+    return top.length > 0 ? top : null
   } catch {
     return null
   }

@@ -33,6 +33,7 @@ export type Strings = {
   available: string
   of: (total: string) => string
   used: (used: string) => string
+  mostly: string
   swapNone: string
   swap: (used: string, total: string) => string
   disk: string
@@ -73,6 +74,7 @@ const en: Strings = {
   available: 'available',
   of: t => `of ${t} GB`,
   used: u => `used ${u} GB`,
+  mostly: 'mostly',
   swapNone: 'swap not configured',
   swap: (u, t) => `swap ${u} / ${t} GB`,
   disk: 'Disk',
@@ -113,6 +115,7 @@ const fr: Strings = {
   available: 'disponible',
   of: t => `sur ${t} Go`,
   used: u => `utilisée ${u} Go`,
+  mostly: 'surtout',
   swapNone: 'swap non configuré',
   swap: (u, t) => `swap ${u} / ${t} Go`,
   disk: 'Disque',
@@ -153,6 +156,7 @@ const ja: Strings = {
   available: '空き',
   of: t => `/ ${t} GB`,
   used: u => `使用中 ${u} GB`,
+  mostly: '主に',
   swapNone: 'スワップ未設定',
   swap: (u, t) => `スワップ ${u} / ${t} GB`,
   disk: 'ディスク',
@@ -193,6 +197,7 @@ const zh: Strings = {
   available: '可用',
   of: t => `/ 共 ${t} GB`,
   used: u => `已用 ${u} GB`,
+  mostly: '主要是',
   swapNone: '未配置交换空间',
   swap: (u, t) => `交换空间 ${u} / ${t} GB`,
   disk: '磁盘',

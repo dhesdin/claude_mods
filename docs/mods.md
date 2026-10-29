@@ -10,9 +10,9 @@ One page for everything a user can see or set. Each mod is independent: install,
 | [langmod](#langmod) | display language of every mod at once | `/langmod en\|fr\|ja\|zh` |
 | [project-hours](#project-hours) | Claude Code time per project and per week, alert when a priority project goes quiet | `/hours`, `/hours 4`, `/hours panel` |
 | [notify](#notify) | desktop notification when Claude finishes a reply or waits for you | none |
-| [project-memory](#project-memory) | your rules and the project's hand-off notes loaded at start and after each compaction, on every machine; reminder to update the notes before compaction | none |
+| [project-memory](#project-memory) | reminder to update the project's hand-off notes before the automatic compaction | none |
 
-Two of them write to the model on purpose: **project-memory** (rules and notes, at the start and after compaction) and **sysmon** (only when Claude calls its tool). The others cost no tokens.
+Two of them write to the model on purpose, briefly: **project-memory** (one reminder per compaction cycle) and **sysmon** (only when Claude calls its tool). The others cost no tokens.
 
 ## Setting options
 
@@ -38,7 +38,7 @@ Three framed cards above the prompt: the 5-hour session window, the week, and th
 
 ## sysmon
 
-A "Machine" panel: GPU (NVIDIA; Jetson and AMD not yet validated on real hardware), CPU, RAM, disks, with what is loading the GPU. Measures only while the panel is open. Claude can also call its `machine_status` tool for a one-sentence summary. A GPU machine needs its driver tool (`nvidia-smi`...): [hardware.md](hardware.md).
+A "Machine" panel: GPU (NVIDIA; Jetson and AMD not yet validated on real hardware), CPU, RAM with the 3 programs using the most, disks, with what is loading the GPU. Measures only while the panel is open. Claude can also call its `machine_status` tool for a one-sentence summary. A GPU machine needs its driver tool (`nvidia-smi`...): [hardware.md](hardware.md).
 
 - `/sysmon`: opens or closes the panel. Opened by itself, it waits for a terminal at least 144 columns wide.
 
@@ -111,11 +111,8 @@ A desktop notification, titled with the project's name, when a reply ends (repli
 
 ## project-memory
 
-Your rules for every project (the mod's `rules.md`) and the project's `.claude/contexte.md` with a git snapshot, given to Claude at the start of each conversation and after each compaction, on every machine where the mod is. When the context reaches `handoffTokens`, Claude is told once to run the `project-handoff` skill, so the notes are current before the automatic compaction. Rules are changed in the repository (`plugins/project-memory/rules.md`), then the mod is uploaded again.
+When the context reaches `handoffTokens`, Claude is told once to run the `project-handoff` skill, so `.claude/contexte.md` is current before the automatic compaction. About 40 tokens per compaction cycle. The notes themselves and your rules are loaded by Claude Code, set up per machine by `make user-settings` ([install guide](install.md#per-machine-settings)).
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `globalRules` | `true` | give Claude the rules |
-| `handoffTokens` | `250000` | context size of the hand-off reminder; keep it under the auto-compact window (`0` = never) |
-
-Per machine, once: `scripts/user-settings.sh` turns automatic compaction on at 300,000 tokens and removes the old `charger-contexte.sh` hook ([install guide](install.md#per-machine-settings)).
+| `handoffTokens` | `250000` | context size of the reminder; keep it under the auto-compact window (`0` = never) |

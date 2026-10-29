@@ -18,6 +18,7 @@
 ╭──────────────────────────────────────────────────────╮
 │ RAM  available 8.0 GB of 15.2 GB                      │
 │ used 7.2 GB · swap not configured                     │
+│ mostly firefox 3.1 GB · code 1.8 GB · claude 0.9 GB   │
 ╰──────────────────────────────────────────────────────╯
 ╭──────────────────────────────────────────────────────╮
 │ Disk /  166.2 GB free of 385.2 GB                     │
@@ -56,6 +57,7 @@ Everything stays on the machine: the mod makes no network request and reads no c
 | Runs `tegrastats --interval 200`, reads its first line, then stops it | Jetson GPU figures |
 | Runs `rocm-smi` (`--showid`, then the query listed in docs/hardware.md, `--json`) | AMD GPU figures |
 | Runs `df -B1 --output=target,size,avail -- <diskPaths>` | free disk space of the paths you configure |
+| Runs `ps -eo rss=,comm=`, every 15 s | the 3 programs using the most RAM (all their processes added up) |
 | Reads `/proc/stat`, `/proc/loadavg`, `/proc/meminfo`, `/proc/device-tree/model` | CPU, load, RAM, board name |
 
 Programs run with fixed arguments (never a shell), only while the panel is open, and only the GPU tool that exists on the machine.

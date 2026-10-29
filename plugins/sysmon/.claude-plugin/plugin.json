@@ -1,6 +1,6 @@
 {
   "name": "sysmon",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "GPU / CPU / RAM / disk panel: is the machine free, and what is loading it",
   "author": {
     "name": "ValentinD"
