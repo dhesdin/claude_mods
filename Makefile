@@ -7,6 +7,7 @@
 ##   make uninstall <mod> [<mod>...]    uninstall the mods you name (all without names)
 ##   make teardown                      uninstall every mod and remove the marketplace
 ##   make list                          mods, their description, installed or not
+##   make dist                          zip each mod (committed state) into dist/plugins/, to upload to claude.ai
 ##   make skills                        zip the account skills of skills/ into dist/skills/, to upload to claude.ai
 ##   make check | make fix              every CI check | format and safe lint fixes
 ##
@@ -39,7 +40,7 @@ $(eval $(wordlist 2,$(words $(MOD_GOALS)),$(MOD_GOALS)):;@:)
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help setup install uninstall teardown list skills check fix $(addprefix install-,$(MODS)) $(addprefix uninstall-,$(MODS))
+.PHONY: help setup install uninstall teardown list dist skills check fix $(addprefix install-,$(MODS)) $(addprefix uninstall-,$(MODS))
 
 help:
 	@sed -n 's/^## \{0,1\}//p' $(firstword $(MAKEFILE_LIST))
@@ -66,6 +67,12 @@ $(addprefix install-,$(MODS)): install-%:
 
 $(addprefix uninstall-,$(MODS)): uninstall-%:
 	@scripts/install.sh --uninstall $*
+
+# Built from the last commit (git archive): only tracked files, reproducible. Commit first.
+dist:
+	@mkdir -p dist/plugins
+	@for m in $(MODS); do git archive --format=zip --prefix=$$m/ -o dist/plugins/$$m.zip HEAD:plugins/$$m && echo "dist/plugins/$$m.zip"; done
+	@echo "Upload each zip on claude.ai: Customize > Plugins > Add > Upload plugin (same name = new version)."
 
 SKILLS := $(notdir $(wildcard skills/*))
 

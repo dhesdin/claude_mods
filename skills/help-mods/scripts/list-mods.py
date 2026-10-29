@@ -8,6 +8,8 @@ import subprocess
 import sys
 
 MARKETPLACE = "claude-mods"
+# Mods uploaded to the claude.ai account load as <name>@synced on every machine.
+ORIGINS = {MARKETPLACE, "synced"}
 REPO = "https://github.com/dhesdin/claude_mods.git"
 CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 
@@ -30,7 +32,7 @@ def installed_mods() -> dict:
     for line in claude("list").splitlines():
         head = re.match(r"^\s*❯\s+(\S+)@(\S+)\s*$", line)
         if head:
-            current = head.group(1) if head.group(2) == MARKETPLACE else None
+            current = head.group(1) if head.group(2) in ORIGINS else None
             if current:
                 mods[current] = {}
             continue
@@ -44,12 +46,13 @@ def main() -> None:
     if not shutil.which("claude"):
         print("Claude Code (claude) is not on PATH.")
         return
-    if MARKETPLACE not in claude("marketplace", "list"):
-        print(f"The {MARKETPLACE} mods are not set up on this machine. To get them:")
+    installed = installed_mods()
+    if not installed and MARKETPLACE not in claude("marketplace", "list"):
+        print("No mods on this machine. They come from your claude.ai account (Customize > Plugins),")
+        print("synced at the next Claude Code start; or install them from a clone:")
         print(f"  git clone {REPO} ~/claude-mods && cd ~/claude-mods && make install")
         return
 
-    installed = installed_mods()
     descriptions = {}
     try:
         available = json.loads(claude("list", "--available", "--json") or "{}").get("available", [])
@@ -67,13 +70,13 @@ def main() -> None:
             except (OSError, ValueError):
                 pass
 
-    print(f"Mods ({MARKETPLACE})")
+    print("Mods (claude.ai account and claude-mods)")
     for name in sorted(set(descriptions) | set(installed), key=str):
         info = installed.get(name)
         state = "not installed" if info is None else ("enabled" if "enabled" in info.get("status", "") else "disabled")
         print(f"  {clean(name, 20):<16} {state:<14} {clean(descriptions.get(name, ''))}")
     print()
-    print("Install: make install <mod> (in the claude-mods clone)  ·  options: /config  ·  disable: claude plugin disable <mod>@claude-mods")
+    print("Options: /config  ·  disable: /plugin, Installed tab  ·  add or update: claude.ai > Customize > Plugins")
 
 
 if __name__ == "__main__":
