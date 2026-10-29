@@ -64,8 +64,19 @@ fi
 ok "sysmon will use" "$backend (gpuBackend = auto)"
 
 echo "== Tools"
-for t in git make python3 df; do if has "$t"; then ok "$t" "found"; else ok "$t" "missing"; fi; done
+for t in git make python3 df notify-send; do if has "$t"; then ok "$t" "found"; else ok "$t" "missing"; fi; done
+[[ "$(uname -s)" == Linux ]] && ! has notify-send && next+=("notify needs notify-send: sudo apt install libnotify-bin (or your distribution's libnotify package)")
 has make || next+=("without make, use scripts/install.sh (same options)")
+
+echo "== User settings (make user-settings)"
+cfg="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+window="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("autoCompactWindow","unset") if d.get("autoCompactEnabled",True) else "auto-compaction off")' "$cfg/settings.json" 2>/dev/null || echo unset)"
+ok "compaction window" "$window"
+if grep -q 'load-context.sh' "$cfg/settings.json" 2>/dev/null && [[ -x "$cfg/hooks/load-context.sh" ]]; then ok "hand-off notes hook" "installed"; else ok "hand-off notes hook" "missing"; fi
+if [[ -L "$cfg/CLAUDE.md" ]]; then
+  if [[ -e "$cfg/CLAUDE.md" ]]; then ok "global rules" "linked to $(readlink "$cfg/CLAUDE.md")"; else ok "global rules" "BROKEN link"; next+=("~/.claude/CLAUDE.md points to a missing file: make user-settings RULES=1"); fi
+elif [[ -f "$cfg/CLAUDE.md" ]]; then ok "global rules" "own file (not linked to this repository)"; else ok "global rules" "none"; fi
+[[ "$window" == 300000 && "$(grep -c 'load-context.sh' "$cfg/settings.json" 2>/dev/null)" != 0 ]] || next+=("per-machine settings: make user-settings (see docs/install.md)")
 
 echo "== Mods"
 CLAUDE="$claude" "$repo/scripts/install.sh" --list 2>/dev/null | sed 's/^/  /' || echo "  (claude not available)"

@@ -1,43 +1,38 @@
 # project-memory
 
-Keeps Claude's memory of your project across sessions and compactions, the same on every machine:
+Reminds Claude, once before the automatic compaction, to update the project's hand-off notes.
 
-1. **Your rules for every project** (the mod's [rules.md](rules.md)): given to Claude at the start of each conversation and after each compaction.
-2. **The project's hand-off notes** (`.claude/contexte.md`, kept by the `project-handoff` skill) with a git snapshot (branch, uncommitted changes, last 5 commits): loaded at the same moments, so Claude does not re-read them.
-3. **A reminder before compaction**: when the context reaches `handoffTokens` (default 250,000), Claude is told once to run the `project-handoff` skill, so the notes hold the current state before the conversation is summarized. After the compaction, point 2 loads them back.
+When the context reaches `handoffTokens` (default 250,000) in a git repo or a folder with `.claude/contexte.md`, Claude reads, once, on its next tool result or your next message:
 
-The chain with the default settings: 250k tokens, reminder and notes updated; 300k, automatic compaction (`autoCompactWindow`, set per machine by `scripts/user-settings.sh`); after it, rules and notes loaded again.
+> The context is approaching the compaction threshold: run the project-handoff skill now, so .claude/contexte.md holds the current state before the conversation is summarized.
 
-Uploaded to your claude.ai account, it replaces the per-machine `~/.claude/CLAUDE.md` rules and the `charger-contexte.sh` SessionStart hook: `scripts/user-settings.sh` removes that hook once the mod is installed.
+The full chain, with the per-machine settings of `make user-settings`:
 
-## Changing the rules
+| Step | Done by |
+| --- | --- |
+| 250k tokens: the notes are updated | this mod (reminder) + the `project-handoff` skill |
+| 300k tokens: automatic compaction | Claude Code (`autoCompactWindow`, set by `make user-settings`) |
+| after it, at each start, `/clear` and resume: the notes and a git snapshot are loaded | the SessionStart hook `load-context.sh` (installed by `make user-settings`) |
+| your rules for every project | `~/.claude/CLAUDE.md` (linked to this repository's `user/CLAUDE.md` by `make user-settings RULES=1`) |
 
-Edit [rules.md](rules.md) in this repository, then `make dist` and upload `dist/plugins/project-memory.zip` again: every machine gets the new rules at its next start. Keep them short: they are read at each conversation start.
+The notes and the rules are loaded by Claude Code itself, not by a mod: another plugin can never skip them. Only the reminder, which needs the context size, is a mod; if it is ever skipped, the rule "update the notes after each task" still holds.
 
 ## Tokens
 
-This mod is the one that writes to the model, by design:
-
-| What | When | Size |
-| --- | --- | --- |
-| rules + notes + git snapshot | first message of a conversation, and after each compaction | rules (~100 tokens) + notes (at most 6,000 characters, ~1,500 tokens) |
-| the reminder | once per compaction cycle, past `handoffTokens` | ~40 tokens |
-
-Without `.claude/contexte.md` in the project, only the rules are sent. Outside a git repo and without notes, no reminder.
+About 40 tokens, once per compaction cycle. Nothing otherwise.
 
 ## What it does on your machine
 
-Reads `.claude/contexte.md` (the session folder's, otherwise the git root's) and the mod's own `rules.md`; runs `git -C <session folder>` with `rev-parse --show-toplevel`, `status --short`, `branch --show-current`, `log --oneline -5`. Control characters are removed and lengths capped before the text reaches Claude. No network, no file written.
+At session start: runs `git -C <session folder> rev-parse --is-inside-work-tree` and checks whether `.claude/contexte.md` exists. Reads the context size Claude Code reports after each reply. No file written, no network.
 
 ## Options (`/config`, or `scripts/configure.sh project-memory key=value`)
 
 | Option | Default | Role |
 | --- | --- | --- |
-| `globalRules` | true | give Claude the rules of `rules.md` |
-| `handoffTokens` | 250000 | context size of the hand-off reminder, below the auto-compact window; `0` = never |
+| `handoffTokens` | 250000 | context size of the reminder, below the auto-compact window; `0` = never |
 
 ## Disable
 
-`claude plugin disable project-memory@claude-mods` (or `@synced`). Then keep your rules in `~/.claude/CLAUDE.md` on each machine.
+`claude plugin disable project-memory@claude-mods` (or `@synced`).
 
 Spec: [docs/specs/06-project-memory.md](../../docs/specs/06-project-memory.md)

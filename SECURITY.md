@@ -22,7 +22,7 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 | 3 | `/langmod` changes only `<plugin>.language` rows following the repo convention, never a locked row, and never echoes its argument | `plugins/langmod/hooks/register.ts` |
 | 4 | CI token read-only, checkout without persisted credentials, no secrets, no `pull_request_target`, actions pinned by commit SHA (Dependabot proposes updates), Claude Code version pinned | `.github/` |
 | 4 | `scripts/install.sh` only uses the local clone: nothing is downloaded and executed | `scripts/install.sh` |
-| 4 | `scripts/user-settings.sh` backs up `settings.json` before writing, writes through a temporary file, changes only the keys it names | `scripts/user-settings.sh` |
+| 4 | `scripts/user-settings.sh` backs up every file before writing, writes `settings.json` through a temporary file, changes only the keys it names, links the owner's rules only with `--rules` | `scripts/user-settings.sh` |
 | 3 | `scripts/configure.sh` accepts only option names declared in the mod's manifest and single-line values, JSON-escaped, passed on stdin (never on a command line or through a shell) | `scripts/configure.sh` |
 | 2 | project-hours: project names are stripped of control characters and capped; the data file name keeps only `[A-Za-z0-9_.-]` from the host name and session id, so no value can leave the data folder | `plugins/project-hours/hooks/register.tsx` |
 | 1 | Trojan Source: CI fails on any bidi-override or zero-width character in a tracked file (they can make code read differently than it runs) | `scripts/check.sh` |
@@ -36,7 +36,7 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 - `teacher-guard` reads Bash commands statically, best effort: an inline interpreter, a script or an alias can still write. It is a guard against autopilot, **not** a security barrier (plugins/teacher-guard/README.md, Limits). It fails closed: a check that throws refuses the call. Only the person at the prompt can turn it off (`/teacher-mode deactivate` run by a plugin or the model is refused).
 - project-hours trusts the `.jsonl` files of its data folder: anyone who can write there (or a sync tool shared with another person) can change the totals shown. Lines that do not parse are skipped; nothing in them is executed or sent to the model.
 - notify runs `notify-send`, `osascript` or `powershell.exe` from your `PATH`, like sysmon's tools; the notification text goes as arguments (never through a shell) or, for PowerShell, on stdin.
-- project-memory sends `.claude/contexte.md`, the git status and the last commit titles to the model. Treat a repository you did not write like any untrusted input: its notes and commit messages reach Claude as context.
+- The SessionStart hook installed by `make user-settings` (`user/hooks/load-context.sh`) sends a project's `.claude/contexte.md`, git status and last commit titles to the model. Treat a repository you did not write like any untrusted input: its notes and commit messages reach Claude as context.
 - The surface snapshot says *which* capabilities a plugin uses, not *how*: review code changes too.
 
 ## Updating safely

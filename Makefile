@@ -7,7 +7,8 @@
 ##   make uninstall <mod> [<mod>...]    uninstall the mods you name (all without names)
 ##   make teardown                      uninstall every mod and remove the marketplace
 ##   make doctor                        check this machine: system, Claude Code, GPU, what to do next
-##   make user-settings                 once per machine: the Claude Code settings no plugin can carry
+##   make user-settings [RULES=1]       once per machine: compaction window, hand-off notes hook (RULES=1: link
+##                                      ~/.claude/CLAUDE.md to user/CLAUDE.md, this repository owner's rules)
 ##   make list                          mods, their description, installed or not
 ##   make dist                          zip each mod (committed state) into dist/plugins/, to upload to claude.ai
 ##   make check | make fix              every CI check | format and safe lint fixes
@@ -65,7 +66,7 @@ list:
 	@scripts/install.sh --list
 
 user-settings:
-	@scripts/user-settings.sh
+	@scripts/user-settings.sh $(if $(RULES),--rules)
 
 doctor:
 	@scripts/doctor.sh

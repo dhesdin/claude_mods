@@ -38,7 +38,7 @@
     {
       "name": "project-memory",
       "source": "./plugins/project-memory",
-      "description": "Rules and project hand-off notes loaded at start and after compaction, on every machine"
+      "description": "Reminder to update the hand-off notes before compaction"
     }
   ]
 }

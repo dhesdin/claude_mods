@@ -1,4 +1,4 @@
-./register.ts hooks: session.start, prompt.context, session.measure, tool.call, prompt.submit, session.compact, session.end
+./register.ts hooks: session.start, session.measure, tool.call, prompt.submit, session.compact, session.end
 ./register.ts gating hook with .catch: tool.call
 ./register.ts gating hook with .catch: prompt.submit
 ./register.ts gating hook with .catch: session.compact

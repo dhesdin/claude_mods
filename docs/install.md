@@ -100,13 +100,23 @@ If `make doctor` lists a GPU under Next (driver or tool missing), follow the mat
 
 ## Per-machine settings
 
-A few Claude Code settings live in each machine's `~/.claude/settings.json` and no plugin can carry them. Once per machine:
+Some things live in each machine's `~/.claude/` and no plugin can carry them (or a plugin could be skipped by another one). This repository holds them, `make user-settings` installs them, once per machine and again after a `git pull` that changes `user/`:
 
 ```bash
-make user-settings        # or: scripts/user-settings.sh [--dry-run] [--window 300000]
+make user-settings             # compaction window + hand-off notes hook
+make user-settings RULES=1     # also your global rules (this repository owner's user/CLAUDE.md)
+scripts/user-settings.sh --dry-run [--rules] [--window 300000]   # show the changes, write nothing
 ```
 
-It backs up `settings.json` (timestamped copy next to it), then merges, keeping every other key: automatic compaction on, at 300,000 tokens (`autoCompactEnabled`, `autoCompactWindow`); the `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` variable removed; and, once project-memory is installed, the old `charger-contexte.sh` SessionStart hook removed (the mod loads the notes now). It prints each change; run again, it changes nothing. A 300,000 window needs a model with a 1M context (`/model`, `[1m]`); Claude Code caps it at the model's window.
+| What | Where | How |
+| --- | --- | --- |
+| automatic compaction at 300,000 tokens; `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` removed | `~/.claude/settings.json` | merged, every other key kept |
+| loading the project's `.claude/contexte.md` + a git snapshot at each start, `/clear`, resume and after compaction | `~/.claude/hooks/load-context.sh` + a SessionStart hook in `settings.json` | **copied** from `user/hooks/`: keeps working if the clone moves |
+| your rules for every project | `~/.claude/CLAUDE.md` | with `RULES=1`, a **symbolic link** to `user/CLAUDE.md`: one source, an edit on either side is the same file, `git pull` updates it |
+
+Every file is backed up (`<file>.<date>.bak`) before a change; run again, nothing changes. `make doctor` shows the state (User settings section) and flags a broken link if the clone moved. A 300,000 window needs a model with a 1M context (`/model`, `[1m]`); Claude Code caps it at the model's window.
+
+Per project, nothing to install: the hook reads the `.claude/contexte.md` of whatever project the session opens, and the `project-handoff` skill writes it.
 
 ## 6. Check that it works
 
@@ -120,7 +130,7 @@ In a Claude Code session (`/plugin` lists the loaded mods on its dim line under 
 | langmod | `/langmod` lists each mod's language; `/langmod fr` switches them |
 | project-hours | `/hours` lists this week's Claude Code time per project (after a first reply); `/hours panel` opens the Hours panel |
 | notify | a desktop notification "Claude has finished." after a reply of 15 s or more |
-| project-memory | in a project with `.claude/contexte.md`, ask Claude "what are you working on?": it answers from the notes without reading the file |
+| project-memory | nothing to see until 250k tokens; `make doctor` shows the hook that loads the notes. In a project with `.claude/contexte.md`, ask Claude "what are you working on?": it answers from the notes without reading the file |
 
 ## Configure
 
@@ -157,9 +167,9 @@ Adding up project-hours across machines (optional, with a sync tool such as Sync
 | Mods installed with `make install` | that machine | clone and install again |
 | Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you sign in |
 | Skills in `~/.claude/skills/` | that machine | not synced: upload them on claude.ai (Customize > Skills) to have them everywhere |
-| Your rules for every project, the hand-off notes loading | the project-memory mod, on your account | there with the mod |
-| `~/.claude/settings.json`: mod options, compaction window | that machine | not synced: `make user-settings`, and `scripts/configure.sh` for options other than the defaults |
-| `~/.claude/CLAUDE.md` | that machine | not synced; with project-memory, keep only machine-specific notes there |
+| `~/.claude/settings.json`: mod options, compaction window, notes hook | that machine | not synced: `make user-settings`, and `scripts/configure.sh` for options other than the defaults |
+| `~/.claude/CLAUDE.md` (your global rules) | that machine, linked to the repository | `make user-settings RULES=1` after cloning |
+| A project's `.claude/contexte.md` | the project (commit it to have it elsewhere) | there with the project |
 | project-hours data (`~/.claude/mod-data/project-hours/`) | that machine | not synced, unless `dataFolder` points to a folder a sync tool shares ([how](mods.md#project-hours)) |
 | A repository's `.claude/skills/` and `CLAUDE.md` | the repository | there after `git clone` |
 

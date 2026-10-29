@@ -24,7 +24,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 - `docs/mods.md`: every mod, its command and its options (the catalog users and `/install-mods` read).
 - `docs/install.md`: the install guide for humans (the same steps as `/install-mods`).
 - `scripts/configure.sh <mod> key=value`: set options of an installed mod (repo or account copy).
-- `scripts/user-settings.sh` (`make user-settings`): the per-machine Claude Code settings no plugin can carry (compaction window).
+- `scripts/user-settings.sh` (`make user-settings [RULES=1]`): per-machine setup no plugin can carry: compaction window, the SessionStart hook `user/hooks/load-context.sh`, and with RULES=1 `~/.claude/CLAUDE.md` linked to `user/CLAUDE.md` (the owner's global rules).
 - `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
 - `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.
@@ -59,7 +59,7 @@ Added on request along the way: `langmod` (display language), `notify` (05) and 
 ## Constraints common to every mod
 
 - **Zero network.** No mod makes a network request. Data stays on the machine.
-- **Zero tokens.** The display sends nothing to the model, unless a spec explicitly asks for it (sysmon's tool, project-memory's block and reminder).
+- **Zero tokens.** The display sends nothing to the model, unless a spec explicitly asks for it (sysmon's tool, project-memory's reminder).
 - **Clean degradation.** When data is unavailable (no GPU, missing file, failing API), show "n/a" or hide the card. Never crash the session.
 - **Minimal cost.** No polling while a panel is hidden. Configurable intervals, sensible defaults.
 - **Config**: the plugin's `userConfig` (one manifest per mod), paths and thresholds in it, never hard-coded.
