@@ -70,4 +70,4 @@ Added on request along the way: `langmod` (display language). The user's skills 
 
 ## Installing on another machine
 
-The README explains it in copyable commands: on the claude.ai account (`make dist`, upload each zip: synced to every machine), or per machine: clone, `make install [mod...]` (variables `MOD_LANG`, `MOD_SCOPE`, `CLAUDE`, or a git-ignored `config.mk`), then `/reload-plugins` in an open session. Test install changes with `CLAUDE=echo` (prints the commands, changes nothing).
+Whoever clones the repo can run `/install-mods` (project skill `.claude/skills/install-mods/`), which runs `make doctor` and installs what they choose. The README explains it in copyable commands: on the claude.ai account (`make dist`, upload each zip: synced to every machine), or per machine: clone, `make install [mod...]` (variables `MOD_LANG`, `MOD_SCOPE`, `CLAUDE`, or a git-ignored `config.mk`), then `/reload-plugins` in an open session. Test install changes with `CLAUDE=echo` (prints the commands, changes nothing).

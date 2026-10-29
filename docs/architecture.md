@@ -15,11 +15,13 @@ claude-mods/
 ├── plugins/<mod>/                    # one independent plugin per mod
 ├── scripts/
 │   ├── check.sh                      # everything CI runs, runnable locally (--fix formats)
+│   ├── doctor.sh                     # machine check (make doctor): system, Claude Code, GPU, next steps
 │   └── install.sh                    # what the Makefile runs: setup, install/uninstall some or all mods
 ├── biome.json                        # formatter and linter config
 ├── .editorconfig                     # editor defaults matching the formatter
 ├── Makefile                          # modular install (make install sysmon …) and checks
 ├── config.mk.example                 # per-machine make defaults (copy to config.mk, git-ignored)
+├── .claude/skills/install-mods/      # project skill: guided install (/install-mods) for whoever clones the repo
 ├── CLAUDE.md                         # rules for Claude Code working in this repo
 ├── SECURITY.md                       # threat model and reporting
 └── LICENSE                           # MIT

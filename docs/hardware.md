@@ -2,6 +2,23 @@
 
 How to set up any machine (laptop, GPU workstation, robot computer) so `sysmon` sees it, and what it will show. **[to validate]** marks support written from official documentation and recorded output formats, not yet checked on the real hardware: see the checklists at the end.
 
+## Start here: your machine in one table
+
+Run `make doctor` first: it detects most of this for you.
+
+| Machine | What to do | What sysmon shows |
+| --- | --- | --- |
+| Linux, no dedicated GPU (laptop) | nothing | CPU, RAM, disk; GPU card "No supported GPU" (hide it with `hideMissingGpu`) |
+| Linux + NVIDIA GPU | install the NVIDIA driver ([below](#linux-pc-or-laptop-with-an-nvidia-gpu)), check `nvidia-smi` | everything, GPU included |
+| WSL2 + NVIDIA GPU | Windows NVIDIA driver only ([below](#wsl2-windows)) | everything (RAM = what WSL gets) |
+| NVIDIA Jetson | nothing (tegrastats ships with JetPack) | everything, GPU memory shared with RAM **[to validate]** |
+| Linux + AMD GPU | install ROCm, check `rocm-smi` | GPU utilization, VRAM, temperature, power **[to validate]** |
+| Raspberry Pi | nothing | CPU, RAM, disk; no GPU card |
+| Linux + Intel GPU only | nothing | CPU, RAM, disk; Intel GPU not supported |
+| macOS, Windows native | nothing (use WSL2 on Windows) | sysmon shows `n/a`; the other mods work |
+
+The other mods (usage-pace, teacher-guard, langmod) need nothing from the hardware.
+
 ## What sysmon reads
 
 | Source | Gives | Available on | Status |
@@ -18,6 +35,8 @@ How to set up any machine (laptop, GPU workstation, robot computer) so `sysmon` 
 No `/proc` on macOS or native Windows: sysmon shows `n/a` there.
 
 ## One-minute machine check
+
+`make doctor` (or `scripts/doctor.sh`) does all of this and says what to do next. By hand:
 
 ```bash
 cat /etc/os-release | head -2        # distribution

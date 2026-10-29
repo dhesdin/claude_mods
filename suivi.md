@@ -10,3 +10,4 @@
 - mod-help: /skill-help renamed /help-skills (both commands start with help-), Claude Code + plugins section added; make <mod>... shortcut.
 - help-skills / help-mods moved from a mod to account skills (skills/, make skills, upload on claude.ai) so they are there on any machine; passation-projet and travail-econome moved into skills/ too; mod-help plugin removed.
 - Distribution moved to the claude.ai account: 4 mods uploaded as plugins (synced as <mod>@synced, verified after a start), 4 skills uploaded (synced, verified). skills/ removed from the repo; make dist kept; make install stays for per-machine installs.
+- Onboarding: make doctor, /install-mods project skill, machine table in docs/hardware.md; laptop copies of passation-projet and travail-econome removed (now from the account).

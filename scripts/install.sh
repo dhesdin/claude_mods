@@ -5,7 +5,8 @@
 #   scripts/install.sh --uninstall [mod...]    uninstall some mods (all without names)
 #   scripts/install.sh --setup                 only add the marketplace
 #   scripts/install.sh --teardown              uninstall every mod and remove the marketplace
-#   scripts/install.sh --list                  mods, their description, installed or not
+#   scripts/install.sh --list                  mods, their description, and where they come from:
+#                                              installed (this machine), account (synced from claude.ai), or -
 # Options (or the environment variables in brackets):
 #   --lang en|fr|ja|zh   display language of the mods installed   [MOD_LANG]
 #   --scope user|project|local   where Claude Code records them   [MOD_SCOPE, default user]
@@ -45,7 +46,10 @@ for m in "${mods[@]}"; do
 done
 
 description() { sed -n -E 's/^  "description": "(.*)",?$/\1/p' "$repo/plugins/$1/.claude-plugin/plugin.json"; }
-installed() { "$claude" plugin list 2>/dev/null | grep -qF "$1@$marketplace"; }
+plugins="$("$claude" plugin list 2>/dev/null || true)"
+installed() { grep -qF "$1@$marketplace" <<<"$plugins"; }
+# Already coming from the claude.ai account (uploaded there): installing it here too would duplicate it.
+synced() { grep -qF "$1@synced" <<<"$plugins"; }
 
 setup() {
   if "$claude" plugin marketplace list 2>/dev/null | grep -qF "$repo"; then
@@ -58,7 +62,7 @@ setup() {
 case "$action" in
   list)
     for m in "${all_mods[@]}"; do
-      if installed "$m"; then state=installed; else state='-'; fi
+      if installed "$m"; then state=installed; elif synced "$m"; then state=account; else state='-'; fi
       printf '%-15s %-10s %s\n' "$m" "$state" "$(description "$m")"
     done
     ;;
@@ -68,7 +72,13 @@ case "$action" in
     for m in "${mods[@]}"; do
       args=(--scope "$scope")
       if [[ -n "$lang" ]] && grep -q '"language"' "$repo/plugins/$m/.claude-plugin/plugin.json"; then args+=(--config "language=$lang"); fi
-      if installed "$m"; then echo "$m: already installed"; else "$claude" plugin install "$m@$marketplace" "${args[@]}"; fi
+      if installed "$m"; then
+        echo "$m: already installed"
+      elif synced "$m"; then
+        echo "$m: already on this machine from your claude.ai account ($m@synced), skipped"
+      else
+        "$claude" plugin install "$m@$marketplace" "${args[@]}"
+      fi
     done
     echo "Done. In a session that was already open: /reload-plugins"
     ;;

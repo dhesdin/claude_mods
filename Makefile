@@ -6,6 +6,7 @@
 ##   make <mod> [<mod>...]              the same, shorter (or: make install-<mod>)
 ##   make uninstall <mod> [<mod>...]    uninstall the mods you name (all without names)
 ##   make teardown                      uninstall every mod and remove the marketplace
+##   make doctor                        check this machine: system, Claude Code, GPU, what to do next
 ##   make list                          mods, their description, installed or not
 ##   make dist                          zip each mod (committed state) into dist/plugins/, to upload to claude.ai
 ##   make check | make fix              every CI check | format and safe lint fixes
@@ -39,7 +40,7 @@ $(eval $(wordlist 2,$(words $(MOD_GOALS)),$(MOD_GOALS)):;@:)
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help setup install uninstall teardown list dist check fix $(addprefix install-,$(MODS)) $(addprefix uninstall-,$(MODS))
+.PHONY: help setup install uninstall teardown list doctor dist check fix $(addprefix install-,$(MODS)) $(addprefix uninstall-,$(MODS))
 
 help:
 	@sed -n 's/^## \{0,1\}//p' $(firstword $(MAKEFILE_LIST))
@@ -60,6 +61,9 @@ teardown:
 
 list:
 	@scripts/install.sh --list
+
+doctor:
+	@scripts/doctor.sh
 
 $(addprefix install-,$(MODS)): install-%:
 	@scripts/install.sh $*

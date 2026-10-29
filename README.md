@@ -19,6 +19,17 @@ Display languages available: **English (en), French (fr), Japanese (ja), Chinese
 - Linux (or WSL2) for `sysmon`; `usage-pace` and `langmod` run anywhere Claude Code runs
 - `git`, `make` (or run `scripts/install.sh` directly)
 
+## Quick start
+
+```bash
+git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
+claude          # then type: /install-mods
+```
+
+`/install-mods` (a skill of this repository) checks the machine (`make doctor`: system, Claude Code version, GPU and driver), asks which mods, which language, and whether to install them on this machine or on your claude.ai account, then installs them. For a missing GPU driver it gives the commands for your distribution; it never runs `sudo` itself.
+
+The same by hand: `make doctor`, then one of the two ways below.
+
 ## Install
 
 ### On your claude.ai account (recommended: every machine, nothing to install)
@@ -48,6 +59,7 @@ Then, in a Claude Code session that was already open: `/reload-plugins`.
 | Command | Does |
 | --- | --- |
 | `make help` | every target and variable |
+| `make doctor` | check this machine: system, Claude Code, GPU and driver, what to do next |
 | `make list` | each mod, its description, installed or not |
 | `make setup` | only add this folder as a marketplace |
 | `make uninstall <mod> [<mod>...]` | uninstall the mods you name (all without names) |
