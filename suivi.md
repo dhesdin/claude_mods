@@ -31,21 +31,17 @@
 - Measures: a session file is 1-3 KB (~170 B per segment); 2,000 sessions = a few MB. Reads were the real cost (every file every turn), now bounded by the weeks shown.
 - Pitfalls: `claude plugin configure --values-stdin` takes string values and asks for a restart; a network share as dataFolder is refused by $.fs.
 
-## 2026-10-29 (late night) — notify, project-memory, per-machine settings, skill rename
-- Done: notify 0.1.0 and project-memory 0.1.0 (tests, icons, READMEs, specs 05/06), scripts/user-settings.sh, docs; skill names project-handoff / token-economy / industry-code-review in active files; French duplicates deleted from the account after checking the English ones contain them; both mods uploaded; laptop settings applied (backup settings.json.20261029-214415.bak).
+## 2026-10-29 (late night) — notify, project-memory, per-machine settings
+- Done: notify 0.1.0 and project-memory 0.1.0 (tests, icons, READMEs, specs 05/06), scripts/user-settings.sh, docs; both mods uploaded; laptop settings applied (backup settings.json.20261029-214415.bak).
 - Decisions: test-before-done and retry-intelligence deferred (low value now); notify always notifies, replies under 15 s skipped; reminder at 250k, compaction at 300k.
 - Found: autoCompactEnabled was false and CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=70 set; the default notification channel does nothing in GNOME Terminal.
 - Pitfalls: test stubs must return a full result (turn.complete `{ text }`, session.measure `{ changed }`, session.compact needs one message with `toolUses`); process.run's stdin is under `init`.
 
-## 2026-10-29 (23:00) : rules and notes back to Claude Code, langmod memory, sysmon RAM programs, skills
-- Done: user/CLAUDE.md + user/hooks/load-context.sh installed by make user-settings (RULES=1); project-memory 0.2 reminder only; langmod 0.2 ($.store, applied at start); sysmon 0.3 (top 3 RAM programs, ps every 15 s); version-check and init-project updated on the account; langmod, sysmon, project-memory re-uploaded.
+## 2026-10-29 (23:00) : rules and notes back to Claude Code, langmod memory, sysmon RAM programs
+- Done: user/CLAUDE.md + user/hooks/load-context.sh installed by make user-settings (RULES=1); project-memory 0.2 reminder only; langmod 0.2 ($.store, applied at start); sysmon 0.3 (top 3 RAM programs, ps every 15 s); langmod, sysmon, project-memory re-uploaded.
 - Decisions: plugin-injected context can be skipped by another plugin (cc-plugin-sec-default), so rules/notes use CLAUDE.md and a SessionStart hook.
 - Pitfalls: auto mode refuses Claude writing ~/.claude/settings.json hooks or CLAUDE.md: the user runs make user-settings; a python `open(p,'w').write(open(p).read())` truncates the file (sysmon register restored from git).
 
-## 2026-10-30 : init-project and version-check v3
-- Done: corrections reviewed by Claude Desktop applied and uploaded (diff shown first); versions.sh tested in 5 cases.
-- Decisions: modes merged into pro/perso and portfolio; description unchanged; Read deny rules also cover cat/head/tail/sed (docs), not grep -r or scripts.
-
 ## 2026-10-30 : laptop setup checked
-- Done: user ran make user-settings RULES=1 and /langmod fr; make doctor all set; sysmon RAM line and notify checked on screen; skill rename committed in appli_tracker (a07b91d) and double-regard (cf77a61), not pushed.
+- Done: user ran make user-settings RULES=1 and /langmod fr; make doctor all set; sysmon RAM line and notify checked on screen.
 - Decisions: README demo GIF recorded on the GPU workstation, so the sysmon GPU card shows.
