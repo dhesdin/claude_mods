@@ -20,3 +20,8 @@
 - sysmon submitted to the Anthropic directory (auto-publish off). usage-pace submission not started.
 - project-hours 0.1.0 coded, not finished (README, icon, integration tests, screen check, upload).
 - Pitfalls: variable `h` in .tsx blocked by the directory; a commit was pushed with failing checks once (now: check before commit).
+
+## 2026-10-29 (evening) — project-hours finished in code, usage-pace submission
+- Done: project-hours README, dedicated clock icon, integration tests (session, reload, /hours, pane, degraded), root README row; committed 07b767a and pushed. Linked for hot reload.
+- usage-pace directory submission: steps 1-3 filled (validation passed, 1 `types` warning); step 4 left to the user.
+- Decision: project-hours weeks fixed to Monday (ISO), no option.
