@@ -21,7 +21,9 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 ## Where things are
 
 - `.claude/contexte.md`: current state, injected at session start (do not re-read it).
+- `docs/mods.md`: every mod, its command and its options (the catalog users and `/install-mods` read).
 - `docs/install.md`: the install guide for humans (the same steps as `/install-mods`).
+- `scripts/configure.sh <mod> key=value`: set options of an installed mod (repo or account copy).
 - `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
 - `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.

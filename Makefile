@@ -10,6 +10,7 @@
 ##   make list                          mods, their description, installed or not
 ##   make dist                          zip each mod (committed state) into dist/plugins/, to upload to claude.ai
 ##   make check | make fix              every CI check | format and safe lint fixes
+##   scripts/configure.sh <mod> [key=value...]   show or set a mod's options (docs/mods.md)
 ##
 ## Variables, from the command line (make install MOD_LANG=fr), the environment,
 ## or a git-ignored config.mk (copy config.mk.example):

@@ -45,7 +45,7 @@ The Bash check reads the command statically, best effort:
 - Reads `HOME` and `TMPDIR` to resolve `~` and `$TMPDIR` in commands.
 - Sends to the model only the two-line reviewer instruction (while a repo is protected) and the refusal message. No network request, no credential.
 
-## Options (`/config`)
+## Options (`/config`, or `scripts/configure.sh teacher-guard key=value`)
 
 | Option | Default | Role |
 | --- | --- | --- |

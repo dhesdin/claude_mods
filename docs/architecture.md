@@ -84,7 +84,8 @@ Each mod with visible text has a `language` field in `userConfig`:
 2. Create `plugins/<mod>/` with the anatomy above (copy the smallest existing plugin as a start).
 3. Add an entry to `.claude-plugin/marketplace.json` (the Makefile and `/help-mods` pick it up from there and from `plugins/`).
 4. Generate its surface snapshot: `scripts/check.sh --update-surface <mod>`, then review the diff.
-5. `scripts/check.sh` green, then validate on screen (docs/development.md).
+5. Document it: a section in `docs/mods.md` (what it does, its command, every option), `plugins/<mod>/README.md` (the same plus what it runs and reads on the machine), a row in the root README table. `scripts/check.sh` fails when a mod or an option is missing from these.
+6. `scripts/check.sh` green, then validate on screen (docs/development.md).
 
 ## Versioning
 

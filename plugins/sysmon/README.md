@@ -66,7 +66,7 @@ The only data that leaves the mod is the `machine_status` tool's answer, a one-s
 
 Measures only while the panel is open and in front: nothing runs while it is closed. Disk every 60 s. A GPU tool that is not installed is not started again until the panel is reopened.
 
-## Options (`/config`)
+## Options (`/config`, or `scripts/configure.sh sysmon key=value`)
 
 | Option | Default | Role |
 | --- | --- | --- |

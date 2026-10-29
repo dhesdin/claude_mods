@@ -57,7 +57,7 @@ make dist        # one zip per mod in dist/plugins/, built from the last commit
 
 1. On claude.ai: **Customize > Plugins > Add > Upload plugin**, choose `dist/plugins/<mod>.zip`, then **Import**. Repeat for each mod you want.
 2. Start Claude Code (or restart it) on any machine where you are signed in: the mods sync in the background and load as `<mod>@synced`. If a session was already open: `/reload-plugins`.
-3. Set the language on each machine: `/langmod fr` (or `en`, `ja`, `zh`).
+3. Set the language and the options on each machine (they are per machine): `/langmod fr`, then [Configure](#configure).
 
 ## 4b. Install on this machine
 
@@ -68,7 +68,7 @@ make sysmon usage-pace               # the same, shorter
 make install MOD_LANG=fr             # with a display language: en, fr, ja, zh
 ```
 
-Then `/reload-plugins` in a session that was already open.
+Then `/reload-plugins` in a session that was already open, and set the options you want ([Configure](#configure)).
 
 | Command | Does |
 | --- | --- |
@@ -104,14 +104,25 @@ In a Claude Code session (`/plugin` lists the loaded mods on its dim line under 
 
 | Mod | You should see |
 | --- | --- |
-| usage-pace | three cards above the prompt after your first message (5-hour session, week, pace); nothing without a Claude subscription |
+| usage-pace | three cards above the prompt after your first message (5-hour session, week, pace); nothing without a Claude subscription. `/usage-pace` hides or shows them |
 | sysmon | `/sysmon` opens the Machine panel (it opens by itself from 144 terminal columns) |
 | teacher-guard | `/teacher-mode activate` in a repo: the status line shows `TEACHER MODE · <repo>`; ask Claude to edit a file, it is refused |
 | langmod | `/langmod` lists each mod's language; `/langmod fr` switches them |
+| project-hours | `/hours` lists this week's Claude Code time per project (after a first reply); `/hours panel` opens the Hours panel |
 
 ## Configure
 
-Every option is in `/config`, in each mod's section, with its default; each mod's README (`plugins/<mod>/README.md`) explains them. Options are stored per machine in `~/.claude/settings.json`.
+Every option of every mod, its default and its effect: **[docs/mods.md](mods.md)**. Options are per machine (stored in `~/.claude/settings.json`), also for mods that come from your account. Set them either way:
+
+```bash
+scripts/configure.sh project-hours                                 # show its options and their state
+scripts/configure.sh project-hours idleMinutes=15 priorityProjects='sip/edge=3'
+scripts/configure.sh sysmon diskPaths=/,/home,/data openOnStart=false
+```
+
+or in Claude Code: `/config`, the mod's section. A value set from the terminal applies when Claude Code restarts. `scripts/configure.sh` finds the installed copy (`<mod>@claude-mods` or `<mod>@synced`) and refuses an option the mod does not have.
+
+Adding up project-hours across machines (optional, with a sync tool such as Syncthing): [docs/mods.md](mods.md#project-hours).
 
 ## Update
 
@@ -134,7 +145,8 @@ Every option is in `/config`, in each mod's section, with its default; each mod'
 | Mods installed with `make install` | that machine | clone and install again |
 | Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you sign in |
 | Skills in `~/.claude/skills/` | that machine | not synced: upload them on claude.ai (Customize > Skills) to have them everywhere |
-| `~/.claude/CLAUDE.md`, `~/.claude/settings.json` (mod options) | that machine | not synced: copy them |
+| `~/.claude/CLAUDE.md`, `~/.claude/settings.json` (mod options) | that machine | not synced: copy them, or run `scripts/configure.sh` again |
+| project-hours data (`~/.claude/mod-data/project-hours/`) | that machine | not synced, unless `dataFolder` points to a folder a sync tool shares ([how](mods.md#project-hours)) |
 | A repository's `.claude/skills/` and `CLAUDE.md` | the repository | there after `git clone` |
 
 ## Troubleshooting
@@ -147,4 +159,5 @@ Every option is in `/config`, in each mod's section, with its default; each mod'
 | The sysmon panel does not open by itself | the terminal is narrower than 144 columns: run `/sysmon` |
 | sysmon says "No supported GPU" | `make doctor`, then [docs/hardware.md](hardware.md) for your GPU |
 | The language went back to English | options are per machine: `/langmod fr` on that machine |
+| `/hours` shows only this machine's time | expected: each machine counts its own; to add them up, see [docs/mods.md](mods.md#project-hours) |
 | The usage band stays empty | it needs a Claude subscription and appears after the first reply of the session |

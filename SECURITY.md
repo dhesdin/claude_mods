@@ -22,6 +22,8 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 | 3 | `/langmod` changes only `<plugin>.language` rows following the repo convention, never a locked row, and never echoes its argument | `plugins/langmod/hooks/register.ts` |
 | 4 | CI token read-only, checkout without persisted credentials, no secrets, no `pull_request_target`, actions pinned by commit SHA (Dependabot proposes updates), Claude Code version pinned | `.github/` |
 | 4 | `scripts/install.sh` only uses the local clone: nothing is downloaded and executed | `scripts/install.sh` |
+| 3 | `scripts/configure.sh` accepts only option names declared in the mod's manifest and single-line values, JSON-escaped, passed on stdin (never on a command line or through a shell) | `scripts/configure.sh` |
+| 2 | project-hours: project names are stripped of control characters and capped; the data file name keeps only `[A-Za-z0-9_.-]` from the host name and session id, so no value can leave the data folder | `plugins/project-hours/hooks/register.tsx` |
 | 1 | Trojan Source: CI fails on any bidi-override or zero-width character in a tracked file (they can make code read differently than it runs) | `scripts/check.sh` |
 | 1 | Linter (Biome, recommended rules) and shellcheck in CI; exceptions are justified line by line | `biome.json`, `scripts/check.sh` |
 | 4 | Biome and TypeScript fetched at pinned versions, never a release younger than two weeks | `scripts/check.sh` |
@@ -31,6 +33,7 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 
 - sysmon runs `nvidia-smi`, `tegrastats`, `rocm-smi` and `df` from your `PATH`, exactly as if you typed them: a malicious program placed earlier in `PATH` would run. Keep `PATH` clean.
 - `teacher-guard` reads Bash commands statically, best effort: an inline interpreter, a script or an alias can still write. It is a guard against autopilot, **not** a security barrier (plugins/teacher-guard/README.md, Limits). It fails closed: a check that throws refuses the call. Only the person at the prompt can turn it off (`/teacher-mode deactivate` run by a plugin or the model is refused).
+- project-hours trusts the `.jsonl` files of its data folder: anyone who can write there (or a sync tool shared with another person) can change the totals shown. Lines that do not parse are skipped; nothing in them is executed or sent to the model.
 - The surface snapshot says *which* capabilities a plugin uses, not *how*: review code changes too.
 
 ## Updating safely

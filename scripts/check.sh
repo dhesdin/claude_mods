@@ -69,6 +69,30 @@ print("\n".join(bad))
 sys.exit(1 if bad else 0)
 '); then echo "  ok"; else echo "$out"; fail "broken relative links in docs"; fi
 
+echo "== docs coverage"
+# Every mod is in the README table, in docs/mods.md (its own section) and in the marketplace;
+# every option of its manifest is named in that section and in the mod's README.
+if out=$(python3 -I -c '
+import json, os, re
+bad = []
+readme = open("README.md", encoding="utf-8").read()
+catalog = open("docs/mods.md", encoding="utf-8").read()
+sections = {m.group(1): m.group(2) for m in re.finditer(r"^## (\S+)\n(.*?)(?=^## |\Z)", catalog, re.M | re.S)}
+listed = [p["name"] for p in json.load(open(".claude-plugin/marketplace.json"))["plugins"]]
+for mod in sorted(os.listdir("plugins")):
+    manifest = json.load(open(f"plugins/{mod}/.claude-plugin/plugin.json"))
+    own = open(f"plugins/{mod}/README.md", encoding="utf-8").read() if os.path.exists(f"plugins/{mod}/README.md") else ""
+    if f"](plugins/{mod})" not in readme: bad.append(f"README.md: no row for {mod}")
+    if mod not in sections: bad.append(f"docs/mods.md: no section ## {mod}")
+    if mod not in listed: bad.append(f".claude-plugin/marketplace.json: {mod} missing")
+    if not own: bad.append(f"plugins/{mod}/README.md missing")
+    for key in manifest.get("userConfig", {}):
+        if f"`{key}`" not in sections.get(mod, ""): bad.append(f"docs/mods.md ## {mod}: option `{key}` not described")
+        if f"`{key}`" not in own: bad.append(f"plugins/{mod}/README.md: option `{key}` not described")
+print("\n".join(bad))
+raise SystemExit(1 if bad else 0)
+'); then echo "  ok"; else echo "$out"; fail "a mod or an option is missing from the docs"; fi
+
 echo "== doctor"
 if scripts/doctor.sh >/dev/null 2>&1; then echo "  runs"; else fail "scripts/doctor.sh fails"; fi
 

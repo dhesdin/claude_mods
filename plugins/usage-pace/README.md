@@ -19,7 +19,7 @@ Band above the prompt with three framed cards:
 
 It reads the usage figures Claude Code already has (`session.measure`, `$.session.usage()`) and draws them. It runs no program, reads no file or credential, makes no network request, and sends nothing to the model.
 
-## Options (`/config`)
+## Options (`/config`, or `scripts/configure.sh usage-pace key=value`)
 
 | Option | Default | Role |
 | --- | --- | --- |
