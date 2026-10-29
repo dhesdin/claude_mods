@@ -54,7 +54,7 @@ One mod at a time, in this order. The next one starts only once the user has che
 3. `teacher-guard` (docs/specs/03-teacher-guard.md)
 4. `project-hours` (docs/specs/04-project-hours.md)
 
-Added on request along the way: `langmod` (display language), `notify` (05) and `project-memory` (06). The user's skills (`help-skills`, `help-mods`, `project-handoff`, `token-economy`) live on their claude.ai account, not in this repo.
+Added on request along the way: `langmod` (display language), `notify` (05) and `project-memory` (06).
 
 ## Constraints common to every mod
 

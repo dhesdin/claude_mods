@@ -19,6 +19,7 @@ Everything `/install-mods` does for you, step by step, with no AI involved. Ten 
 | signed in with a claude.ai account (not an API key), Claude Code 2.1.273 or later | the account route only |
 | `git`, `make` (or bash for `scripts/install.sh`), `python3` | cloning and installing |
 | Linux or WSL2 | sysmon (it reads `/proc`); the other mods run anywhere Claude Code runs |
+| bash (Linux, macOS, WSL2, Git Bash) | the scripts (`make doctor`, `make install`, `make dist`, `make user-settings`); on Windows without WSL2, use the account route with zips built on another machine |
 
 ## 2. Check your machine
 
@@ -165,8 +166,6 @@ Adding up project-hours across machines (optional, with a sync tool such as Sync
 | --- | --- | --- |
 | Mods uploaded to your account | your account (synced to `~/.claude/plugins/synced/`) | there at the next start after you sign in |
 | Mods installed with `make install` | that machine | clone and install again |
-| Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you sign in |
-| Skills in `~/.claude/skills/` | that machine | not synced: upload them on claude.ai (Customize > Skills) to have them everywhere |
 | `~/.claude/settings.json`: mod options, compaction window, notes hook | that machine | not synced: `make user-settings`, and `scripts/configure.sh` for options other than the defaults |
 | `~/.claude/CLAUDE.md` (your global rules) | that machine, linked to the repository | `make user-settings RULES=1` after cloning |
 | A project's `.claude/contexte.md` | the project (commit it to have it elsewhere) | there with the project |

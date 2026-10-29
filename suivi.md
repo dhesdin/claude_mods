@@ -6,10 +6,10 @@
 - Pitfalls: `$` cannot be passed as a value; types contract without import; test stub ordering; TS2589 on $.tool.call with MCP types.
 - Later: Biome lint + format, shellcheck, Trojan Source guard added to check.sh and CI; literal bidi characters found and escaped in sysmon util.ts and its test; formatter JSX-spacing pitfall fixed.
 - teacher-guard: path-aware Bash guard (writes into a protected repo refused, temp folders free), fail-closed tool guards, status line with marker warnings, session instruction via prompt.compose.
-- Makefile for modular installs (make install sysmon …, MOD_LANG/MOD_SCOPE/CLAUDE, config.mk); teacher-guard v0.2 with /teacher-mode activate|deactivate per session instead of a marker file; mod-help (/skill-help, /help-mods). An install smoke test without a dry run installed every mod once: undone, CLAUDE=echo documented.
-- mod-help: /skill-help renamed /help-skills (both commands start with help-), Claude Code + plugins section added; make <mod>... shortcut.
-- help-skills / help-mods moved from a mod to account skills (skills/, make skills, upload on claude.ai) so they are there on any machine; passation-projet and travail-econome moved into skills/ too; mod-help plugin removed.
-- Distribution moved to the claude.ai account: 4 mods uploaded as plugins (synced as <mod>@synced, verified after a start), 4 skills uploaded (synced, verified). skills/ removed from the repo; make dist kept; make install stays for per-machine installs.
+- Makefile for modular installs (make install sysmon …, MOD_LANG/MOD_SCOPE/CLAUDE, config.mk); teacher-guard v0.2 with /teacher-mode activate|deactivate per session instead of a marker file; a mod-help plugin (later removed). An install smoke test without a dry run installed every mod once: undone, CLAUDE=echo documented.
+- make <mod>... shortcut.
+- mod-help plugin removed from the repo.
+- Distribution moved to the claude.ai account: 4 mods uploaded as plugins (synced as <mod>@synced, verified after a start); skills/ removed from the repo; make dist kept; make install stays for per-machine installs.
 - Onboarding: make doctor, /install-mods project skill, machine table in docs/hardware.md; laptop copies of passation-projet and travail-econome removed (now from the account).
 - Docs restructured for two audiences: AGENTS.md + /install-mods for agents, docs/install.md for humans; README slimmed to how it works + paths; doc link check in CI.
 
