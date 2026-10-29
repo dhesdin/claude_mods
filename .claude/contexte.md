@@ -1,9 +1,9 @@
 # Current context — claude-mods
 
-Updated: 2026-10-29 20:00
+Updated: 2026-10-29 20:50
 
 ## Current goal
-Mod 4 `project-hours` done in code and docs, linked for hot reload in this session (~/.claude/dev-mods/4f3c1696-…/project-hours). Waiting for the user's on-screen check of /hours, /hours 2, /hours panel. Then: make dist and upload usage-pace 0.3 + project-hours to the account.
+All five mods done, validated on screen, on the user's claude.ai account (usage-pace 0.3 and project-hours uploaded 2026-10-29 evening; they sync at the next Claude Code start). No hot-reload link left. Next: the user's new questions.
 
 ## Done (repo public on github.com/dhesdin/claude_mods)
 - usage-pace 0.2, sysmon 0.2, teacher-guard 0.2, langmod: on the user's claude.ai account, synced as <mod>@synced on every machine.
@@ -32,9 +32,9 @@ Mod 4 `project-hours` done in code and docs, linked for hot reload in this sessi
 - tsc type-check of project-hours skipped until a session lays its types (after the hot-reload load).
 
 ## Next action
-1. User tests /hours, /hours 2, /hours panel here (hot reload). Fix what they report.
-2. After validation: CLAUDE.md status "Checked on screen" = yes; remove the dev-mods link; make dist; user uploads usage-pace.zip (0.3, /usage-pace toggle) and project-hours.zip; check `claude plugin list` shows them @synced.
-3. Directory: usage-pace and sysmon will be rescanned (main moved); check claude.ai/directory/manage. CI not checked locally (no gh CLI): look at GitHub Actions.
+1. After a Claude Code restart: `claude plugin list` should show usage-pace 0.3.0@synced and project-hours@synced.
+2. Directory: usage-pace and sysmon are "En cours d'examen" (held: the plugin includes a mod, Anthropic reviewer). The directory picks new commits about every 6 h (usage-pace 0.3 not yet seen). project-hours not submitted (offer it).
+3. CI not checked locally (no gh CLI): look at GitHub Actions.
 
 ## Pending (remind the user)
 - Demo GIF for the README (Peek, short script) once all mods are done.
