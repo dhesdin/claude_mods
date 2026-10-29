@@ -25,3 +25,8 @@
 - Done: project-hours README, dedicated clock icon, integration tests (session, reload, /hours, pane, degraded), root README row; committed 07b767a and pushed. Linked for hot reload.
 - usage-pace directory submission: steps 1-3 filled (validation passed, 1 `types` warning); step 4 left to the user.
 - Decision: project-hours weeks fixed to Monday (ISO), no option.
+
+## 2026-10-29 (night) — options, sync, docs for humans and agents
+- Done: usage-pace 0.3 (/usage-pace toggle); /hours panel; project-hours reads only needed weeks, dataFolder option (sync via Syncthing), rolling alerts; docs/mods.md catalog; scripts/configure.sh; /install-mods asks options per mod; AGENTS.md rewritten; CI docs-coverage check; help-mods skill fixed (v2 on the account).
+- Measures: a session file is 1-3 KB (~170 B per segment); 2,000 sessions = a few MB. Reads were the real cost (every file every turn), now bounded by the weeks shown.
+- Pitfalls: `claude plugin configure --values-stdin` takes string values and asks for a restart; a network share as dataFolder is refused by $.fs.
