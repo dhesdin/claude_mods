@@ -45,3 +45,7 @@
 ## 2026-10-30 : init-project and version-check v3
 - Done: corrections reviewed by Claude Desktop applied and uploaded (diff shown first); versions.sh tested in 5 cases.
 - Decisions: modes merged into pro/perso and portfolio; description unchanged; Read deny rules also cover cat/head/tail/sed (docs), not grep -r or scripts.
+
+## 2026-10-30 : laptop setup checked
+- Done: user ran make user-settings RULES=1 and /langmod fr; make doctor all set; sysmon RAM line and notify checked on screen; skill rename committed in appli_tracker (a07b91d) and double-regard (cf77a61), not pushed.
+- Decisions: README demo GIF recorded on the GPU workstation, so the sysmon GPU card shows.

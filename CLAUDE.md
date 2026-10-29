@@ -39,10 +39,10 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | --- | --- | --- | --- |
 | usage-pace | yes | yes | yes |
 | sysmon | yes | laptop yes; GPU [to validate] | yes |
-| langmod | yes | not yet | yes |
+| langmod | yes | yes (laptop) | yes |
 | teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
 | project-hours | yes | yes | yes |
-| notify | yes | Linux test notification | yes |
+| notify | yes | yes (laptop) | yes |
 | project-memory | yes | yes (reminder seen) | yes |
 
 ## Build order

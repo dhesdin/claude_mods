@@ -1,31 +1,30 @@
 # Current context: claude-mods
 
-Updated: 2026-10-30 00:10
+Updated: 2026-10-30 (laptop done)
 
 ## Current goal
-Everything is coded, committed and on the claude.ai account. Remaining: the per-machine step the user runs (auto mode refuses Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md), then on-screen checks after a Claude Code restart.
+Laptop fully set up and checked. Remaining: the GPU workstation (setup, GPU checks, README demo GIF).
 
 ## Done
-- Account: 7 mods (usage-pace 0.3, sysmon 0.3 with the 3 biggest RAM programs, teacher-guard 0.2, langmod 0.2 remembering the language per machine, project-hours 0.1, notify 0.1, project-memory 0.2 = reminder only) and skills version-check v3 (versions.sh: project .venv, distribution names, scoped npm; supply-chain checks) and init-project v3 (modes pro/perso and portfolio; portfolio writes the teacher-mode reminder into the project's CLAUDE.md; architecture section, strict typing, config, errors/logging, test layout, docs/adr; templates ci.yml with audit step, dependabot.yml weekly grouped with uv, settings.json denying every forced push form).
-- Global rules in user/CLAUDE.md, hand-off notes hook user/hooks/load-context.sh; scripts/user-settings.sh installs both (hook copied, CLAUDE.md symlinked with --rules / RULES=1), backups, dry run; make doctor shows the state.
-- Laptop: compaction 300k already applied; dev-mods links removed.
+- Account: 7 mods (usage-pace 0.3, sysmon 0.3, teacher-guard 0.2, langmod 0.2, project-hours 0.1, notify 0.1, project-memory 0.2) and skills version-check v3, init-project v3.
+- Laptop: make user-settings RULES=1 run, /langmod fr, make doctor all set (compaction 300k, hand-off hook, global rules linked); sysmon RAM line "surtout …" and notify checked on screen.
+- appli_tracker (a07b91d) and double-regard (cf77a61): skill rename committed, not pushed (appli_tracker is 6 commits ahead of origin).
 
 ## Recent decisions
-- Rules and notes are loaded by Claude Code itself (CLAUDE.md, SessionStart hook), not by a mod: another plugin (seen: cc-plugin-sec-default) can pass prompt.context past a mod silently.
-- Hook copied (survives a moved clone), rules symlinked (one source, git pull updates); rules only with --rules (owner's own).
-- test-before-done and retry-intelligence dropped/deferred.
+- Rules and notes are loaded by Claude Code itself (user/CLAUDE.md, SessionStart hook), not by a mod: another plugin can pass prompt.context past a mod silently.
+- Hook copied, rules symlinked; rules only with RULES=1.
+- README demo GIF recorded on the GPU workstation, so the sysmon GPU card is in it.
 
 ## Known pitfalls
-- Languages are stored per installed copy (`<mod>@synced`, `@inline` for old dev copies): /langmod once per machine; langmod 0.2 then applies it to mods installed later.
-- Test stubs need full results; process.run stdin is under `init`; engine types appear after a session loads the mod.
+- Languages are stored per installed copy: /langmod once per machine; langmod 0.2 applies it to mods installed later.
+- Auto mode refuses Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md: the user runs make user-settings.
 - No local `gh`: CI results unseen locally.
 
 ## Next action
-User runs, in this repo: `! make user-settings RULES=1`, restarts Claude Code, types `/langmod fr`, then `make doctor` (User settings section all set). Then check: sysmon RAM line "surtout …", notify after a reply ≥ 15 s. On the workstation: clone/pull, `make user-settings RULES=1`, `/langmod fr`.
+On the workstation: clone or pull, `make user-settings RULES=1`, restart Claude Code, `/langmod fr`, `make doctor`, then the GPU checklist in docs/hardware.md (sysmon GPU card), then record the README demo GIF.
 
 ## Waiting for the user
-- Uncommitted CLAUDE.md edits in appli_quotidien/appli_tracker and appli_quotidien/appli_jeu/double-regard (skill rename).
-- Reminder: README demo GIF at the end.
+- Whether to push appli_tracker and double-regard.
 
 ## Missing info
-- GPU checks on the workstation (docs/hardware.md).
+- Workstation OS (Linux assumed) and GPU check results.
