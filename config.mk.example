@@ -1,0 +1,4 @@
+# Per-machine defaults for `make`. Copy to config.mk (git-ignored) and edit.
+MOD_LANG = fr
+MOD_SCOPE = user
+# CLAUDE = /path/to/claude

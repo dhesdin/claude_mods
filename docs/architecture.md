@@ -15,9 +15,11 @@ claude-mods/
 ├── plugins/<mod>/                    # one independent plugin per mod
 ├── scripts/
 │   ├── check.sh                      # everything CI runs, runnable locally (--fix formats)
-│   └── install.sh                    # add the marketplace and install every plugin
+│   └── install.sh                    # what the Makefile runs: setup, install/uninstall some or all mods
 ├── biome.json                        # formatter and linter config
 ├── .editorconfig                     # editor defaults matching the formatter
+├── Makefile                          # modular install (make install sysmon …) and checks
+├── config.mk.example                 # per-machine make defaults (copy to config.mk, git-ignored)
 ├── CLAUDE.md                         # rules for Claude Code working in this repo
 ├── SECURITY.md                       # threat model and reporting
 └── LICENSE                           # MIT
@@ -72,7 +74,7 @@ Each mod with visible text has a `language` field in `userConfig`:
 
 1. Write `docs/specs/NN-<mod>.md`.
 2. Create `plugins/<mod>/` with the anatomy above (copy the smallest existing plugin as a start).
-3. Add an entry to `.claude-plugin/marketplace.json`.
+3. Add an entry to `.claude-plugin/marketplace.json` (the Makefile and `/help-mods` pick it up from there and from `plugins/`).
 4. Generate its surface snapshot: `scripts/check.sh --update-surface <mod>`, then review the diff.
 5. `scripts/check.sh` green, then validate on screen (docs/development.md).
 

@@ -10,6 +10,7 @@
 ## The loop
 
 ```bash
+make check                  # = scripts/check.sh
 scripts/check.sh            # everything CI runs, on every plugin
 scripts/check.sh sysmon     # one plugin
 scripts/check.sh --fix      # format and apply safe lint fixes

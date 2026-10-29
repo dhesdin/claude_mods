@@ -8,7 +8,8 @@ A Claude Code marketplace of small, independent mods. Each mod is a plugin you c
 | --- | --- | --- |
 | [usage-pace](plugins/usage-pace) | Band above the prompt: 5-hour and weekly usage, time to reset, projected weekly pace | [spec](docs/specs/01-usage-pace.md) |
 | [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
-| [teacher-guard](plugins/teacher-guard) | Teacher mode: in a repo holding a `.teacher-mode` file, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
+| [teacher-guard](plugins/teacher-guard) | `/teacher-mode activate`: for the current repo and session, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
+| [mod-help](plugins/mod-help) | `/skill-help` (every skill, global and project, one line each) and `/help-mods` (the mods, their commands and options) | [spec](docs/specs/05-mod-help.md) |
 | [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
 
 Display languages available: **English (en), French (fr), Japanese (ja), Chinese (zh)**. Other languages can be added (see [Internationalization](docs/architecture.md#internationalization)).
@@ -17,25 +18,35 @@ Display languages available: **English (en), French (fr), Japanese (ja), Chinese
 
 - [Claude Code](https://code.claude.com/docs) 2.1.312 or later
 - Linux (or WSL2) for `sysmon`; `usage-pace` and `langmod` run anywhere Claude Code runs
-- `git`
+- `git`, `make` (or run `scripts/install.sh` directly)
 
 ## Install
 
 ```bash
 git clone https://github.com/dhesdin/claude_mods.git ~/claude-mods
-~/claude-mods/scripts/install.sh            # or: scripts/install.sh --lang fr
+cd ~/claude-mods
+make install                          # every mod
+make install sysmon teacher-guard     # only some (or: make install-sysmon)
+make install MOD_LANG=fr              # with a display language (en, fr, ja, zh)
 ```
 
 Then, in a Claude Code session that was already open: `/reload-plugins`.
 
-The same steps by hand:
+| Command | Does |
+| --- | --- |
+| `make help` | every target and variable |
+| `make list` | each mod, its description, installed or not |
+| `make setup` | only add this folder as a marketplace |
+| `make uninstall sysmon` | uninstall some mods (all without names) |
+| `make teardown` | uninstall every mod and remove the marketplace |
+
+Variables, from the command line, the environment, or a per-machine `config.mk` (git-ignored, copy `config.mk.example`): `MOD_LANG` (en, fr, ja, zh), `MOD_SCOPE` (user, project, local; default user), `CLAUDE` (the binary; `CLAUDE=echo` prints the commands instead of running them).
+
+Without `make`: `scripts/install.sh [--lang fr] [--scope user] [mod...]`, or by hand:
 
 ```bash
 claude plugin marketplace add ~/claude-mods
-claude plugin install usage-pace@claude-mods
-claude plugin install sysmon@claude-mods
-claude plugin install teacher-guard@claude-mods
-claude plugin install langmod@claude-mods
+claude plugin install sysmon@claude-mods      # one line per mod
 ```
 
 Preparing a GPU machine (NVIDIA driver, WSL2, Jetson, AMD): [docs/hardware.md](docs/hardware.md).
@@ -59,15 +70,17 @@ Then `/reload-plugins` in an open session. Read what changed (`git -C ~/claude-m
 
 ```bash
 claude plugin disable sysmon@claude-mods     # enable again: claude plugin enable sysmon@claude-mods
-claude plugin uninstall sysmon@claude-mods
-claude plugin marketplace remove claude-mods
+make uninstall sysmon                        # or: claude plugin uninstall sysmon@claude-mods
+make teardown                                # every mod and the marketplace
 ```
+
+In a session, `/help-mods` lists the mods with their commands and options, and `/skill-help` lists every skill.
 
 ## Develop
 
 ```bash
-scripts/check.sh                       # lint, format, validate, surface snapshots, tests, type-check
-scripts/check.sh --fix                 # format and apply safe lint fixes
+make check                             # lint, format, validate, surface snapshots, tests, type-check
+make fix                               # format and apply safe lint fixes
 claude --plugin-dir ./plugins/sysmon   # run one plugin from disk, hot reload
 ```
 
