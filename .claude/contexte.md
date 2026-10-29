@@ -1,34 +1,32 @@
-# Contexte courant — claude-mods
+# Current context — claude-mods
 
-Mis à jour : 2026-10-29 13:00
+Updated: 2026-10-29 17:30
 
-## Objectif en cours
-Mod 1/4 `usage-pace` (specs/01-usage-pace.md) codé, en attente de validation à l'écran par l'utilisateur. Ordre et définition de « terminé » : CLAUDE.md.
+## Current goal
+Repo restructured to "senior" standards (English everywhere, docs/, scripts/, CI, security audit). Next: mod 3 `teacher-guard` (docs/specs/03-teacher-guard.md), after the user has read the report.
 
-## Fait
-- Bandeau v3 (retours utilisateur) : 3 cartes encadrées (Session 5h, Semaine, Rythme), couleur par niveau (levelColor), phrase « Réinitialisation dans : 01h42 (à 13h42) », rythme = projection linéaire (« ~X % à la réinitialisation » ou « limite atteinte <jour> vers <h> »). 5 tests OK.
-- `plugins/usage-pace/` : plugin.json (userConfig paceMinHours=3, refreshSeconds=60), hooks/register.tsx (bandeau AbovePrompt), types/index.d.ts (state limits/tick), tests/usage-pace.test.tsx (3 tests).
-- `claude plugin validate` OK (hooks: session.start, session.measure, ui.render{AbovePrompt} ; calls: clock.every/now, session.usage, state, ui.resolve). `claude plugin test` 3/3. tsc strict OK.
-- docs/mods-api.md (API vérifiée, boucle de dev, pièges), spec 01 réécrite. CLAUDE.md : renvoi vers docs/contexte + tableau d état des mods (à tenir à jour).
-- `.claude-plugin/marketplace.json` (nom `claude-mods`, source `./plugins/usage-pace`), README.md, .gitignore, git : remote origin git@github.com:dhesdin/claude_mods.git (SSH), 2 commits poussés sur main (socle, usage-pace).
-- Lien symbolique `~/.claude/dev-mods/<session>/usage-pace` -> repo, pour le rechargement à chaud dans la session.
+## Done
+- Plugins: usage-pace 0.2.0, sysmon 0.2.0, langmod 0.1.0 (new: `/langmod en|fr|ja|zh` sets `<plugin>.language` rows via $.config.set). Display i18n en/fr/ja/zh in `hooks/i18n.ts` of each mod; `language` userConfig picker (default en).
+- sysmon: GPU sources in hooks/gpu.ts (NVIDIA nvidia-smi, Jetson tegrastats [to validate], AMD rocm-smi [to validate]), `gpuBackend` auto detection; system.ts (/proc, df); util.ts `clean()` for untrusted text; throttling written out ("thermal (GPU too hot)" red, "power limit (max power draw reached)" orange).
+- Repo: docs/{architecture,development,mods-api,hardware}.md, docs/specs/ (moved from specs/), README, per-plugin README, SECURITY.md, LICENSE (MIT), scripts/check.sh (validate + surface.txt snapshot + zero-network + tests + tsc), scripts/install.sh (--lang), .github CI (SHA-pinned actions, read-only) + Dependabot.
+- Security audit: secret scan clean, history clean, names JSON-quoted in machine_status, no shell, option coercion. Details in SECURITY.md.
+- Checks: 13 tests pass, all surfaces match, tsc ok where engine types are laid.
 
-## Décisions récentes
-- Source des données : événement `session.measure` (`rateLimits`, kinds `five_hour`/`seven_day`, `percentUsed`, `resetsAt`) + `$.session.usage()` au démarrage. Aucun calcul d'usage maison.
-- Config via `userConfig` du manifeste (réglable dans /config), pas un fichier JSON séparé.
-- Bandeau masqué si aucune fenêtre ; fenêtre manquante -> `n/a`. Timer `$.clock.every` ne redessine que s'il y a des données.
+## Decisions
+- UI language per mod (userConfig `language`), model-facing text stays English.
+- Two nvidia-smi calls per cycle (GPU + processes), accepted by the user.
+- Surface snapshots (`surface.txt`) are the review gate for new capabilities.
+- CI cannot type-check (engine types only exist after a session loads a plugin): local `scripts/check.sh` does.
+- Commits: no Claude co-author line (user request); remote SSH git@github.com:dhesdin/claude_mods.git.
 
-- Rythme en « écart en points » de la spec remplacé par une projection, à la demande de l'utilisateur ; option alertThreshold supprimée.
-- Heure locale : Date/Intl donnent bien Europe/Paris dans l'environnement des mods (vérifié dans claude plugin test).
+## Known pitfalls
+- `$` can never be passed or stored: sysmon builds an `Host`/`Io` object of closures in session.start.
+- Tests: stubs before the first `$` call; `clock.every` → `{ value: undefined }`; `$.tool.call` on an MCP tool name needs a narrowed cast (TS2589 with engine types).
+- Contract `types/index.d.ts` must have no import.
 
-## Pièges connus
-- Contrat `types/index.d.ts` : aucun `import` autorisé (validate refuse) ; type Limit redéfini localement.
-- Tests : tous les `on(...)` de stub avant le premier appel à `$` ; `clock.every` stubbé `{ value: undefined }` ; props AbovePrompt exigent `view: {}`.
-- Type-check : tsconfig hors du mod, dans le scratchpad, incluant le .d.ts du skill plugin-authoring (`npx -p typescript@5.6.3 tsc`).
+## Next action
+Mod 3 teacher-guard: read docs/specs/03-teacher-guard.md, check `tool.call` matchers for Write/Edit/NotebookEdit/Bash and `prompt.compose` in the types, then code.
 
-## Prochaine action
-Mod 2 `sysmon` (specs/02-sysmon.md).
-
-## Infos manquantes
-- Validation visuelle du bandeau par l'utilisateur.
-- Licence souhaitée (validate signale LICENSE manquant, non bloquant).
+## Missing info
+- GPU checks on the workstation (docs/hardware.md checklists); Jetson/AMD on real hardware.
+- On-screen check of /langmod and of the ja/zh display.

@@ -1,85 +1,71 @@
-# claude-mods : marketplace perso de mods Claude Code
+# claude-mods: a marketplace of Claude Code mods
 
-Repo Git privé qui sert de marketplace personnelle. Il est installé sur deux machines :
-- **laptop** : Linux Mint, pas de GPU NVIDIA
-- **tour** : machine GPU NVIDIA (OS à confirmer, Linux supposé)
+Git repository used as a Claude Code marketplace. Installed on two machines:
+- **laptop**: Linux Mint, no NVIDIA GPU
+- **workstation**: NVIDIA GPU machine (OS to confirm, Linux assumed)
 
-Chaque mod est un plugin indépendant, activable et désactivable seul.
+Each mod is an independent plugin, enabled and disabled on its own. Everything in the repo (code, comments, docs, specs, commit messages) is in English; only the mods' display text is translated (docs/architecture.md, Internationalization).
 
-## Règle n°1 : ne jamais inventer l'API des mods
+## Rule 1: never invent the mods API
 
-Les mods sont sortis le 1er octobre 2026. Tes connaissances d'entraînement peuvent ne pas les couvrir ou être fausses.
-Avant d'écrire la moindre ligne :
-1. Lis la doc officielle : https://code.claude.com/docs/en/plugins/mods/overview, puis les pages `create`, `api`, `interface` et la page plugins/marketplaces.
-2. Vérifie chaque appel contre les définitions de types de la version installée (`claude --version`).
-3. Si une capacité décrite dans une spec n'existe pas dans l'API, **arrête-toi et signale-le**. Ne contourne pas, ne simule pas.
+Mods were released on 1 October 2026. Training knowledge may not cover them, or may be wrong.
+Before writing any line:
+1. Read `docs/mods-api.md` (the verified subset used here). For anything else, read the official docs (https://code.claude.com/docs/en/plugins/mods/overview, then the `create`, `api`, `interface` pages and the plugins/marketplaces page).
+2. Check every call against the type definitions of the installed version (`claude --version`).
+3. If a capability a spec describes does not exist in the API, **stop and say so**. Do not work around it, do not simulate it.
 
-Rappel de la doc : un hook n'a aucun accès direct au système. Lire un fichier, lancer un processus, dessiner, ajouter une commande : tout passe par l'API `$` des mods. Pas de `require('os')`, pas de `fs` direct.
+A hook has no direct system access. Reading a file, starting a process, drawing, adding a command: everything goes through the mods `$` API. No `require('os')`, no direct `fs`.
 
-## Où trouver l'information
+## Where things are
 
-- `.claude/contexte.md` : état courant, réinjecté au démarrage (ne pas le relire).
-- `docs/mods-api.md` : API des mods vérifiée, boucle de dev, pièges des tests. **À lire avant de coder un mod**, au lieu de réexplorer les types.
-- `suivi.md` : journal daté des sessions.
+- `.claude/contexte.md`: current state, injected at session start (do not re-read it).
+- `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
+- `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
+- `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.
+- `docs/hardware.md`: machine setup per hardware and validation checklists (GPU checks still to run on the workstation, Jetson and AMD marked [to validate]).
+- `docs/specs/`: one functional spec per mod.
+- `SECURITY.md`: threat model and the controls the repo relies on.
+- `suivi.md`: dated session log.
 
-## État des mods
+## Mod status
 
-| Mod | Codé | Validé à l'écran | Commité |
+| Mod | Coded | Checked on screen | Committed |
 | --- | --- | --- | --- |
-| usage-pace | oui | oui | oui |
-| sysmon | non | non | non |
-| teacher-guard | non | non | non |
-| project-hours | non | non | non |
+| usage-pace | yes | yes | yes |
+| sysmon | yes | laptop yes; GPU [to validate] | yes |
+| langmod | yes | not yet | yes |
+| teacher-guard | no | no | no |
+| project-hours | no | no | no |
 
-## Structure attendue
+## Build order
 
-```
-claude-mods/
-├── CLAUDE.md
-├── README.md                  # installation sur une nouvelle machine
-├── docs/mods-api.md           # API vérifiée et boucle de dev
-├── .claude-plugin/
-│   └── marketplace.json       # format à vérifier dans la doc officielle
-├── specs/                     # specs fonctionnelles, une par mod
-└── plugins/
-    ├── usage-pace/
-    ├── sysmon/
-    ├── teacher-guard/
-    └── project-hours/
-```
+One mod at a time, in this order. The next one starts only once the user has checked the previous one on screen.
 
-## Ordre de construction
+1. `usage-pace` (docs/specs/01-usage-pace.md)
+2. `sysmon` (docs/specs/02-sysmon.md)
+3. `teacher-guard` (docs/specs/03-teacher-guard.md)
+4. `project-hours` (docs/specs/04-project-hours.md)
 
-Un mod à la fois, dans cet ordre. On ne passe au suivant que quand le précédent est validé par l'utilisateur à l'écran.
+## Constraints common to every mod
 
-1. `usage-pace` (specs/01-usage-pace.md)
-2. `sysmon` (specs/02-sysmon.md)
-3. `teacher-guard` (specs/03-teacher-guard.md)
-4. `project-hours` (specs/04-project-hours.md)
+- **Zero network.** No mod makes a network request. Data stays on the machine.
+- **Zero tokens.** The display sends nothing to the model, unless a spec explicitly asks for it.
+- **Clean degradation.** When data is unavailable (no GPU, missing file, failing API), show "n/a" or hide the card. Never crash the session.
+- **Minimal cost.** No polling while a panel is hidden. Configurable intervals, sensible defaults.
+- **Config**: the plugin's `userConfig` (one manifest per mod), paths and thresholds in it, never hard-coded.
+- **Persistent data** in `~/.claude/mod-data/<mod-name>/`.
+- **Untrusted text** from other programs is cleaned before display or before reaching the model (SECURITY.md).
+- Strict TypeScript. Short readable code: the user must be able to review it.
 
-## Contraintes communes à tous les mods
+## Definition of done for each mod
 
-- **Zéro réseau.** Aucun mod ne fait de requête réseau. Les données restent sur la machine.
-- **Zéro token.** L'affichage ne doit rien envoyer au modèle, sauf si une spec le demande explicitement.
-- **Dégradation propre.** Si une donnée est indisponible (pas de GPU, fichier absent, API qui échoue), le mod affiche "n/a" ou masque la carte. Il ne plante jamais la session.
-- **Coût minimal.** Pas de polling quand le panneau est masqué si l'API le permet. Intervalles configurables, valeurs par défaut raisonnables.
-- **Config** : un fichier de config par mod, chemins et seuils dedans, jamais en dur dans le code.
-- **Données persistantes** dans `~/.claude/mod-data/<nom-du-mod>/`.
-- TypeScript strict. Code court et lisible, l'utilisateur doit pouvoir le relire.
+- [ ] `scripts/check.sh <mod>` passes (validate, surface snapshot, tests, type-check)
+- [ ] The `hooks:` and `calls:` lines in `plugins/<mod>/surface.txt` match what the spec allows, nothing more
+- [ ] Tested loaded from disk with hot reload
+- [ ] Degraded cases tested (missing data, errors)
+- [ ] `plugins/<mod>/README.md` written and the root README table updated: what it does, its config, how to disable it
+- [ ] Clean commit, one mod per commit or small series; no Claude co-author line
 
-## Définition de "terminé" pour chaque mod
+## Installing on another machine
 
-- [ ] `claude plugin validate ./plugins/<mod>` passe sans erreur
-- [ ] Les lignes `hooks:` et `calls:` de la validation correspondent à ce que la spec autorise, rien de plus
-- [ ] Testé en chargement local (`--plugin-dir`) avec rechargement à chaud
-- [ ] Cas dégradés testés (donnée absente, erreur)
-- [ ] Section ajoutée au README : ce que fait le mod, sa config, comment le désactiver
-- [ ] Commit propre, un mod par commit ou par petite série
-
-## Installation sur une seconde machine
-
-Le README doit expliquer, en commandes copiables :
-1. cloner le repo
-2. ajouter la marketplace locale ou Git dans Claude Code
-3. installer chaque plugin
-4. `/reload-plugins` dans une session ouverte
+The README explains it in copyable commands: clone, `scripts/install.sh` (or the manual `claude plugin marketplace add` / `claude plugin install`), then `/reload-plugins` in an open session.

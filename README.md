@@ -1,57 +1,82 @@
 # claude-mods
 
-Marketplace personnelle de mods Claude Code. Chaque mod est un plugin indépendant, activable et désactivable seul.
-Aucun mod ne fait de requête réseau ni n'envoie de token au modèle.
+[![ci](https://github.com/dhesdin/claude_mods/actions/workflows/ci.yml/badge.svg)](https://github.com/dhesdin/claude_mods/actions/workflows/ci.yml)
 
-## Installation sur une nouvelle machine
+A Claude Code marketplace of small, independent mods. Each mod is a plugin you can install, configure and disable on its own. No mod makes a network request, and the display costs no tokens.
+
+| Mod | What it does | Docs |
+| --- | --- | --- |
+| [usage-pace](plugins/usage-pace) | Band above the prompt: 5-hour and weekly usage, time to reset, projected weekly pace | [spec](docs/specs/01-usage-pace.md) |
+| [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
+| [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
+
+Display languages available: **English (en), French (fr), Japanese (ja), Chinese (zh)**. Other languages can be added (see [Internationalization](docs/architecture.md#internationalization)).
+
+## Requirements
+
+- [Claude Code](https://code.claude.com/docs) 2.1.312 or later
+- Linux (or WSL2) for `sysmon`; `usage-pace` and `langmod` run anywhere Claude Code runs
+- `git`
+
+## Install
 
 ```bash
-git clone <URL_DU_REPO> ~/claude-mods
+git clone https://github.com/dhesdin/claude_mods.git ~/claude-mods
+~/claude-mods/scripts/install.sh            # or: scripts/install.sh --lang fr
+```
+
+Then, in a Claude Code session that was already open: `/reload-plugins`.
+
+The same steps by hand:
+
+```bash
 claude plugin marketplace add ~/claude-mods
 claude plugin install usage-pace@claude-mods
+claude plugin install sysmon@claude-mods
+claude plugin install langmod@claude-mods
 ```
 
-Puis, dans une session déjà ouverte : `/reload-plugins`.
+Preparing a GPU machine (NVIDIA driver, WSL2, Jetson, AMD): [docs/hardware.md](docs/hardware.md).
 
-La marketplace étant un dossier local, une mise à jour se fait par `git pull` dans `~/claude-mods` puis `/reload-plugins`, sans réinstaller.
+## Update
 
-## Désactiver / réactiver un mod
+The marketplace is a local folder: plugins are read from it directly.
 
 ```bash
-claude plugin disable usage-pace@claude-mods
-claude plugin enable usage-pace@claude-mods
+git -C ~/claude-mods pull --ff-only
 ```
 
-## Mods
+Then `/reload-plugins` in an open session. Read what changed (`git -C ~/claude-mods log -p ORIG_HEAD..`) before reloading: a mod runs code on your machine (see [SECURITY.md](SECURITY.md)).
 
-### usage-pace
+## Configure
 
-Bandeau au-dessus du prompt, toujours visible, trois cartes encadrées (elles passent à la ligne si le terminal est étroit) :
+- Every option of every mod is in `/config` (each mod's section), with its default. Options are listed in each mod's README.
+- Language: pick it in `/config` (`language` row of each mod), or `/langmod fr` for all mods at once.
 
-```
-╭──────────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────╮
-│ Session 5h ████████░░░░ 64 %              │ │ Semaine    ██████░░░░░░ 48 %                  │ │ Rythme À ce rythme, ~90 % à la réinitialisation     │
-│ Réinitialisation dans : 01h42 (à 13h42)   │ │ Réinitialisation dans : 3j 06h (dimanche à 18h00) │ │ limite non atteinte cette semaine                   │
-╰──────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────╯
-```
-
-- Les chiffres viennent de l'événement `session.measure` de Claude Code (fenêtres `five_hour` et `seven_day`) : l'usage n'est jamais estimé.
-- Couleur de la barre et du % : blanc < 50 %, jaune 50-75 %, orange 75-90 %, rouge ≥ 90 %.
-- Rythme : projection linéaire du % hebdo au rythme moyen depuis la dernière réinitialisation.
-  Soit « À ce rythme, ~X % à la réinitialisation » (coloré selon X), soit « À ce rythme, limite atteinte samedi vers 15h » en rouge, avec la marge avant la réinitialisation.
-- Sans abonnement ou avant la première mesure, le bandeau est masqué ; une fenêtre absente affiche `n/a`.
-
-Config (`/config`, section du plugin, ou `pluginConfigs` dans `~/.claude/settings.json`) :
-
-| Option | Défaut | Rôle |
-| --- | --- | --- |
-| `paceMinHours` | 3 | heures écoulées depuis la réinitialisation hebdo avant d'afficher une projection |
-| `refreshSeconds` | 60 | rafraîchissement du compte à rebours entre deux tours (0 = seulement après chaque tour) |
-
-## Développement
+## Disable or remove
 
 ```bash
-claude plugin validate ./plugins/<mod>
-claude plugin test ./plugins/<mod>
-claude --plugin-dir ./plugins/<mod>     # chargement local avec rechargement à chaud
+claude plugin disable sysmon@claude-mods     # enable again: claude plugin enable sysmon@claude-mods
+claude plugin uninstall sysmon@claude-mods
+claude plugin marketplace remove claude-mods
 ```
+
+## Develop
+
+```bash
+scripts/check.sh                       # validate, surface snapshots, tests, type-check
+claude --plugin-dir ./plugins/sysmon   # run one plugin from disk, hot reload
+```
+
+- [docs/architecture.md](docs/architecture.md): layout, anatomy of a mod, conventions, i18n
+- [docs/development.md](docs/development.md): dev loop, tests, CI, definition of done
+- [docs/mods-api.md](docs/mods-api.md): the parts of the mods API used here, verified
+- [docs/specs/](docs/specs): one functional spec per mod
+
+## Security
+
+See [SECURITY.md](SECURITY.md): threat model, what each mod may touch, and how to report a problem.
+
+## License
+
+[MIT](LICENSE)
