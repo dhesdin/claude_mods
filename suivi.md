@@ -45,3 +45,5 @@
 ## 2026-10-30 : laptop setup checked
 - Done: user ran make user-settings RULES=1 and /langmod fr; make doctor all set; sysmon RAM line and notify checked on screen.
 - Decisions: README demo GIF recorded on the GPU workstation, so the sysmon GPU card shows.
+- Done: notes, log and docs keep only this repository (no account skills); bash requirement and Windows route in docs/install.md; project-memory 0.2.1: the reminder names .claude/contexte.md instead of a skill outside the repo.
+- Decisions: user/CLAUDE.md stays (global rules, linked from ~/.claude/CLAUDE.md, loaded in every project); it is what ties the notes to the user's own skill.

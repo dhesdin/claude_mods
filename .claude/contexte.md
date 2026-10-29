@@ -6,7 +6,7 @@ Updated: 2026-10-30 (laptop done)
 Laptop fully set up and checked. Remaining: the GPU workstation (setup, GPU checks, README demo GIF).
 
 ## Done
-- Account: 7 mods (usage-pace 0.3, sysmon 0.3, teacher-guard 0.2, langmod 0.2, project-hours 0.1, notify 0.1, project-memory 0.2).
+- Account: 7 mods (usage-pace 0.3, sysmon 0.3, teacher-guard 0.2, langmod 0.2, project-hours 0.1, notify 0.1, project-memory 0.2.1 built, to upload).
 - Laptop: make user-settings RULES=1 run, /langmod fr, make doctor all set (compaction 300k, hand-off hook, global rules linked); sysmon RAM line "surtout …" and notify checked on screen.
 - docs checked: install, user settings, mods catalog, hardware checklist up to date (langmod per-machine memory added to docs/mods.md).
 
@@ -21,7 +21,7 @@ Laptop fully set up and checked. Remaining: the GPU workstation (setup, GPU chec
 - No local `gh`: CI results unseen locally.
 
 ## Next action
-On the workstation: clone or pull, `make user-settings RULES=1`, restart Claude Code, `/langmod fr`, `make doctor`, then the GPU checklist in docs/hardware.md (sysmon GPU card), then record the README demo GIF.
+Upload dist/plugins/project-memory.zip (0.2.1) on claude.ai. Then, on the workstation: clone or pull, `make user-settings RULES=1`, restart Claude Code, `/langmod fr`, `make doctor`, then the GPU checklist in docs/hardware.md (sysmon GPU card), then record the README demo GIF.
 
 ## Waiting for the user
 - nothing
