@@ -14,7 +14,7 @@
 # Safe to run again: an existing marketplace or plugin is left as is.
 set -euo pipefail
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-marketplace=claude-mods
+marketplace="claude-mods"
 claude="${CLAUDE:-claude}"
 lang="${MOD_LANG:-}"
 scope="${MOD_SCOPE:-user}"
