@@ -1,8 +1,24 @@
 {
   "name": "claude-mods",
-  "owner": { "name": "ValentinD" },
-  "description": "Marketplace perso de mods Claude Code (laptop + tour)",
+  "owner": {
+    "name": "ValentinD"
+  },
+  "description": "Personal Claude Code mods: usage pace, machine monitor, display language",
   "plugins": [
-    { "name": "usage-pace", "source": "./plugins/usage-pace", "description": "Usage 5 h / hebdo et rythme au-dessus du prompt" }
+    {
+      "name": "usage-pace",
+      "source": "./plugins/usage-pace",
+      "description": "5-hour and weekly usage above the prompt, time to reset, projected pace"
+    },
+    {
+      "name": "sysmon",
+      "source": "./plugins/sysmon",
+      "description": "GPU / CPU / RAM / disk panel and a machine_status tool for Claude"
+    },
+    {
+      "name": "langmod",
+      "source": "./plugins/langmod",
+      "description": "/langmod en|fr|ja|zh: display language of every mod at once"
+    }
   ]
 }

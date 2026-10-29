@@ -1,0 +1,7 @@
+{
+  "name": "langmod",
+  "version": "0.1.0",
+  "description": "/langmod en|fr|ja|zh: set the display language of every installed mod at once",
+  "author": { "name": "ValentinD" },
+  "license": "MIT"
+}
