@@ -98,6 +98,16 @@ claude plugin install sysmon@claude-mods        # one line per mod
 
 If `make doctor` lists a GPU under Next (driver or tool missing), follow the matching row of [docs/hardware.md](hardware.md#start-here-your-machine-in-one-table): NVIDIA driver per distribution, WSL2, Jetson, AMD (ROCm), Raspberry Pi. Run `make doctor` again afterwards: "sysmon will use" should name your GPU's source.
 
+## Per-machine settings
+
+A few Claude Code settings live in each machine's `~/.claude/settings.json` and no plugin can carry them. Once per machine:
+
+```bash
+make user-settings        # or: scripts/user-settings.sh [--dry-run] [--window 300000]
+```
+
+It backs up `settings.json` (timestamped copy next to it), then merges, keeping every other key: automatic compaction on, at 300,000 tokens (`autoCompactEnabled`, `autoCompactWindow`); the `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` variable removed; and, once project-memory is installed, the old `charger-contexte.sh` SessionStart hook removed (the mod loads the notes now). It prints each change; run again, it changes nothing. A 300,000 window needs a model with a 1M context (`/model`, `[1m]`); Claude Code caps it at the model's window.
+
 ## 6. Check that it works
 
 In a Claude Code session (`/plugin` lists the loaded mods on its dim line under the tabs):
@@ -109,6 +119,8 @@ In a Claude Code session (`/plugin` lists the loaded mods on its dim line under 
 | teacher-guard | `/teacher-mode activate` in a repo: the status line shows `TEACHER MODE · <repo>`; ask Claude to edit a file, it is refused |
 | langmod | `/langmod` lists each mod's language; `/langmod fr` switches them |
 | project-hours | `/hours` lists this week's Claude Code time per project (after a first reply); `/hours panel` opens the Hours panel |
+| notify | a desktop notification "Claude has finished." after a reply of 15 s or more |
+| project-memory | in a project with `.claude/contexte.md`, ask Claude "what are you working on?": it answers from the notes without reading the file |
 
 ## Configure
 
@@ -145,7 +157,9 @@ Adding up project-hours across machines (optional, with a sync tool such as Sync
 | Mods installed with `make install` | that machine | clone and install again |
 | Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you sign in |
 | Skills in `~/.claude/skills/` | that machine | not synced: upload them on claude.ai (Customize > Skills) to have them everywhere |
-| `~/.claude/CLAUDE.md`, `~/.claude/settings.json` (mod options) | that machine | not synced: copy them, or run `scripts/configure.sh` again |
+| Your rules for every project, the hand-off notes loading | the project-memory mod, on your account | there with the mod |
+| `~/.claude/settings.json`: mod options, compaction window | that machine | not synced: `make user-settings`, and `scripts/configure.sh` for options other than the defaults |
+| `~/.claude/CLAUDE.md` | that machine | not synced; with project-memory, keep only machine-specific notes there |
 | project-hours data (`~/.claude/mod-data/project-hours/`) | that machine | not synced, unless `dataFolder` points to a folder a sync tool shares ([how](mods.md#project-hours)) |
 | A repository's `.claude/skills/` and `CLAUDE.md` | the repository | there after `git clone` |
 

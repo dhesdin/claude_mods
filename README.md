@@ -10,6 +10,8 @@ Small, independent mods for Claude Code. Each one is a plugin you install, confi
 | [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | `/sysmon` opens or closes the panel | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
 | [teacher-guard](plugins/teacher-guard) | Teacher mode: in the protected repo, Claude cannot write your code; it explains and reviews | `/teacher-mode activate` / `deactivate` | [spec](docs/specs/03-teacher-guard.md) |
 | [langmod](plugins/langmod) | Display language of every mod at once | `/langmod en\|fr\|ja\|zh` | [architecture](docs/architecture.md#internationalization) |
+| [notify](plugins/notify) | Desktop notification when Claude finishes a reply or waits for you, with the project's name | none | [spec](docs/specs/05-notify.md) |
+| [project-memory](plugins/project-memory) | Your rules and the project's hand-off notes loaded at start and after each compaction, on every machine; reminder to update the notes before compaction | none | [spec](docs/specs/06-project-memory.md) |
 | [project-hours](plugins/project-hours) | Claude Code time per project and per week (open sessions only), alert when a priority project goes quiet; optional sync between machines | `/hours`, `/hours 4`, `/hours panel` | [spec](docs/specs/04-project-hours.md) |
 
 **Every option of every mod, and how to set it: [docs/mods.md](docs/mods.md).** In short: `/config` in Claude Code, or `scripts/configure.sh <mod> key=value` from the repository. Options are per machine.
@@ -41,6 +43,7 @@ The agent checks the machine (system, Claude Code version, GPU and driver), asks
 ```bash
 git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
 make doctor                      # what this machine has, what to fix
+make user-settings               # once per machine: compaction at 300k tokens (settings no plugin can carry)
 make install MOD_LANG=fr         # every mod on this machine (or: make install sysmon usage-pace)
 scripts/configure.sh project-hours priorityProjects='sip/edge=3'   # any option, see docs/mods.md
 ```

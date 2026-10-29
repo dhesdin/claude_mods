@@ -29,6 +29,16 @@
       "name": "project-hours",
       "source": "./plugins/project-hours",
       "description": "Claude Code time per project and per week, priority-project alerts"
+    },
+    {
+      "name": "notify",
+      "source": "./plugins/notify",
+      "description": "Desktop notification when Claude finishes or waits for you"
+    },
+    {
+      "name": "project-memory",
+      "source": "./plugins/project-memory",
+      "description": "Rules and project hand-off notes loaded at start and after compaction, on every machine"
     }
   ]
 }

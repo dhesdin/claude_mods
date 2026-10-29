@@ -32,6 +32,8 @@ The facts come from the repository, not from memory: `docs/mods.md` (each mod, i
    - Ask the display language once for every mod (`en`, `fr`, `ja`, `zh`).
    - **project-hours**: say first that it counts only the time of open Claude Code sessions. Ask for priority projects (`name=weeks`), aliases, and whether they work on one project from **several machines**. If yes, explain the sync option of `docs/mods.md` (a tool they install themselves, such as Syncthing, shares a folder; then `dataFolder` points to it on each machine). It is optional and can be set later.
    - **sysmon** on a GPU machine: `gpuBackend` stays `auto` unless the doctor found the wrong source.
+   - **notify** on Linux: needs `notify-send` (package `libnotify-bin`); give the install command if the doctor or `command -v notify-send` finds none.
+   - **project-memory**: say it sends the rules and `.claude/contexte.md` to Claude at each conversation start and after compaction (that is its purpose), and that the rules are edited in `plugins/project-memory/rules.md`. Offer `make user-settings` (step 7b).
 
 5. **Recap and confirm**: the mods, where, the language, the options that differ from the defaults, the exact commands you will run. Wait for a yes.
 
@@ -40,6 +42,8 @@ The facts come from the repository, not from memory: `docs/mods.md` (each mod, i
    - Account: `make dist`, then the person uploads each `dist/plugins/<mod>.zip` on claude.ai (Customize > Plugins > Add > Upload plugin) and restarts Claude Code. Wait until `claude plugin list` shows `<mod>@synced` before step 7. The language is an option like the others: set it in step 7.
 
 7. **Configure**, one command per mod, only the options that change: `scripts/configure.sh <mod> key=value [key=value...]` (values with `;` or spaces in single quotes). It finds the installed copy (`@claude-mods` or `@synced`) and refuses an unknown key. Check with `scripts/configure.sh <mod>`; the values apply when Claude Code restarts. Options are per machine: on another machine, run step 7 again there.
+
+7b. **Per-machine settings**, if they agree: `scripts/user-settings.sh --dry-run`, show the changes, then `scripts/user-settings.sh` (it backs up `settings.json` first). Run it after project-memory is installed, so it can remove the old `charger-contexte.sh` hook.
 
 8. **Hardware, for sysmon.** If the doctor reports a GPU without its tool, point to the matching section of `docs/hardware.md` and quote its commands for their distribution. Mention the sections still marked **[to validate]** (Jetson, AMD).
 

@@ -9,6 +9,10 @@ One page for everything a user can see or set. Each mod is independent: install,
 | [teacher-guard](#teacher-guard) | teacher mode: in the protected repo, Claude explains and reviews but cannot write | `/teacher-mode activate` / `deactivate` |
 | [langmod](#langmod) | display language of every mod at once | `/langmod en\|fr\|ja\|zh` |
 | [project-hours](#project-hours) | Claude Code time per project and per week, alert when a priority project goes quiet | `/hours`, `/hours 4`, `/hours panel` |
+| [notify](#notify) | desktop notification when Claude finishes a reply or waits for you | none |
+| [project-memory](#project-memory) | your rules and the project's hand-off notes loaded at start and after each compaction, on every machine; reminder to update the notes before compaction | none |
+
+Two of them write to the model on purpose: **project-memory** (rules and notes, at the start and after compaction) and **sysmon** (only when Claude calls its tool). The others cost no tokens.
 
 ## Setting options
 
@@ -95,3 +99,23 @@ Time spent per project and per week, to see whether a priority project is being 
 3. Optional: copy the old weeks across once, from `~/.claude/mod-data/project-hours/` into the shared folder.
 
 Each session writes its own file, so two machines never write the same file. Machines exchange files when they are on at the same time; until then `/hours` shows what has arrived. A cloud folder (Nextcloud, Dropbox...) works too, but your data then goes through that service. The folder must be local: a network share (NFS, SMB) is refused by Claude Code.
+
+## notify
+
+A desktop notification, titled with the project's name, when a reply ends (replies shorter than `minTurnSeconds` are skipped), when Claude waits for a permission or an answer, and when a background session waits or ends. Always, even with the terminal in front. Linux `notify-send`, macOS `osascript`, Windows and WSL a PowerShell toast (macOS and Windows [to validate]); in iTerm2, Ghostty and Kitty Claude Code already notifies, so it is not doubled. No tokens.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `language` | `en` | `en`, `fr`, `ja`, `zh` |
+| `minTurnSeconds` | `15` | shortest reply notified, in seconds; `0` = every reply |
+
+## project-memory
+
+Your rules for every project (the mod's `rules.md`) and the project's `.claude/contexte.md` with a git snapshot, given to Claude at the start of each conversation and after each compaction, on every machine where the mod is. When the context reaches `handoffTokens`, Claude is told once to run the `project-handoff` skill, so the notes are current before the automatic compaction. Rules are changed in the repository (`plugins/project-memory/rules.md`), then the mod is uploaded again.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `globalRules` | `true` | give Claude the rules |
+| `handoffTokens` | `250000` | context size of the hand-off reminder; keep it under the auto-compact window (`0` = never) |
+
+Per machine, once: `scripts/user-settings.sh` turns automatic compaction on at 300,000 tokens and removes the old `charger-contexte.sh` hook ([install guide](install.md#per-machine-settings)).
