@@ -3,7 +3,7 @@
   "owner": {
     "name": "ValentinD"
   },
-  "description": "Personal Claude Code mods: usage pace, machine monitor, teacher mode, display language",
+  "description": "Personal Claude Code mods: usage pace, machine monitor, teacher mode, help, display language",
   "plugins": [
     {
       "name": "usage-pace",
@@ -18,12 +18,17 @@
     {
       "name": "teacher-guard",
       "source": "./plugins/teacher-guard",
-      "description": "Teacher mode: Claude cannot write in repos holding a .teacher-mode file"
+      "description": "Teacher mode per repo and session (/teacher-mode activate): Claude reviews, you write the code"
     },
     {
       "name": "langmod",
       "source": "./plugins/langmod",
       "description": "/langmod en|fr|ja|zh: display language of every mod at once"
+    },
+    {
+      "name": "mod-help",
+      "source": "./plugins/mod-help",
+      "description": "/skill-help and /help-mods: every skill and every mod, one line each"
     }
   ]
 }

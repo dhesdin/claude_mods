@@ -1,12 +1,14 @@
 # Current context — claude-mods
 
-Updated: 2026-10-29 19:30
+Updated: 2026-10-29 21:00
 
 ## Current goal
-Mod 3 `teacher-guard` coded and committed, waiting for the user to check it on screen in a repo holding `.teacher-mode`. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
+teacher-guard v0.2 (/teacher-mode command), mod-help (/skill-help, /help-mods) and the modular Makefile are done and pushed; waiting for the user to check them on screen. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
 
 ## Done
-- teacher-guard 0.1.0: hooks/bash.ts (static Bash write analysis: quotes, cd, git -C, ~/$HOME/$TMPDIR, heredocs), paths.ts, register.ts (Write/Edit/NotebookEdit/Bash refused into a protected repo, fail closed; status line with git-tracked/not-ignored warning; prompt.compose instruction). 8 tests.
+- teacher-guard 0.2.0: /teacher-mode activate|deactivate (repo = git root of the session cwd, per session in $.state; deactivate only from the prompt); hooks/bash.ts path-aware Bash analysis; fail-closed tool guards; status line; prompt.compose instruction. 8 tests.
+- mod-help 0.1.0: /skill-help (account synced skills, machine ~/.claude/skills, project .claude/skills) and /help-mods (marketplace + config/command lists). 3 tests.
+- Makefile + scripts/install.sh: make install [mods], install-<mod>, uninstall, teardown, list, setup, check, fix; MOD_LANG / MOD_SCOPE / CLAUDE from CLI, env or git-ignored config.mk. CLAUDE=echo for a dry run.
 - Plugins: usage-pace 0.2.0, sysmon 0.2.0, langmod 0.1.0 (new: `/langmod en|fr|ja|zh` sets `<plugin>.language` rows via $.config.set). Display i18n en/fr/ja/zh in `hooks/i18n.ts` of each mod; `language` userConfig picker (default en).
 - sysmon: GPU sources in hooks/gpu.ts (NVIDIA nvidia-smi, Jetson tegrastats [to validate], AMD rocm-smi [to validate]), `gpuBackend` auto detection; system.ts (/proc, df); util.ts `clean()` for untrusted text; throttling written out ("thermal (GPU too hot)" red, "power limit (max power draw reached)" orange).
 - Repo: docs/{architecture,development,mods-api,hardware}.md, docs/specs/ (moved from specs/), README, per-plugin README, SECURITY.md, LICENSE (MIT), scripts/check.sh (validate + surface.txt snapshot + zero-network + tests + tsc), scripts/install.sh (--lang), .github CI (SHA-pinned actions, read-only) + Dependabot.
@@ -15,7 +17,7 @@ Mod 3 `teacher-guard` coded and committed, waiting for the user to check it on s
 - Checks: 13 tests pass, all surfaces match, tsc ok where engine types are laid.
 
 ## Decisions
-- teacher-guard: only writes INTO a protected repo are refused (user choice); temp folders free; marker created by hand per repo; status line instead of an AbovePrompt band; $.env.get takes literal names only (HOME, TMPDIR).
+- teacher-guard: only writes INTO a protected repo are refused; temp folders free; activation by command per session (marker file dropped at the user's request).
 - UI language per mod (userConfig `language`), model-facing text stays English.
 - Two nvidia-smi calls per cycle (GPU + processes), accepted by the user.
 - Surface snapshots (`surface.txt`) are the review gate for new capabilities.
@@ -23,6 +25,7 @@ Mod 3 `teacher-guard` coded and committed, waiting for the user to check it on s
 - Commits: no Claude co-author line (user request); remote SSH git@github.com:dhesdin/claude_mods.git.
 
 ## Known pitfalls
+- Never smoke-test install targets without CLAUDE=echo: a test once installed every mod in the user's config (undone with teardown).
 - Biome collapses double spaces in JSX text: padded labels live in string constants (LABEL_GPU…).
 - The Write tool turned `\u202e`-style escapes into literal characters once: the invisible-character guard now catches it.
 - shellcheck via npx was refused by auto mode: it runs in CI only.
@@ -31,7 +34,7 @@ Mod 3 `teacher-guard` coded and committed, waiting for the user to check it on s
 - Contract `types/index.d.ts` must have no import.
 
 ## Next action
-After the user checks teacher-guard on screen: mod 4 project-hours (read the spec, check session events for active time and $.fs.write/$.store for JSONL storage).
+After the user checks teacher-guard, mod-help and make on screen: mod 4 project-hours (read the spec, check session events for active time and $.fs.write/$.store for JSONL storage).
 
 ## Missing info
 - GPU checks on the workstation (docs/hardware.md checklists); Jetson/AMD on real hardware.

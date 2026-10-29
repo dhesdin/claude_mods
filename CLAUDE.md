@@ -34,7 +34,8 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | usage-pace | yes | yes | yes |
 | sysmon | yes | laptop yes; GPU [to validate] | yes |
 | langmod | yes | not yet | yes |
-| teacher-guard | yes | not yet | yes |
+| teacher-guard | yes (v0.2: /teacher-mode command) | not yet | yes |
+| mod-help | yes | not yet | yes |
 | project-hours | no | no | no |
 
 ## Build order
@@ -45,6 +46,8 @@ One mod at a time, in this order. The next one starts only once the user has che
 2. `sysmon` (docs/specs/02-sysmon.md)
 3. `teacher-guard` (docs/specs/03-teacher-guard.md)
 4. `project-hours` (docs/specs/04-project-hours.md)
+
+Added on request along the way: `langmod` (display language), `mod-help` (docs/specs/05-mod-help.md).
 
 ## Constraints common to every mod
 
@@ -68,4 +71,4 @@ One mod at a time, in this order. The next one starts only once the user has che
 
 ## Installing on another machine
 
-The README explains it in copyable commands: clone, `scripts/install.sh` (or the manual `claude plugin marketplace add` / `claude plugin install`), then `/reload-plugins` in an open session.
+The README explains it in copyable commands: clone, `make install [mod...]` (variables `MOD_LANG`, `MOD_SCOPE`, `CLAUDE`, or a git-ignored `config.mk`), then `/reload-plugins` in an open session. Test install changes with `CLAUDE=echo` (prints the commands, changes nothing).
