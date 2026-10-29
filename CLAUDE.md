@@ -24,6 +24,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 - `docs/mods.md`: every mod, its command and its options (the catalog users and `/install-mods` read).
 - `docs/install.md`: the install guide for humans (the same steps as `/install-mods`).
 - `scripts/configure.sh <mod> key=value`: set options of an installed mod (repo or account copy).
+- `scripts/user-settings.sh` (`make user-settings`): the per-machine Claude Code settings no plugin can carry (compaction window).
 - `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
 - `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.
@@ -41,6 +42,8 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | langmod | yes | not yet | yes |
 | teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
 | project-hours | yes | yes | yes |
+| notify | yes | not yet | yes |
+| project-memory | yes | not yet | yes |
 
 ## Build order
 
@@ -51,12 +54,12 @@ One mod at a time, in this order. The next one starts only once the user has che
 3. `teacher-guard` (docs/specs/03-teacher-guard.md)
 4. `project-hours` (docs/specs/04-project-hours.md)
 
-Added on request along the way: `langmod` (display language). The user's skills (`help-skills`, `help-mods`, `passation-projet`, `travail-econome`) live on their claude.ai account, not in this repo.
+Added on request along the way: `langmod` (display language), `notify` (05) and `project-memory` (06). The user's skills (`help-skills`, `help-mods`, `project-handoff`, `token-economy`) live on their claude.ai account, not in this repo.
 
 ## Constraints common to every mod
 
 - **Zero network.** No mod makes a network request. Data stays on the machine.
-- **Zero tokens.** The display sends nothing to the model, unless a spec explicitly asks for it.
+- **Zero tokens.** The display sends nothing to the model, unless a spec explicitly asks for it (sysmon's tool, project-memory's block and reminder).
 - **Clean degradation.** When data is unavailable (no GPU, missing file, failing API), show "n/a" or hide the card. Never crash the session.
 - **Minimal cost.** No polling while a panel is hidden. Configurable intervals, sensible defaults.
 - **Config**: the plugin's `userConfig` (one manifest per mod), paths and thresholds in it, never hard-coded.

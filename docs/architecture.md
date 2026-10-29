@@ -29,7 +29,7 @@ claude-mods/
 └── LICENSE                           # MIT
 ```
 
-`.claude/contexte.md` and `suivi.md` are the session hand-off notes (current state and dated log), kept by the `passation-projet` skill.
+`.claude/contexte.md` and `suivi.md` are the session hand-off notes (current state and dated log), kept by the `project-handoff` skill.
 
 ## Anatomy of a mod
 

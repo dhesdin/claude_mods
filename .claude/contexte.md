@@ -7,7 +7,7 @@ All five mods done, validated on screen, on the user's claude.ai account (usage-
 
 ## Done (repo public on github.com/dhesdin/claude_mods)
 - usage-pace 0.2, sysmon 0.2, teacher-guard 0.2, langmod: on the user's claude.ai account, synced as <mod>@synced on every machine.
-- User skills (help-skills, help-mods, passation-projet, travail-econome) live on the claude.ai account, not in this repo.
+- User skills (help-skills, help-mods, project-handoff, token-economy) live on the claude.ai account, not in this repo.
 - Repo tooling: docs/, AGENTS.md, /install-mods, make doctor/install/dist, scripts/check.sh, CI, ruleset protect-main (owner bypass), security settings (SECURITY.md).
 - Directory (claude.ai/directory/manage): sysmon submitted, waiting for scan + review. usage-pace: steps 1-3 done (repo dhesdin/claude_mods, path plugins/usage-pace, validation passed at 07b767a with the known `types` warning; data handling: no personal data, nothing sent, not retained, not for minors). Step 4 (contact e-mail + 4 compliance ticks) and step 5 are the user's, in the open Chrome tab.
 
