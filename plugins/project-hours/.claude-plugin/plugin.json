@@ -1,0 +1,50 @@
+{
+  "name": "project-hours",
+  "version": "0.1.0",
+  "description": "Claude Code time per project and per week, with an alert when a priority project goes quiet",
+  "author": { "name": "ValentinD" },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/project-hours",
+  "repository": "https://github.com/dhesdin/claude_mods",
+  "license": "MIT",
+  "keywords": ["time-tracking", "projects", "hours", "focus"],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Display language (also settable for every mod at once with /langmod)",
+      "options": ["en", "fr", "ja", "zh"],
+      "default": "en"
+    },
+    "idleMinutes": {
+      "type": "number",
+      "title": "Idle threshold (minutes)",
+      "description": "A gap between two events longer than this ends the active segment",
+      "default": 10
+    },
+    "aliases": {
+      "type": "string",
+      "title": "Project aliases",
+      "description": "Display names, separated by ';': a path prefix or a repo name, '=', the name. Example: ~/code/sip/edge=sip/edge; k4u-erp=ERP",
+      "default": ""
+    },
+    "priorityProjects": {
+      "type": "string",
+      "title": "Priority projects",
+      "description": "Projects to watch, separated by ';': name=max weeks without activity. Example: sip/edge=3",
+      "default": ""
+    },
+    "toolingProjects": {
+      "type": "string",
+      "title": "Tooling projects",
+      "description": "Projects flagged as tooling (time on tools rather than on the substance), separated by ';'",
+      "default": "claude-mods"
+    },
+    "openOnStart": {
+      "type": "boolean",
+      "title": "Open the panel on start",
+      "description": "Open the Hours panel in every session (otherwise: /hours pane)",
+      "default": false
+    }
+  }
+}

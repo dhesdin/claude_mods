@@ -24,6 +24,11 @@
       "name": "langmod",
       "source": "./plugins/langmod",
       "description": "/langmod en|fr|ja|zh: display language of every mod at once"
+    },
+    {
+      "name": "project-hours",
+      "source": "./plugins/project-hours",
+      "description": "Claude Code time per project and per week, priority-project alerts"
     }
   ]
 }
