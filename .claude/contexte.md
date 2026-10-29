@@ -1,37 +1,37 @@
-# Contexte courant : claude-mods
+# Current context: claude-mods
 
-Mis à jour : 2026-10-29 22:00
+Updated: 2026-10-29 22:00
 
-## Objectif en cours
-Vérification à l'écran de notify (05) et project-memory (06), chargés dans cette session par liens dev-mods (~/.claude/dev-mods/4f3c1696-…/) et envoyés sur le compte claude.ai. Le bloc projectMemory et le rappel de passation à 250k sont arrivés dans cette session : project-memory fonctionne.
+## Current goal
+On-screen check of notify (05) and project-memory (06), loaded in this session through dev-mods links (~/.claude/dev-mods/4f3c1696-…/) and uploaded to the claude.ai account. The projectMemory block and the 250k hand-off reminder both arrived in this session: project-memory works.
 
-## Fait
-- 7 mods sur le compte claude.ai (usage-pace 0.3, sysmon, teacher-guard, langmod, project-hours, notify, project-memory), statut dans CLAUDE.md.
-- scripts/user-settings.sh appliqué sur le laptop (compaction auto à 300k, CLAUDE_AUTOCOMPACT_PCT_OVERRIDE retiré ; sauvegarde settings.json.20261029-214415.bak). Hook charger-contexte.sh encore présent.
-- Skills renommées (project-handoff, token-economy, industry-code-review) ; doublons français supprimés du compte.
-- docs/mods.md = catalogue unique ; check.sh « docs coverage » l'impose.
-- Annuaire : usage-pace et sysmon en examen chez Anthropic ; project-hours non soumis.
+## Done
+- 7 mods on the claude.ai account (usage-pace 0.3, sysmon, teacher-guard, langmod, project-hours, notify, project-memory); status table in CLAUDE.md.
+- scripts/user-settings.sh applied on the laptop (auto-compaction at 300k, CLAUDE_AUTOCOMPACT_PCT_OVERRIDE removed; backup settings.json.20261029-214415.bak). The charger-contexte.sh hook is still there.
+- Skills renamed (project-handoff, token-economy, industry-code-review); French duplicates deleted from the account.
+- docs/mods.md is the single catalog; check.sh "docs coverage" enforces it.
+- Directory: usage-pace and sysmon under Anthropic review; project-hours not submitted.
 
-## Décisions récentes
-- Nouveaux mods en TypeScript : notify (classic.Notification + turn.complete, notify-send/osascript/PowerShell par argv) ; project-memory (prompt.context, session.measure, `context` de tool.call/prompt.submit).
-- Réglages hors plugin (autoCompactEnabled, autoCompactWindow) : scripts/user-settings.sh, une fois par machine.
-- test-before-done et retry-intelligence reportés (peu utiles aujourd'hui).
-- Texte destiné au modèle en anglais ; affichage traduit (`language`, /langmod).
-- Commits sans co-auteur Claude ; scripts/check.sh vert avant chaque commit.
+## Recent decisions
+- New mods are TypeScript: notify (classic.Notification + turn.complete, notify-send/osascript/PowerShell by argv); project-memory (prompt.context, session.measure, tool.call/prompt.submit `context`).
+- Settings no plugin can carry (autoCompactEnabled, autoCompactWindow): scripts/user-settings.sh, once per machine.
+- test-before-done and retry-intelligence deferred (little value today).
+- Model-facing text in English; display translated (`language`, /langmod).
+- Commits without Claude co-author; scripts/check.sh green before every commit.
 
-## Pièges connus
-- `$` ne se passe ni ne se stocke : closures construites dans session.start.
-- Stubs de test : renvoyer un résultat complet (turn.complete `{ text }`, session.measure `{ changed }`, session.compact avec un message ayant `toolUses`) ; stdin de process.run est sous `init`.
-- Types moteur absents tant qu'une session n'a pas chargé le mod : copier .claude-plugin/types et tsconfig.json d'un autre mod (git-ignorés).
-- shellcheck tourne seulement en CI ; pas de `gh` local pour voir la CI.
+## Known pitfalls
+- `$` cannot be passed or stored: closures built in session.start.
+- Test stubs return a full result (turn.complete `{ text }`, session.measure `{ changed }`, session.compact with one message holding `toolUses`); process.run's stdin is under `init`.
+- Engine types are missing until a session loads the mod: copy .claude-plugin/types and tsconfig.json from another mod (git-ignored).
+- shellcheck runs in CI only; no local `gh` to read CI results.
 
-## Prochaine action
-Après redémarrage de Claude Code sur le laptop : vérifier notify@synced et project-memory@synced (`claude plugin list`), relancer `make user-settings` (retire le hook), retirer les 2 règles de ~/.claude/CLAUDE.md, supprimer les liens dev-mods. Sur la tour : `make user-settings`.
+## Next action
+After a Claude Code restart on the laptop: check notify@synced and project-memory@synced (`claude plugin list`), run `make user-settings` again (removes the hook), remove the 2 rules from ~/.claude/CLAUDE.md, delete the dev-mods links. On the workstation: `make user-settings`.
 
-## En attente de l'utilisateur
-- Corrections proposées pour les skills version-check et init-project (le marqueur `.teacher-mode` d'init-project n'existe pas).
-- CLAUDE.md modifiés non commités : appli_quotidien/appli_tracker, appli_quotidien/appli_jeu/double-regard.
-- Rappel : GIF de démo du README à la fin.
+## Waiting for the user
+- Proposed fixes to the version-check and init-project skills (init-project's `.teacher-mode` marker does not exist).
+- Uncommitted CLAUDE.md edits: appli_quotidien/appli_tracker, appli_quotidien/appli_jeu/double-regard.
+- Reminder: README demo GIF at the end.
 
-## Infos manquantes
-- Vérifications GPU sur la tour (docs/hardware.md) ; Jetson/AMD sur vrai matériel.
+## Missing info
+- GPU checks on the workstation (docs/hardware.md); Jetson/AMD on real hardware.
