@@ -117,7 +117,7 @@ scripts/user-settings.sh --dry-run [--rules] [--window 300000]   # show the chan
 
 Every file is backed up (`<file>.<date>.bak`) before a change; run again, nothing changes. `make doctor` shows the state (User settings section) and flags a broken link if the clone moved. A 300,000 window needs a model with a 1M context (`/model`, `[1m]`); Claude Code caps it at the model's window.
 
-Per project, nothing to install: the hook reads the `.claude/contexte.md` of whatever project the session opens, and the `project-handoff` skill writes it.
+Per project, nothing to install: the hook reads the `.claude/contexte.md` of whatever project the session opens, and Claude keeps it up to date (reminded by project-memory before compaction).
 
 ## 6. Check that it works
 

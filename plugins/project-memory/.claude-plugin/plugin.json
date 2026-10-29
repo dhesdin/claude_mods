@@ -1,6 +1,6 @@
 {
   "name": "project-memory",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Reminds Claude, once before the automatic compaction, to update the project's hand-off notes (.claude/contexte.md)",
   "author": {
     "name": "ValentinD"

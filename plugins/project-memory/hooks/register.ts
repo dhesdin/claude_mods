@@ -5,7 +5,7 @@ import type { Register } from 'claude-code'
 // mod can do: telling Claude, once per compaction cycle, to update the notes before the automatic compaction.
 
 export const REMINDER =
-  'The context is approaching the compaction threshold: run the project-handoff skill now, so .claude/contexte.md holds the current state before the conversation is summarized.'
+  'The context is approaching the compaction threshold: update .claude/contexte.md now (current goal, what is done, recent decisions, next action), so it holds the current state before the conversation is summarized.'
 
 export const register: Register = (on, options) => {
   const handoffTokens = Math.max(0, Number(options.handoffTokens ?? 250000))

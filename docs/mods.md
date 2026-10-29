@@ -112,7 +112,7 @@ A desktop notification, titled with the project's name, when a reply ends (repli
 
 ## project-memory
 
-When the context reaches `handoffTokens`, Claude is told once to run the `project-handoff` skill, so `.claude/contexte.md` is current before the automatic compaction. About 40 tokens per compaction cycle. The notes themselves and your rules are loaded by Claude Code, set up per machine by `make user-settings` ([install guide](install.md#per-machine-settings)).
+When the context reaches `handoffTokens`, Claude is told once to update `.claude/contexte.md` (current goal, what is done, recent decisions, next action), so it is current before the automatic compaction. About 40 tokens per compaction cycle. The notes themselves and your rules are loaded by Claude Code, set up per machine by `make user-settings` ([install guide](install.md#per-machine-settings)).
 
 | Option | Default | Effect |
 | --- | --- | --- |

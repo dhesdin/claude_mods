@@ -4,13 +4,13 @@ Reminds Claude, once before the automatic compaction, to update the project's ha
 
 When the context reaches `handoffTokens` (default 250,000) in a git repo or a folder with `.claude/contexte.md`, Claude reads, once, on its next tool result or your next message:
 
-> The context is approaching the compaction threshold: run the project-handoff skill now, so .claude/contexte.md holds the current state before the conversation is summarized.
+> The context is approaching the compaction threshold: update .claude/contexte.md now (current goal, what is done, recent decisions, next action), so it holds the current state before the conversation is summarized.
 
 The full chain, with the per-machine settings of `make user-settings`:
 
 | Step | Done by |
 | --- | --- |
-| 250k tokens: the notes are updated | this mod (reminder) + the `project-handoff` skill |
+| 250k tokens: the notes are updated | Claude, told by this mod (reminder) |
 | 300k tokens: automatic compaction | Claude Code (`autoCompactWindow`, set by `make user-settings`) |
 | after it, at each start, `/clear` and resume: the notes and a git snapshot are loaded | the SessionStart hook `load-context.sh` (installed by `make user-settings`) |
 | your rules for every project | `~/.claude/CLAUDE.md` (linked to this repository's `user/CLAUDE.md` by `make user-settings RULES=1`) |
