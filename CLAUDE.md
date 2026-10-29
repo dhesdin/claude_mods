@@ -16,12 +16,28 @@ Avant d'écrire la moindre ligne :
 
 Rappel de la doc : un hook n'a aucun accès direct au système. Lire un fichier, lancer un processus, dessiner, ajouter une commande : tout passe par l'API `$` des mods. Pas de `require('os')`, pas de `fs` direct.
 
+## Où trouver l'information
+
+- `.claude/contexte.md` : état courant, réinjecté au démarrage (ne pas le relire).
+- `docs/mods-api.md` : API des mods vérifiée, boucle de dev, pièges des tests. **À lire avant de coder un mod**, au lieu de réexplorer les types.
+- `suivi.md` : journal daté des sessions.
+
+## État des mods
+
+| Mod | Codé | Validé à l'écran | Commité |
+| --- | --- | --- | --- |
+| usage-pace | oui | oui | oui |
+| sysmon | non | non | non |
+| teacher-guard | non | non | non |
+| project-hours | non | non | non |
+
 ## Structure attendue
 
 ```
 claude-mods/
 ├── CLAUDE.md
 ├── README.md                  # installation sur une nouvelle machine
+├── docs/mods-api.md           # API vérifiée et boucle de dev
 ├── .claude-plugin/
 │   └── marketplace.json       # format à vérifier dans la doc officielle
 ├── specs/                     # specs fonctionnelles, une par mod
