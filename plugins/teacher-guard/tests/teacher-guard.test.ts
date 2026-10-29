@@ -65,23 +65,24 @@ test('bash: cd, variables, substitutions and heredocs', () => {
   expect(writes('2>&1 echo hi >&2')).toEqual([])
 })
 
-// A fake machine: files that exist, the session folder, and what reached the engine.
-function machine(files: string[], cwd: string, isMarkerTracked = false) {
+// A fake machine: the session folder, its git repo, and what reached the engine.
+function machine(cwd: string, gitRoot: string | null) {
   const ran: string[] = []
   const status: (string | undefined)[] = []
   const install = (on: (event: string, hook: (...args: never[]) => unknown) => void) => {
     on('session.start', ((_: unknown, e: { cwd: string }) => ({ cwd: e.cwd })) as never)
     on('session.cwd', (() => ({ value: cwd })) as never)
+    on('command.register', (() => ({ value: { command: 'teacher-mode' } })) as never)
     on('env.get', ((_: unknown, e: { name: string }) => ({ value: (VARS as Record<string, string>)[e.name] })) as never)
-    on('fs.read', ((_: unknown, e: { path: string }) => {
-      if (!files.includes(e.path)) throw new Error('ENOENT')
-      return { value: '' }
-    }) as never)
-    on('process.run', ((_: unknown, e: { argv: string[] }) => {
-      // git ls-files: tracked 0 / not tracked 1; git check-ignore: ignored 0.
-      const exitCode = e.argv.includes('ls-files') && !isMarkerTracked ? 1 : 0
-      return { value: { exitCode, stdout: '', stderr: '', isStdoutTruncated: false, isStderrTruncated: false } }
-    }) as never)
+    on('process.run', (() => ({
+      value: {
+        exitCode: gitRoot ? 0 : 128,
+        stdout: gitRoot ? `${gitRoot}\n` : '',
+        stderr: '',
+        isStdoutTruncated: false,
+        isStderrTruncated: false,
+      },
+    })) as never)
     on('ui.status', ((_: unknown, e: { text: string | undefined }) => {
       status.push(e.text)
       return { value: undefined }
@@ -100,60 +101,83 @@ type Call = { tool: string; [field: string]: unknown }
 const call = ($: unknown, input: Call) =>
   ($ as { tool: { call: (i: Call) => Promise<{ deny?: string; result?: unknown }> } }).tool.call(input)
 
-test('protected repo: Edit and writes refused, reading and tests allowed, status and instruction shown', async ($, on) => {
-  const m = machine([`${REPO}/.teacher-mode`], CWD)
+const person = { kind: 'composer' as const }
+const command = (args: string, origin: { kind: string } = person) => ({
+  command: 'teacher-mode',
+  args,
+  origin: origin as never,
+  presentation: { isFullscreen: false, columns: 120 },
+})
+const compose = {
+  model: 'm',
+  promptModel: 'm',
+  surfaces: [],
+  tools: [],
+  outputStyle: { name: 'default', isKeepingCodingInstructions: true },
+  traits: [],
+} as never
+
+test('off by default: nothing is refused, no status, no instruction', async ($, on) => {
+  const m = machine(CWD, REPO)
   m.install(on as never)
   await $.session.start({ cwd: CWD, surface: 'terminal', isInteractive: true })
 
-  expect(m.status).toEqual(['TEACHER MODE'])
+  expect(m.status).toEqual([undefined])
+  expect((await call($, { tool: 'Edit', file_path: `${CWD}/a.py`, old_string: 'a', new_string: 'b' })).result).toBe('ok')
+  expect((await call($, { tool: 'Bash', command: 'git commit -am x && rm -rf build' })).result).toBe('ok')
+  expect((await $.prompt.compose(compose)).sections.map(s => s.id)).toEqual(['base'])
+})
+
+test('activate: the current repo is protected, temp folders stay free', async ($, on) => {
+  const m = machine(CWD, REPO)
+  m.install(on as never)
+  await $.session.start({ cwd: CWD, surface: 'terminal', isInteractive: true })
+
+  expect((await $.command.run(command('activate'))).text).toBe(
+    `Teacher mode on for ${REPO} (this session): Claude can no longer write in it.`,
+  )
+  expect(m.status).toEqual([undefined, 'TEACHER MODE · sip'])
+  expect((await $.command.run(command('activate'))).text).toBe(`Teacher mode is already on for ${REPO}.`)
+
   const edit = await call($, { tool: 'Edit', file_path: `${CWD}/main.py`, old_string: 'a', new_string: 'b' })
   expect(edit.deny).toContain('Repo in teacher mode: no writes.')
   expect(edit.deny).toContain(`(refused: Edit in ${REPO})`)
+  expect((await call($, { tool: 'Write', file_path: `${REPO}/deep/new.py`, content: 'x' })).deny).toContain(REPO)
   expect((await call($, { tool: 'Bash', command: 'echo x > f' })).deny).toContain('redirection >')
-  expect((await call($, { tool: 'Bash', command: 'rm ../.teacher-mode' })).deny).toContain('rm')
-  expect((await call($, { tool: 'Bash', command: 'git commit -m "done"' })).deny).toContain('git commit')
+  expect((await call($, { tool: 'Bash', command: 'git add -A && git commit -m "done"' })).deny).toContain('git add')
+  expect((await call($, { tool: 'Bash', command: 'cd /tmp && cp /tmp/claude/fix.py ~/sip/src/' })).deny).toContain('cp')
   expect((await call($, { tool: 'Bash', command: 'cat main.py' })).result).toBe('ok')
   expect((await call($, { tool: 'Bash', command: 'pytest' })).result).toBe('ok')
-  // Free to work in temporary folders.
   expect((await call($, { tool: 'Bash', command: 'cp main.py /tmp/claude/main.py && rm -rf /tmp/claude/old' })).result).toBe('ok')
   expect((await call($, { tool: 'Write', file_path: '/tmp/claude/notes.md', content: 'x' })).result).toBe('ok')
   expect(m.ran).toEqual(['Bash', 'Bash', 'Bash', 'Write'])
 
-  const composed = await $.prompt.compose({
-    model: 'm',
-    promptModel: 'm',
-    surfaces: [],
-    tools: [],
-    outputStyle: { name: 'default', isKeepingCodingInstructions: true },
-    traits: [],
-  } as never)
-  expect(composed.sections.map(s => s.id)).toEqual(['base', 'teacher-guard:instruction'])
+  expect((await $.prompt.compose(compose)).sections.map(s => s.id)).toEqual(['base', 'teacher-guard:instruction'])
 })
 
-test('unprotected repo: nothing changes', async ($, on) => {
-  const m = machine([], '/home/u/other')
-  m.install(on as never)
-  await $.session.start({ cwd: '/home/u/other', surface: 'terminal', isInteractive: true })
-
-  expect(m.status).toEqual([undefined])
-  expect((await call($, { tool: 'Edit', file_path: '/home/u/other/a.py', old_string: 'a', new_string: 'b' })).result).toBe('ok')
-  expect((await call($, { tool: 'Bash', command: 'git commit -am x && rm -rf build' })).result).toBe('ok')
-  expect(m.ran).toEqual(['Edit', 'Bash'])
-})
-
-test('a write aimed at a protected repo from another folder is refused', async ($, on) => {
-  const m = machine([`${REPO}/.teacher-mode`], '/home/u/other')
-  m.install(on as never)
-  await $.session.start({ cwd: '/home/u/other', surface: 'terminal', isInteractive: true })
-
-  expect((await call($, { tool: 'Write', file_path: `${REPO}/src/deep/new.py`, content: 'x' })).deny).toContain(REPO)
-  expect((await call($, { tool: 'Bash', command: 'cp fix.py ~/sip/src/' })).deny).toContain('cp')
-  expect(m.ran).toEqual([])
-})
-
-test('French status line; a marker tracked by git is flagged', { options: { language: 'fr' } }, async ($, on) => {
-  const m = machine([`${REPO}/.teacher-mode`], CWD, true)
+test('deactivate: only from the prompt, then everything is writable again', async ($, on) => {
+  const m = machine(CWD, REPO)
   m.install(on as never)
   await $.session.start({ cwd: CWD, surface: 'terminal', isInteractive: true })
-  expect(m.status).toEqual(['MODE PROF · .teacher-mode est suivi par git : git rm --cached .teacher-mode'])
+  await $.command.run(command('activate'))
+
+  expect((await $.command.run(command('deactivate', { kind: 'plugin' }))).text).toBe('Only you can turn teacher mode off, from the prompt.')
+  expect((await call($, { tool: 'Edit', file_path: `${CWD}/a.py`, old_string: 'a', new_string: 'b' })).deny).toBeDefined()
+
+  expect((await $.command.run(command('deactivate'))).text).toBe(`Teacher mode off for ${REPO}.`)
+  expect(m.status.at(-1)).toBe(undefined)
+  expect((await call($, { tool: 'Edit', file_path: `${CWD}/a.py`, old_string: 'a', new_string: 'b' })).result).toBe('ok')
+  expect((await $.command.run(command('deactivate'))).text).toBe('Teacher mode is not on for this repo.')
+})
+
+test('outside a git repo the folder itself is protected; French replies', { options: { language: 'fr' } }, async ($, on) => {
+  const m = machine('/home/u/notes', null)
+  m.install(on as never)
+  await $.session.start({ cwd: '/home/u/notes', surface: 'terminal', isInteractive: true })
+
+  expect((await $.command.run(command('activate'))).text).toBe(
+    'Mode prof activé pour /home/u/notes (cette session) : Claude ne peut plus y écrire.',
+  )
+  expect(m.status.at(-1)).toBe('MODE PROF · notes')
+  expect((await $.command.run(command(''))).text).toBe('Mode prof actif pour : /home/u/notes\nUsage : /teacher-mode activate | deactivate')
 })

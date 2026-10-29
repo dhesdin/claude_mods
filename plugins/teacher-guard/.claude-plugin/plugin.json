@@ -1,14 +1,17 @@
 {
   "name": "teacher-guard",
-  "version": "0.1.0",
-  "description": "Teacher mode: in a repo holding a .teacher-mode file, Claude cannot write your code; it explains and reviews instead",
-  "author": { "name": "ValentinD" },
+  "version": "0.2.0",
+  "description": "Teacher mode, per repo and per session: /teacher-mode activate, and Claude cannot write your code there; it explains and reviews instead",
+  "author": {
+    "name": "ValentinD"
+  },
   "license": "MIT",
+  "types": "./types/index.d.ts",
   "userConfig": {
     "language": {
       "type": "string",
       "title": "Language",
-      "description": "Language of the status line (also settable for every mod at once with /langmod)",
+      "description": "Language of the status line and command replies (also settable for every mod at once with /langmod)",
       "options": ["en", "fr", "ja", "zh"],
       "default": "en"
     }

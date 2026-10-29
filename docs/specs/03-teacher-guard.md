@@ -1,36 +1,35 @@
 # Mod 03: teacher-guard
 
 ## Problem
-In the portfolio repos (SIP, 3D Vision, etc.), the user must write the code themselves: they will have to defend it in interviews. The risk is letting Claude code "just this once". This mod makes that slide impossible without a conscious effort.
+In the portfolio repos (SIP, 3D Vision, etc.), the user must write the code themselves: they will have to defend it in interviews. The risk is letting Claude code "just this once". This mod makes that slide impossible without a conscious step.
 
-## Activation: marker file
-- A repo is protected if it holds a `.teacher-mode` file at its root. The file is created in the current project (SIP) but never committed nor pushed: teacher mode applies to the user, while the portfolio must stay professional and not show Claude's presence.
-- No list of paths in config: paths differ between laptop and workstation, the marker travels with the working copy.
-- Disabling = deleting the file by hand. **No slash command turns the mode off.** The friction is deliberate.
+## Activation: a command, per repo and per session
+- `/teacher-mode activate` protects the current repo (its git root, or the current folder outside git) for the session. `/teacher-mode deactivate` turns it off; `/teacher-mode` alone says what is protected.
+- Only the person at the prompt can deactivate (`origin.kind === 'composer'`): the same command from a plugin or the model is refused.
+- State in `$.state` (session): it survives a reload of the mod, and a new session starts with everything off.
+- Nothing is written in the repo: the portfolio stays professional and shows no trace of Claude.
+- (v0.1 used a `.teacher-mode` marker file. Replaced at the user's request: a command is more modular, per repo and per session.)
 
 ## Behavior in a protected repo
-1. **Block** tool calls that write files: Write, Edit, NotebookEdit (check the exact names in the docs).
-2. **Bash, best effort**: block commands that modify repo files (`>` and `>>` redirections, `tee`, `sed -i`, `mv`, `cp`, `rm`, `git commit`, `git push`, `git apply`, `patch`). Allow reading and running: `ls`, `cat`, `git status/diff/log`, running the tests or an existing script.
-   - This filter is **not a security barrier**, only a guard against autopilot. Document it as such in the README.
+1. **Refuse** tool calls that write files into the repo: `Write`, `Edit`, `NotebookEdit`.
+2. **Bash, best effort**: refuse commands whose write target is in the repo. Write commands: `>` and `>>` redirections, `tee`, `rm`, `mv`, `cp` (destination), `touch`, `mkdir`, `ln`, `chmod`, `sed -i`, `perl -i`, `dd of=`, `patch`. Git commands that change the repo or its history: `add`, `commit`, `push`, `apply`, `merge`, `rebase`, `reset`, `restore`, `checkout`, `stash`, `rm`, `mv`, `clean`, `pull`, `tag`, `clone`, `init`, `worktree`, `am`, `cherry-pick`, `revert`, `switch`. Quotes, `cd`, `git -C`, `~`, `$HOME`, `$TMPDIR` and heredocs are understood; an unknown target is judged by the folder the command runs in.
+   - Allowed: reading and running (`ls`, `cat`, `git status/diff/log`, tests, existing scripts), and anything outside protected repos (temporary folders, copying code out to `/tmp`).
+   - This filter is **not a security barrier**, only a guard against autopilot. Documented as such in the README.
 3. Clear refusal message sent back to Claude: "Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code."
-4. Permanent discreet band: `TEACHER MODE` while the session is in a protected repo.
+4. Permanent discreet indicator: the status line `TEACHER MODE · <repo>` (does not compete with other mods' bands).
+5. The guard fails closed: if a check throws before the call is let through, the call is refused.
 
 ## Only token spending allowed
-At the start of a session in a protected repo, inject a short instruction (2 to 3 lines max) so Claude acts as a reviewer from the start, rather than attempting refused writes. If the API does not allow it, skip it: blocking is enough.
-
-## Implementation decisions (agreed with the user)
-- Scope: only writes **into** a protected repo are refused. Writes elsewhere (temporary folders, Claude's memory, other projects) stay allowed, including copying code out to `/tmp`.
-- Protected = the path or one of its parents holds `.teacher-mode`, read again on every check (deleting the file turns the mode off at once).
-- Bash is judged by **where** a command writes, not only by its name: write commands (`rm`, `mv`, `cp` destination, `touch`, `mkdir`, `ln`, `chmod`, `tee`, `sed -i`, `perl -i`, `dd of=`, `patch`, redirections) and git commands that change the repo (`add`, `commit`, `push`, `apply`, `merge`, `rebase`, `reset`, `restore`, `checkout`, `stash`, `rm`, `mv`, `clean`, `pull`, `tag`, `clone`, `init`, `worktree`…) are refused when their target is in a protected repo. Quotes, `cd`, `git -C`, `~`, `$HOME`, `$TMPDIR` and heredocs are understood; an unknown target is judged by the folder the command runs in.
-- The guard fails closed: if a check throws before the call is let through, the call is refused.
-- Band: the status line under the prompt (`$.ui.status`), which does not compete with other mods' bands. It also warns when `.teacher-mode` is tracked by git or not git-ignored.
-- The marker is created by hand in each repo the user wants protected, and kept out of commits through `.git/info/exclude` or the global git ignore (README).
-- Status line translated (`language` option); the refusal and the instruction stay English (read by the model).
+While a repo is protected, a short instruction (2 lines) is added to the system prompt (`prompt.compose`, scope `session`) so Claude acts as a reviewer rather than attempting refused writes. Removed as soon as nothing is protected.
 
 ## Cases to test
-- Protected repo: Edit refused, `cat` allowed, `echo x > f` refused, `pytest` allowed.
-- Unprotected repo: no behavior change.
-- Subfolder of a protected repo: protected too (look for the marker walking up to the Git root).
+- Off by default: nothing refused, no status, no instruction.
+- After `activate`: Edit refused, `cat` allowed, `echo x > f` refused, `pytest` allowed, `git commit` refused, writes in `/tmp` allowed, a write aimed at the repo from elsewhere refused.
+- Subfolder of a protected repo: protected too (the git root is protected).
+- `deactivate` from a plugin refused; from the prompt, everything writable again.
+
+## Config
+`language` (en): status line and command replies.
 
 ## Out of scope
-Detecting code pasted by the user, statistics.
+Detecting code pasted by the user, statistics, persisting the mode across sessions.

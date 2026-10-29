@@ -1,22 +1,20 @@
 # teacher-guard
 
-Teacher mode for the repos where **you** write the code (portfolio projects you will defend in interviews). In a protected repo, Claude cannot change your files: it explains, asks questions, gives hints and reviews.
+Teacher mode for the repos where **you** write the code (portfolio projects you will defend in interviews). While it is on, Claude cannot change your files there: it explains, asks questions, gives hints and reviews.
 
-## Turn it on for a repo
+## Use
 
-```bash
-cd ~/code/my-project
-touch .teacher-mode                          # the marker: this repo is protected
-echo .teacher-mode >> .git/info/exclude      # keep it out of every commit (local, never pushed)
+```
+/teacher-mode activate      the current repo is protected, for this session
+/teacher-mode deactivate    back to normal (only you, from the prompt)
+/teacher-mode               what is protected right now
 ```
 
-To keep the marker out of every repo at once instead, add `.teacher-mode` to your global git ignore (`git config --global core.excludesFile`, usually `~/.config/git/ignore`).
+- **Scope**: the current git repo (its root, everything below it), or the current folder outside git. Several repos can be on at once.
+- **Per session**: a new session starts with teacher mode off everywhere; it survives a reload of the mod within the session. Nothing is written in your repo: no marker, nothing to keep out of commits.
+- `/teacher-mode deactivate` coming from a plugin or from the model is refused: only the person at the prompt turns it off.
 
-**Turn it off**: delete `.teacher-mode` by hand. There is deliberately no command for it. Deleting the file takes effect at once, without reloading anything.
-
-## What it does in a protected repo
-
-The repo is the folder holding `.teacher-mode` and everything below it (subfolders, nested repos).
+## What it does while on
 
 | Claude tries to… | Result |
 | --- | --- |
@@ -28,8 +26,8 @@ The repo is the folder holding `.teacher-mode` and everything below it (subfolde
 | anything in temporary folders (`/tmp/...`) or outside protected repos, including copying your code out to `/tmp` | allowed |
 
 - A refusal tells Claude: "Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code."
-- Status line under the prompt: `TEACHER MODE`, or a warning when `.teacher-mode` is tracked by git or not git-ignored (so it never lands in a commit).
-- At the start of a session in a protected repo, a two-line instruction tells Claude to act as a reviewer. It is the only token this mod spends.
+- Status line under the prompt: `TEACHER MODE · <repo>`.
+- While a repo is on, a two-line instruction in the system prompt tells Claude to act as a reviewer. It is the only token this mod spends.
 - Subagents are covered: their tool calls go through the same checks.
 
 ## Limits: a guard against autopilot, not a security barrier
@@ -44,10 +42,10 @@ The Bash check reads the command statically, best effort:
 
 | Option | Default | Role |
 | --- | --- | --- |
-| `language` | `en` | status line language: `en`, `fr`, `ja`, `zh` (or `/langmod`) |
+| `language` | `en` | status line and replies: `en`, `fr`, `ja`, `zh` (or `/langmod`) |
 
 ## Disable the mod
 
-`claude plugin disable teacher-guard@claude-mods` (every repo becomes writable again).
+`claude plugin disable teacher-guard@claude-mods` or `make uninstall teacher-guard`.
 
 Spec: [docs/specs/03-teacher-guard.md](../../docs/specs/03-teacher-guard.md)

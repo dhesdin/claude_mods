@@ -1,78 +1,53 @@
-import type { ProcessRunResult, Register } from 'claude-code'
+import type { Register } from 'claude-code'
+import { atom, read, update } from 'claude-code'
 
+import type { Roots } from '../types'
 import { bashWrites } from './bash'
 import { strings } from './i18n'
-import { resolve, selfAndAncestors } from './paths'
+import { basename, normalize, resolve } from './paths'
 
-const MARKER = '.teacher-mode'
+// Repos in teacher mode for this session. $.state: survives a reload of the mod, not a new session.
+const roots = atom({ plugin: 'teacher-guard', key: 'roots' } as const, [] as Roots)
+
 // Sent back to the model when a write is refused. English: the reader is the model.
 const REFUSAL = 'Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code.'
-// The only tokens this mod spends: a short instruction while the session runs in a protected repo.
-const SECTION = {
-  id: 'teacher-guard:instruction',
-  text:
-    'This repository is in teacher mode: the user writes the code and you cannot change its files. ' +
-    'Act as a reviewer: explain, ask questions, give hints; never provide complete code.',
-  scope: 'session',
-} as const
+const SECTION_ID = 'teacher-guard:instruction'
+// The only tokens this mod spends: a short instruction while a repo is in teacher mode.
+const instruction = (list: Roots) =>
+  `Teacher mode is on for ${list.join(', ')}: the user writes the code there and you cannot change those files. ` +
+  'Act as a reviewer: explain, ask questions, give hints; never provide complete code.'
+
+// The protected repo holding `path` (the repo itself or anything below it), or null.
+export function protectedRoot(list: Roots, path: string): string | null {
+  const p = normalize(path)
+  return list.find(root => p === root || p.startsWith(`${root}/`)) ?? null
+}
 
 // System access, built in session.start from `$` (which can never be passed around as a value).
 type Host = {
-  exists: (path: string) => Promise<boolean>
   cwd: () => Promise<string>
-  // Only the variables a path in a command commonly uses; $.env.get takes literal names.
   vars: () => Promise<Record<string, string>>
-  run: (argv: readonly string[]) => Promise<ProcessRunResult>
+  gitRoot: (dir: string) => Promise<string | null>
+  roots: () => Promise<Roots>
+  setRoots: (fn: (list: Roots) => Roots) => Promise<unknown>
   status: (text: string | undefined) => void
-}
-
-// The folder holding the marker for `path` (the path itself or a parent), or null.
-// The marker is read again on every check: deleting the file turns the mode off at once.
-export async function protectedRoot(exists: (path: string) => Promise<boolean>, path: string): Promise<string | null> {
-  for (const dir of selfAndAncestors(path)) {
-    if (await exists(`${dir === '/' ? '' : dir}/${MARKER}`)) return dir
-  }
-  return null
-}
-
-// One check = one dispatch: a folder is looked up once even when several paths share it.
-const memo = (exists: (path: string) => Promise<boolean>) => {
-  const seen = new Map<string, Promise<boolean>>()
-  return (path: string) => {
-    let hit = seen.get(path)
-    if (!hit) {
-      hit = exists(path)
-      seen.set(path, hit)
-    }
-    return hit
-  }
 }
 
 export const register: Register = (on, options) => {
   const t = strings(options.language)
   let host: Host | null = null
 
-  const sessionRoot = async (h: Host) => protectedRoot(h.exists, await h.cwd())
-
-  // Status line: the mode, and a warning when the marker could end up in a commit.
   const refreshStatus = async (h: Host) => {
-    const root = await sessionRoot(h)
-    if (!root) return h.status(undefined)
-    const code = (argv: string[]) =>
-      h.run(['git', '-C', root, ...argv]).then(
-        r => r.exitCode,
-        () => 128,
-      )
-    const [tracked, ignored] = await Promise.all([code(['ls-files', '--error-unmatch', MARKER]), code(['check-ignore', '-q', MARKER])])
-    // check-ignore: 0 ignored, 1 not ignored, 128 not a git repo (nothing to commit it into).
-    h.status(tracked === 0 ? t.tracked : ignored === 1 ? t.notIgnored : t.active)
+    const list = await h.roots()
+    h.status(list.length === 0 ? undefined : t.status(list.map(basename).join(', ')))
   }
 
-  // Refuses when one of `paths` sits in a protected repo; `what` says what tried to write.
+  // Refuses when one of the writes lands in a repo in teacher mode.
   const judge = async (h: Host, writes: { what: string; path: string }[]) => {
-    const exists = memo(h.exists)
+    const list = await h.roots()
+    if (list.length === 0) return null
     for (const w of writes) {
-      const root = await protectedRoot(exists, w.path)
+      const root = protectedRoot(list, w.path)
       if (root) return { deny: `${REFUSAL} (refused: ${w.what} in ${root})` }
     }
     return null
@@ -85,33 +60,63 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const h: Host = {
-      exists: path =>
-        $.fs.read(path).then(
-          () => true,
-          () => false,
-        ),
       cwd: () => $.session.cwd(),
       vars: async () => {
+        // $.env.get takes literal names: only the variables paths in commands commonly use.
         const [home, tmpdir] = await Promise.all([$.env.get('HOME'), $.env.get('TMPDIR')])
         return { ...(home ? { HOME: home } : {}), ...(tmpdir ? { TMPDIR: tmpdir } : {}) }
       },
-      run: argv => $.process.run(argv, { timeoutMs: 5000 }),
+      gitRoot: dir =>
+        $.process.run(['git', '-C', dir, 'rev-parse', '--show-toplevel'], { timeoutMs: 5000 }).then(
+          r => (r.exitCode === 0 ? normalize(r.stdout.trim()) : null),
+          () => null,
+        ),
+      roots: () => read($, roots),
+      setRoots: fn => update($, roots, fn),
       status: text => $.ui.status(text),
     }
     host = h
-    await refreshStatus(h).catch(() => {})
+    try {
+      await $.command.register({ name: 'teacher-mode', description: t.commandDescription, argumentHint: 'activate | deactivate' })
+      await refreshStatus(h)
+    } catch {
+      // Command refused: the guard itself still works for repos already on.
+    }
     return next(e)
   })
 
-  on('prompt.submit', async (_, e, next) => {
-    if (host) void refreshStatus(host).catch(() => {})
-    return next(e)
-  }).catch((_, e, next) => next(e))
+  on('command.run', { command: 'teacher-mode' }, async (_, e) => {
+    const h = host
+    if (!h) return { text: t.off }
+    const cwd = await h.cwd()
+    const repo = (await h.gitRoot(cwd)) ?? normalize(cwd)
+    const list = await h.roots()
+    const action = e.args.trim().toLowerCase()
+
+    if (action === 'activate' || action === 'on') {
+      if (protectedRoot(list, repo)) return { text: t.alreadyActive(repo) }
+      await h.setRoots(l => [...l, repo])
+      await refreshStatus(h)
+      return { text: t.activated(repo) }
+    }
+    if (action === 'deactivate' || action === 'off') {
+      // Turning it off is for the person at the prompt, never for a plugin or the model.
+      if (e.origin.kind !== 'composer') return { text: t.personOnly }
+      const root = protectedRoot(list, repo) ?? protectedRoot(list, cwd)
+      if (!root) return { text: t.notActive }
+      await h.setRoots(l => l.filter(r => r !== root))
+      await refreshStatus(h)
+      return { text: t.deactivated(root) }
+    }
+    return { text: `${list.length === 0 ? t.off : t.current(list.join(', '))}\n${t.usage}` }
+  })
 
   on('prompt.compose', async (_, e, next) => {
     const composed = await next(e)
-    if (!host || !(await sessionRoot(host).catch(() => null))) return composed
-    return { sections: [...composed.sections.filter(s => s.id !== SECTION.id), SECTION] }
+    const list = host ? await host.roots().catch(() => []) : []
+    const rest = composed.sections.filter(s => s.id !== SECTION_ID)
+    if (list.length === 0) return rest.length === composed.sections.length ? composed : { sections: rest }
+    return { sections: [...rest, { id: SECTION_ID, text: instruction(list), scope: 'session' as const }] }
   })
 
   // A guard fails closed: if the check itself throws before letting the call through, the call is refused.
