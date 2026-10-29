@@ -6,7 +6,9 @@
 claude-mods/
 ├── .claude-plugin/marketplace.json   # the marketplace: one entry per plugin
 ├── .github/                          # CI (validate + test every plugin) and Dependabot
+├── AGENTS.md                         # entry point for AI agents: install, or change the code
 ├── docs/
+│   ├── install.md                    # install guide for humans, step by step, troubleshooting
 │   ├── architecture.md               # this file
 │   ├── development.md                # dev loop, tests, CI, pitfalls
 │   ├── mods-api.md                   # the parts of the mods API used here, verified

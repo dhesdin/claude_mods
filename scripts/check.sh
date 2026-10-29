@@ -54,6 +54,21 @@ fi
 # hooks / calls / state lines of a validation: what the plugin is allowed to touch.
 surface_of() { sed -n -E 's/^ +❯ (\.\/[^ ]+ (hooks|calls|state reads|state writes|env reads|env writes|answers its own command|gating hook)[^:]*:.*)$/\1/p; s/^ +❯ (types \.\/.*)$/\1/p'; }
 
+echo "== docs links"
+if out=$(git ls-files -z '*.md' | python3 -I -c '
+import os, re, sys
+bad = []
+for f in sys.stdin.read().split("\0"):
+    if not f or not os.path.exists(f):
+        continue
+    for m in re.finditer(r"\]\(([^)#\s]+)(#[^)]*)?\)", open(f, encoding="utf-8").read()):
+        target = m.group(1)
+        if not target.startswith(("http", "mailto")) and not os.path.exists(os.path.join(os.path.dirname(f), target)):
+            bad.append(f"{f}: {target}")
+print("\n".join(bad))
+sys.exit(1 if bad else 0)
+'); then echo "  ok"; else echo "$out"; fail "broken relative links in docs"; fi
+
 echo "== doctor"
 if scripts/doctor.sh >/dev/null 2>&1; then echo "  runs"; else fail "scripts/doctor.sh fails"; fi
 

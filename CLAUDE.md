@@ -1,5 +1,7 @@
 # claude-mods: a marketplace of Claude Code mods
 
+> Asked to **install** the mods for someone? Follow `.claude/skills/install-mods/SKILL.md` (or `/install-mods`); the rest of this file is for **working on the code**.
+
 Git repository used as a Claude Code marketplace. Installed on two machines:
 - **laptop**: Linux Mint, no NVIDIA GPU
 - **workstation**: NVIDIA GPU machine (OS to confirm, Linux assumed)
@@ -19,6 +21,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 ## Where things are
 
 - `.claude/contexte.md`: current state, injected at session start (do not re-read it).
+- `docs/install.md`: the install guide for humans (the same steps as `/install-mods`).
 - `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
 - `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.

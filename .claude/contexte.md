@@ -1,11 +1,12 @@
 # Current context — claude-mods
 
-Updated: 2026-10-29 23:30
+Updated: 2026-10-30 00:15
 
 ## Current goal
 teacher-guard v0.2 (/teacher-mode), the modular Makefile and account distribution are done and pushed; mods and skills are on the claude.ai account and synced. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
 
 ## Done
+- Docs for both audiences: README = how it works + three paths (agent /install-mods, by hand docs/install.md, develop); docs/install.md (requirements, doctor, account vs machine, steps, what to see, update, remove, troubleshooting); AGENTS.md for any agent; check.sh verifies relative doc links.
 - Onboarding for anyone who clones: scripts/doctor.sh (make doctor: system, Claude Code version, GPU + driver, sysmon backend, mods and their origin installed/account, next steps), project skill .claude/skills/install-mods (/install-mods: doctor, choose mods + language + this machine or claude.ai account, install; never sudo), machine table at the top of docs/hardware.md. make install skips mods already synced from the account.
 - teacher-guard 0.2.0: /teacher-mode activate|deactivate (repo = git root of the session cwd, per session in $.state; deactivate only from the prompt); hooks/bash.ts path-aware Bash analysis; fail-closed tool guards; status line; prompt.compose instruction. 8 tests.
 - Distribution: the 4 mods are uploaded to the user's claude.ai account (make dist, Customize > Plugins > Upload) and load as <mod>@synced on every machine (verified). The user's skills help-skills, help-mods, passation-projet, travail-econome are uploaded to the account (Customize > Skills), synced to ~/.claude/skills/synced (verified), and are no longer in this repo.

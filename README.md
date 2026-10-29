@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/dhesdin/claude_mods/actions/workflows/ci.yml/badge.svg)](https://github.com/dhesdin/claude_mods/actions/workflows/ci.yml)
 
-A Claude Code marketplace of small, independent mods. Each mod is a plugin you can install, configure and disable on its own. No mod makes a network request, and the display costs no tokens.
+Small, independent mods for Claude Code. Each one is a plugin you install, configure and disable on its own. No mod makes a network request, and their display costs no tokens.
 
 | Mod | What it does | Docs |
 | --- | --- | --- |
@@ -11,107 +11,39 @@ A Claude Code marketplace of small, independent mods. Each mod is a plugin you c
 | [teacher-guard](plugins/teacher-guard) | `/teacher-mode activate`: for the current repo and session, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
 | [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
 
-Display languages available: **English (en), French (fr), Japanese (ja), Chinese (zh)**. Other languages can be added (see [Internationalization](docs/architecture.md#internationalization)).
+Display languages: **English (en), French (fr), Japanese (ja), Chinese (zh)**; others can be added ([how](docs/architecture.md#internationalization)).
 
-## Requirements
+## How it works
 
-- [Claude Code](https://code.claude.com/docs) 2.1.312 or later
-- Linux (or WSL2) for `sysmon`; `usage-pace` and `langmod` run anywhere Claude Code runs
-- `git`, `make` (or run `scripts/install.sh` directly)
+- A mod is TypeScript code that Claude Code runs **on your machine**: the same code everywhere, each machine sees its own hardware and keeps its own data.
+- It reaches a machine either **from your claude.ai account** (upload it once, every machine where you sign in downloads it) or **from this repository** (`make install` on that machine).
+- Per machine either way: each mod's options (`/config`) and, for sysmon, the GPU driver.
+- This repository is the source: code, tests, docs. It is needed to install by hand, to develop, or to build the zips you upload.
 
-## Quick start
+More: [docs/install.md](docs/install.md#how-it-works).
 
-```bash
-git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
-claude          # then type: /install-mods
-```
+## Install: pick your path
 
-`/install-mods` (a skill of this repository) checks the machine (`make doctor`: system, Claude Code version, GPU and driver), asks which mods, which language, and whether to install them on this machine or on your claude.ai account, then installs them. For a missing GPU driver it gives the commands for your distribution; it never runs `sudo` itself.
-
-The same by hand: `make doctor`, then one of the two ways below.
-
-## Install
-
-### On your claude.ai account (recommended: every machine, nothing to install)
+### With an AI agent (Claude Code)
 
 ```bash
 git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
-make dist          # one zip per mod in dist/plugins/, built from the last commit
+claude        # then type: /install-mods
 ```
 
-Upload each zip on claude.ai: **Customize > Plugins > Add > Upload plugin**. The mods then sync to Claude Code on every machine where you sign in with your claude.ai account, at the next start (as `<mod>@synced`, enabled). Requires Claude Code 2.1.273 or later, signed in with claude.ai (not an API key). To update a mod: commit, `make dist`, upload the zip again (same name = new version). To stop one on a machine: `/plugin`, Installed tab, or `claude plugin disable <mod>@synced`.
+The agent checks the machine (system, Claude Code version, GPU and driver), asks which mods, which language, and whether to install on this machine or on your claude.ai account, then installs. It never runs `sudo`: for a missing driver it gives you the commands. Its instructions: [.claude/skills/install-mods/SKILL.md](.claude/skills/install-mods/SKILL.md); other agents: [AGENTS.md](AGENTS.md).
 
-Per machine still: each mod's options (`/config`, stored in that machine's `~/.claude/settings.json`) and the hardware tools sysmon reads (NVIDIA driver…, see [docs/hardware.md](docs/hardware.md)).
-
-### On one machine only (development, or without a claude.ai account)
+### By hand
 
 ```bash
-git clone https://github.com/dhesdin/claude_mods.git ~/claude-mods
-cd ~/claude-mods
-make install                          # every mod
-make install <mod> [<mod>...]         # the mods you name, e.g. make install sysmon
-make <mod> [<mod>...]                 # the same, shorter
-make install MOD_LANG=fr              # with a display language (en, fr, ja, zh)
+git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
+make doctor                      # what this machine has, what to fix
+make install MOD_LANG=fr         # every mod on this machine (or: make install sysmon usage-pace)
 ```
 
-Then, in a Claude Code session that was already open: `/reload-plugins`.
+Or, for every machine at once: `make dist`, then upload each `dist/plugins/<mod>.zip` on claude.ai (Customize > Plugins > Add > Upload plugin).
 
-| Command | Does |
-| --- | --- |
-| `make help` | every target and variable |
-| `make doctor` | check this machine: system, Claude Code, GPU and driver, what to do next |
-| `make list` | each mod, its description, installed or not |
-| `make setup` | only add this folder as a marketplace |
-| `make uninstall <mod> [<mod>...]` | uninstall the mods you name (all without names) |
-| `make teardown` | uninstall every mod and remove the marketplace |
-
-Variables, from the command line, the environment, or a per-machine `config.mk` (git-ignored, copy `config.mk.example`): `MOD_LANG` (en, fr, ja, zh), `MOD_SCOPE` (user, project, local; default user), `CLAUDE` (the binary; `CLAUDE=echo` prints the commands instead of running them).
-
-Without `make`: `scripts/install.sh [--lang fr] [--scope user] [mod...]`, or by hand:
-
-```bash
-claude plugin marketplace add ~/claude-mods
-claude plugin install sysmon@claude-mods      # one line per mod
-```
-
-Preparing a GPU machine (NVIDIA driver, WSL2, Jetson, AMD): [docs/hardware.md](docs/hardware.md).
-
-## Update
-
-The marketplace is a local folder: plugins are read from it directly.
-
-```bash
-git -C ~/claude-mods pull --ff-only
-```
-
-Then `/reload-plugins` in an open session. Read what changed (`git -C ~/claude-mods log -p ORIG_HEAD..`) before reloading: a mod runs code on your machine (see [SECURITY.md](SECURITY.md)).
-
-## Configure
-
-- Every option of every mod is in `/config` (each mod's section), with its default. Options are listed in each mod's README.
-- Language: pick it in `/config` (`language` row of each mod), or `/langmod fr` for all mods at once.
-
-## Disable or remove
-
-```bash
-claude plugin disable sysmon@claude-mods     # enable again: claude plugin enable sysmon@claude-mods
-make uninstall sysmon                        # or: claude plugin uninstall sysmon@claude-mods
-make teardown                                # every mod and the marketplace
-```
-
-
-
-## What follows you from one machine to another
-
-| What | Where it lives | On a new machine |
-| --- | --- | --- |
-| Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you log in |
-| Claude Code's built-in skills and commands | Claude Code itself | there once Claude Code is installed |
-| **These mods**, uploaded to the account (above) | your account (synced to `~/.claude/plugins/synced/`) | there at the next start after you log in |
-| These mods, installed with `make install` | that machine (`~/.claude/plugins`) | **not synced**: clone and `make install` again |
-| Your machine skills | `~/.claude/skills/<name>/` | **not synced**: stay on the machine; upload a skill on claude.ai (Customize > Skills) to have it everywhere |
-| Your global instructions | `~/.claude/CLAUDE.md` | **not synced**: copy it |
-| Project skills and instructions | `<repo>/.claude/skills/`, `<repo>/CLAUDE.md` | travel with the repo when committed: there after `git clone` |
+Step by step, with what you should see and troubleshooting: **[docs/install.md](docs/install.md)**. Preparing a GPU machine (NVIDIA, WSL2, Jetson, AMD, Raspberry Pi): **[docs/hardware.md](docs/hardware.md)**.
 
 ## Develop
 
@@ -121,14 +53,17 @@ make fix                               # format and apply safe lint fixes
 claude --plugin-dir ./plugins/sysmon   # run one plugin from disk, hot reload
 ```
 
-- [docs/architecture.md](docs/architecture.md): layout, anatomy of a mod, conventions, i18n
-- [docs/development.md](docs/development.md): dev loop, tests, CI, definition of done
-- [docs/mods-api.md](docs/mods-api.md): the parts of the mods API used here, verified
-- [docs/specs/](docs/specs): one functional spec per mod
+| Doc | For |
+| --- | --- |
+| [docs/architecture.md](docs/architecture.md) | layout, anatomy of a mod, conventions, i18n, distribution, adding a mod |
+| [docs/development.md](docs/development.md) | dev loop, tests and their pitfalls, CI, definition of done |
+| [docs/mods-api.md](docs/mods-api.md) | the parts of the mods API used here, verified |
+| [docs/specs/](docs/specs) | one functional spec per mod |
+| [CLAUDE.md](CLAUDE.md) | rules for an AI agent working on this repository |
 
 ## Security
 
-See [SECURITY.md](SECURITY.md): threat model, what each mod may touch, and how to report a problem.
+[SECURITY.md](SECURITY.md): threat model, what each mod may touch, the checks CI enforces, how to report a problem.
 
 ## License
 

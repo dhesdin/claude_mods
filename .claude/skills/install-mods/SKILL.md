@@ -5,7 +5,7 @@ description: Guided install of the claude-mods mods on this machine or on the us
 
 # install-mods
 
-Guide the person through installing the mods of this repository. Speak their language. Never run `sudo`, install a driver or change system settings yourself: give the commands and let them run them.
+Guide the person through installing the mods of this repository. Speak their language. The same steps for a human, with troubleshooting, are in `docs/install.md`: use its tables when something does not appear. Never run `sudo`, install a driver or change system settings yourself: give the commands and let them run them.
 
 1. **Check the machine.** Run `scripts/doctor.sh` from the repository root and give a short summary: system, Claude Code version, GPU found and the source sysmon will use, anything listed under "Next".
 
