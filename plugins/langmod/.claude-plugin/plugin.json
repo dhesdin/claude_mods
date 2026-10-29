@@ -2,6 +2,11 @@
   "name": "langmod",
   "version": "0.1.0",
   "description": "/langmod en|fr|ja|zh: set the display language of every installed mod at once",
-  "author": { "name": "ValentinD" },
-  "license": "MIT"
+  "author": {
+    "name": "ValentinD"
+  },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/langmod",
+  "repository": "https://github.com/dhesdin/claude_mods",
+  "license": "MIT",
+  "keywords": ["language", "i18n", "localization"]
 }

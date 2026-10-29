@@ -5,7 +5,10 @@
   "author": {
     "name": "ValentinD"
   },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/usage-pace",
+  "repository": "https://github.com/dhesdin/claude_mods",
   "license": "MIT",
+  "keywords": ["usage", "rate-limit", "quota", "pace", "status"],
   "types": "./types/index.d.ts",
   "userConfig": {
     "language": {

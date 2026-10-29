@@ -2,8 +2,13 @@
   "name": "sysmon",
   "version": "0.2.0",
   "description": "GPU / CPU / RAM / disk panel: is the machine free, and what is loading it",
-  "author": { "name": "ValentinD" },
+  "author": {
+    "name": "ValentinD"
+  },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/sysmon",
+  "repository": "https://github.com/dhesdin/claude_mods",
   "license": "MIT",
+  "keywords": ["gpu", "nvidia", "jetson", "monitoring", "system", "vram"],
   "types": "./types/index.d.ts",
   "userConfig": {
     "language": {
