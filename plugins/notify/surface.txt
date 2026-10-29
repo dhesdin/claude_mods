@@ -1,0 +1,5 @@
+./register.ts hooks: session.start, turn.complete, classic.Notification
+./register.ts gating hook with .catch: classic.Notification
+./register.ts calls: $.env.get, $.fs.read, $.process.run, $.ui.notify
+./register.ts env writes: nothing
+./register.ts env reads: KITTY_WINDOW_ID, OS, TERM_PROGRAM

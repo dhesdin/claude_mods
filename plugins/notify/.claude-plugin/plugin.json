@@ -1,0 +1,25 @@
+{
+  "name": "notify",
+  "version": "0.1.0",
+  "description": "Desktop notification when Claude finishes a reply or waits for you, with the project's name",
+  "author": { "name": "ValentinD" },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/notify",
+  "repository": "https://github.com/dhesdin/claude_mods",
+  "license": "MIT",
+  "keywords": ["notification", "desktop", "alert"],
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the notifications (also settable for every mod at once with /langmod)",
+      "options": ["en", "fr", "ja", "zh"],
+      "default": "en"
+    },
+    "minTurnSeconds": {
+      "type": "number",
+      "title": "Shortest reply notified (s)",
+      "description": "A finished reply is notified only when it took at least this long; 0 = every reply",
+      "default": 15
+    }
+  }
+}
