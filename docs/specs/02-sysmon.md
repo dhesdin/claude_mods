@@ -66,4 +66,4 @@ Exposed to Claude (`mcp__sysmon__machine_status`, deferred behind ToolSearch): t
 - Consumption history and charts.
 - Intel GPUs, macOS, Windows native: see docs/hardware.md.
 - Watching another computer over the network (zero-network rule).
-- **Inference benchmarks (FPS, latency, CPU/GPU/TensorRT comparison)**: a deliverable of the SIP project, measured reproducibly in that project's code, not in a display mod.
+- **Inference benchmarks (FPS, latency, CPU/GPU/TensorRT comparison)**: measured reproducibly in the project's own code, not in a display mod.

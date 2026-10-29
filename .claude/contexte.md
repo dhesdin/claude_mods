@@ -38,6 +38,9 @@ teacher-guard v0.2 (/teacher-mode), the modular Makefile and account distributio
 ## Next action
 After the user checks teacher-guard on screen: mod 4 project-hours (read the spec, check session events for active time and $.fs.write/$.store for JSONL storage).
 
+## Pending (remind the user)
+- Demo GIF for the README (sysmon pane + usage band), recorded by the user with Peek following a short script: to do once all the mods the user wants are done (user request, 2026-10-29).
+
 ## Missing info
 - GPU checks on the workstation (docs/hardware.md checklists); Jetson/AMD on real hardware.
 - On-screen check of /langmod and of the ja/zh display.

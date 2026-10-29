@@ -1,7 +1,7 @@
 # Mod 04: project-hours
 
 ## Problem
-Know how much real time goes to each project per week, to see without fooling oneself whether a priority project is being neglected (criterion: 3 weeks without work on the Jetson/TensorRT part of SIP = re-evaluate the plan).
+Know how much real time goes to each project per week, to see without fooling oneself whether a priority project is being neglected (for example: 3 weeks without work on a priority part = re-evaluate the plan).
 
 ## Limit to state honestly
 The mod only measures **active time in Claude Code**, not time spent in the editor without Claude. The label must say so ("Claude Code time"), never "work time".
@@ -16,10 +16,10 @@ Collapsible pane:
 
 ```
 Week 44 (Claude Code time)
-SIP             4h20   ██████████
-k4u-erp         2h05   █████
+vision-app      4h20   ██████████
+web-shop        2h05   █████
 claude-mods     1h10   ███   ← tooling
-⚠ sip/edge: 0h for 3 weeks
+⚠ vision-app/edge: 0h for 3 weeks
 ```
 
 - `/hours` command: current week. `/hours 4`: last 4 weeks, per project.

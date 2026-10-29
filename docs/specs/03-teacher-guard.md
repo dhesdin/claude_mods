@@ -1,13 +1,13 @@
 # Mod 03: teacher-guard
 
 ## Problem
-In the portfolio repos (SIP, 3D Vision, etc.), the user must write the code themselves: they will have to defend it in interviews. The risk is letting Claude code "just this once". This mod makes that slide impossible without a conscious step.
+In some repositories (learning projects, portfolio projects), the user must write the code themselves: they have to understand and defend every line. The risk is letting Claude code "just this once". This mod makes that slide impossible without a conscious step.
 
 ## Activation: a command, per repo and per session
 - `/teacher-mode activate` protects the current repo (its git root, or the current folder outside git) for the session. `/teacher-mode deactivate` turns it off; `/teacher-mode` alone says what is protected.
 - Only the person at the prompt can deactivate (`origin.kind === 'composer'`): the same command from a plugin or the model is refused.
 - State in `$.state` (session): it survives a reload of the mod, and a new session starts with everything off.
-- Nothing is written in the repo: the portfolio stays professional and shows no trace of Claude.
+- Nothing is written in the repository: no marker file to keep out of commits.
 - (v0.1 used a `.teacher-mode` marker file. Replaced at the user's request: a command is more modular, per repo and per session.)
 
 ## Behavior in a protected repo

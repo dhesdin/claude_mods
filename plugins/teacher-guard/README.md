@@ -1,6 +1,6 @@
 # teacher-guard
 
-Teacher mode for the repos where **you** write the code (portfolio projects you will defend in interviews). While it is on, Claude cannot change your files there: it explains, asks questions, gives hints and reviews.
+Teacher mode for the repos where **you** write the code (learning or portfolio projects you must fully understand). While it is on, Claude cannot change your files there: it explains, asks questions, gives hints and reviews.
 
 ## Use
 
