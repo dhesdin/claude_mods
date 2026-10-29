@@ -12,3 +12,11 @@
 - Distribution moved to the claude.ai account: 4 mods uploaded as plugins (synced as <mod>@synced, verified after a start), 4 skills uploaded (synced, verified). skills/ removed from the repo; make dist kept; make install stays for per-machine installs.
 - Onboarding: make doctor, /install-mods project skill, machine table in docs/hardware.md; laptop copies of passation-projet and travail-econome removed (now from the account).
 - Docs restructured for two audiences: AGENTS.md + /install-mods for agents, docs/install.md for humans; README slimmed to how it works + paths; doc link check in CI.
+
+## 2026-10-30 — public repo, account distribution, directory
+- Repo made public by the user; protections set (ruleset, CODEOWNERS, Actions restrictions, secret scanning, PVR, Dependabot). CI was red since several commits (shellcheck SC2100 in install.sh): fixed, green.
+- Mods and user skills moved to the claude.ai account (synced, verified). Skills removed from the repo.
+- Docs for two audiences (AGENTS.md + /install-mods; docs/install.md), make doctor, icons, directory metadata.
+- sysmon submitted to the Anthropic directory (auto-publish off). usage-pace submission not started.
+- project-hours 0.1.0 coded, not finished (README, icon, integration tests, screen check, upload).
+- Pitfalls: variable `h` in .tsx blocked by the directory; a commit was pushed with failing checks once (now: check before commit).
