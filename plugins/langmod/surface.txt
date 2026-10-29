@@ -1,3 +1,3 @@
 ./register.ts hooks: session.start, command.run{command=langmod}
 ./register.ts answers its own command: command.run{command=langmod}
-./register.ts calls: $.command.register, $.config.list, $.config.set
+./register.ts calls: $.command.register, $.config.list, $.config.set, $.store.get, $.store.set

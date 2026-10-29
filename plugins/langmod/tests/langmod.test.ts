@@ -53,3 +53,29 @@ test('no argument lists the current languages; an unknown one is refused', async
   expect((await $.command.run(run(''))).text).toBe('sysmon: en\nusage-pace: en\nUsage: /langmod en|fr|ja|zh')
   expect((await $.command.run(run('klingon'))).text).toBe('Unknown language. Available: en, fr, ja, zh.')
 })
+
+test('the chosen language is kept and applied at the next start to mods installed since', async ($, on) => {
+  const store = new Map<string, unknown>()
+  let rows = [row('sysmon.language', 'en')]
+  const set: string[] = []
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'langmod' } }))
+  on('store.get', (_, e) => ({ value: store.get(e.key) }))
+  on('store.set', (_, e) => {
+    store.set(e.key, e.value)
+    return { value: undefined }
+  })
+  on('config.list', () => ({ value: rows }))
+  on('config.set', (_, e) => {
+    set.push(`${e.key}=${String(e.value)}`)
+    return { value: e.value }
+  })
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+  await $.command.run(run('fr'))
+  expect(store.get('language')).toBe('fr')
+
+  rows = [row('sysmon.language', 'fr'), row('notify.language', 'en'), { ...row('locked.language', 'en'), isLocked: true }]
+  set.length = 0
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+  expect(set).toEqual(['notify.language=fr'])
+})
