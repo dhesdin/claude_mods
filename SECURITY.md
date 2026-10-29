@@ -43,11 +43,13 @@ git -C ~/claude-mods pull --ff-only
 
 Then `/reload-plugins`.
 
-## Recommended GitHub settings (repository owner)
+## GitHub settings in force
 
-- Ruleset on `main`: require a pull request and the `check` CI job, block force pushes and deletion.
-- Secret scanning and push protection on; Dependabot alerts on.
-- Two-factor authentication on the account; signed commits if you use them elsewhere.
+- Only the owner can push; there are no collaborators. Everyone else proposes changes through a pull request.
+- Ruleset `protect-main` on the default branch: no deletion, no force push; a pull request with 1 approval (dismissed when new commits are pushed, the latest push approved by someone else than its author), all conversations resolved, the `check` CI job green and the branch up to date. Only the repository admin (the owner) can bypass it.
+- `CODEOWNERS`: the owner reviews every file.
+- Actions: read-only `GITHUB_TOKEN`, Actions cannot create or approve pull requests, only actions pinned to a full commit SHA run, and workflows from an external contributor's pull request wait for the owner's approval.
+- Secret scanning with push protection, private vulnerability reporting, dependency graph, Dependabot and malware alerts on.
 
 ## Reporting a problem
 
