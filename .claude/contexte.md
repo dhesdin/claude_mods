@@ -9,7 +9,7 @@ Mod 1/4 `usage-pace` (specs/01-usage-pace.md) codé, en attente de validation à
 - Bandeau v3 (retours utilisateur) : 3 cartes encadrées (Session 5h, Semaine, Rythme), couleur par niveau (levelColor), phrase « Réinitialisation dans : 01h42 (à 13h42) », rythme = projection linéaire (« ~X % à la réinitialisation » ou « limite atteinte <jour> vers <h> »). 5 tests OK.
 - `plugins/usage-pace/` : plugin.json (userConfig paceMinHours=3, refreshSeconds=60), hooks/register.tsx (bandeau AbovePrompt), types/index.d.ts (state limits/tick), tests/usage-pace.test.tsx (3 tests).
 - `claude plugin validate` OK (hooks: session.start, session.measure, ui.render{AbovePrompt} ; calls: clock.every/now, session.usage, state, ui.resolve). `claude plugin test` 3/3. tsc strict OK.
-- docs/mods-api.md (API vérifiée, boucle de dev, pièges), tableau d état dans CLAUDE.md, spec 01 réécrite.
+- docs/mods-api.md (API vérifiée, boucle de dev, pièges), spec 01 réécrite. CLAUDE.md est en lecture seule (r--r--r--) : pas modifié.
 - `.claude-plugin/marketplace.json` (nom `claude-mods`, source `./plugins/usage-pace`), README.md, .gitignore, git : remote origin git@github.com:dhesdin/claude_mods.git (SSH), 2 commits poussés sur main (socle, usage-pace).
 - Lien symbolique `~/.claude/dev-mods/<session>/usage-pace` -> repo, pour le rechargement à chaud dans la session.
 
