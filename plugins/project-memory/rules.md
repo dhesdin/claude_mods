@@ -1,0 +1,2 @@
+- Apply the `token-economy` skill during all code work, when it is available.
+- After each finished task, update `.claude/contexte.md` with the `project-handoff` skill (create the file if it is missing).

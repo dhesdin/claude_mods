@@ -1,0 +1,24 @@
+{
+  "name": "project-memory",
+  "version": "0.1.0",
+  "description": "Your rules for every project and the project's hand-off notes (.claude/contexte.md), loaded at start and after each compaction, on every machine; a reminder to update the notes before compaction",
+  "author": { "name": "ValentinD" },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/project-memory",
+  "repository": "https://github.com/dhesdin/claude_mods",
+  "license": "MIT",
+  "keywords": ["context", "compaction", "hand-off", "memory"],
+  "userConfig": {
+    "globalRules": {
+      "type": "boolean",
+      "title": "Load the rules",
+      "description": "Give Claude the rules of the mod's rules.md at the start of each conversation and after each compaction",
+      "default": true
+    },
+    "handoffTokens": {
+      "type": "number",
+      "title": "Hand-off reminder (tokens)",
+      "description": "Context size at which Claude is asked, once, to update .claude/contexte.md; keep it under the auto-compact window. 0 = never",
+      "default": 250000
+    }
+  }
+}
