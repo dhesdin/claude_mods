@@ -9,8 +9,16 @@ A Claude Code marketplace of small, independent mods. Each mod is a plugin you c
 | [usage-pace](plugins/usage-pace) | Band above the prompt: 5-hour and weekly usage, time to reset, projected weekly pace | [spec](docs/specs/01-usage-pace.md) |
 | [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
 | [teacher-guard](plugins/teacher-guard) | `/teacher-mode activate`: for the current repo and session, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
-| [mod-help](plugins/mod-help) | `/help-skills` (every available skill: account, Claude Code and plugins, machine, project; one line each) and `/help-mods` (the mods, their commands and options) | [spec](docs/specs/05-mod-help.md) |
 | [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
+
+Plus **account skills** in [skills/](skills), meant to live on your claude.ai account so they follow you to every machine:
+
+| Skill | What it does |
+| --- | --- |
+| `help-skills` | every available skill, one line each, grouped by origin (account, machine, project, Claude Code and plugins) |
+| `help-mods` | the mods on this machine: installed or not, enabled or not, what each does; how to install them when missing |
+| `passation-projet` | keeps `.claude/contexte.md` and `suivi.md` up to date (hand-off notes; kept in its original French) |
+| `travail-econome` | rules to code with as few tokens as possible (kept in its original French) |
 
 Display languages available: **English (en), French (fr), Japanese (ja), Chinese (zh)**. Other languages can be added (see [Internationalization](docs/architecture.md#internationalization)).
 
@@ -75,7 +83,17 @@ make uninstall sysmon                        # or: claude plugin uninstall sysmo
 make teardown                                # every mod and the marketplace
 ```
 
-In a session, `/help-mods` lists the mods with their commands and options, and `/help-skills` lists every skill.
+In a session, `/help-mods` lists the mods and `/help-skills` lists every skill (account skills, see below).
+
+## Account skills
+
+```bash
+make skills        # zips each folder of skills/ into dist/skills/<name>.zip
+```
+
+Upload each zip once on claude.ai (Settings > Capabilities > Skills > Upload skill): the skill is then synced to `~/.claude/skills/synced/` on every machine where you log in to Claude Code, with its bundled scripts. After uploading, remove any copy of the same skill from `~/.claude/skills/` so it is not listed twice. Re-upload after changing a skill.
+
+A skill costs a few tokens when used (Claude reads it and the script's output), unlike a mod's display.
 
 ## What follows you from one machine to another
 
@@ -84,7 +102,7 @@ In a session, `/help-mods` lists the mods with their commands and options, and `
 | Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you log in |
 | Claude Code's built-in skills and commands | Claude Code itself | there once Claude Code is installed |
 | **These mods** | plugins installed on each machine (`~/.claude/plugins`) | **not synced**: clone this repo and `make install` |
-| Your machine skills | `~/.claude/skills/<name>/` | **not synced**: stay on the machine; to carry them, upload them to claude.ai or ship them in a plugin of this repo |
+| Your machine skills | `~/.claude/skills/<name>/` | **not synced**: stay on the machine; keep yours in `skills/` and upload them to claude.ai (above) |
 | Your global instructions | `~/.claude/CLAUDE.md` | **not synced**: copy it |
 | Project skills and instructions | `<repo>/.claude/skills/`, `<repo>/CLAUDE.md` | travel with the repo when committed: there after `git clone` |
 

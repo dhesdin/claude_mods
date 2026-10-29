@@ -7,6 +7,7 @@
 ##   make uninstall <mod> [<mod>...]    uninstall the mods you name (all without names)
 ##   make teardown                      uninstall every mod and remove the marketplace
 ##   make list                          mods, their description, installed or not
+##   make skills                        zip the account skills of skills/ into dist/skills/, to upload to claude.ai
 ##   make check | make fix              every CI check | format and safe lint fixes
 ##
 ## Variables, from the command line (make install MOD_LANG=fr), the environment,
@@ -38,7 +39,7 @@ $(eval $(wordlist 2,$(words $(MOD_GOALS)),$(MOD_GOALS)):;@:)
 endif
 
 .DEFAULT_GOAL := help
-.PHONY: help setup install uninstall teardown list check fix $(addprefix install-,$(MODS)) $(addprefix uninstall-,$(MODS))
+.PHONY: help setup install uninstall teardown list skills check fix $(addprefix install-,$(MODS)) $(addprefix uninstall-,$(MODS))
 
 help:
 	@sed -n 's/^## \{0,1\}//p' $(firstword $(MAKEFILE_LIST))
@@ -65,6 +66,13 @@ $(addprefix install-,$(MODS)): install-%:
 
 $(addprefix uninstall-,$(MODS)): uninstall-%:
 	@scripts/install.sh --uninstall $*
+
+SKILLS := $(notdir $(wildcard skills/*))
+
+skills:
+	@mkdir -p dist/skills
+	@for s in $(SKILLS); do rm -f dist/skills/$$s.zip; (cd skills && python3 -I -m zipfile -c ../dist/skills/$$s.zip $$s) && echo "dist/skills/$$s.zip"; done
+	@echo "Upload each zip on claude.ai: Settings > Capabilities > Skills > Upload skill."
 
 check:
 	@scripts/check.sh

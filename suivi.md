@@ -8,3 +8,4 @@
 - teacher-guard: path-aware Bash guard (writes into a protected repo refused, temp folders free), fail-closed tool guards, status line with marker warnings, session instruction via prompt.compose.
 - Makefile for modular installs (make install sysmon …, MOD_LANG/MOD_SCOPE/CLAUDE, config.mk); teacher-guard v0.2 with /teacher-mode activate|deactivate per session instead of a marker file; mod-help (/skill-help, /help-mods). An install smoke test without a dry run installed every mod once: undone, CLAUDE=echo documented.
 - mod-help: /skill-help renamed /help-skills (both commands start with help-), Claude Code + plugins section added; make <mod>... shortcut.
+- help-skills / help-mods moved from a mod to account skills (skills/, make skills, upload on claude.ai) so they are there on any machine; passation-projet and travail-econome moved into skills/ too; mod-help plugin removed.

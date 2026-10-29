@@ -3,11 +3,11 @@
 Updated: 2026-10-29 21:00
 
 ## Current goal
-teacher-guard v0.2 (/teacher-mode command), mod-help (/help-skills, /help-mods) and the modular Makefile are done and pushed; waiting for the user to check them on screen. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
+teacher-guard v0.2 (/teacher-mode), the modular Makefile and the account skills (skills/, to upload to claude.ai) are done and pushed; waiting for the user to upload the skills and check everything on screen. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
 
 ## Done
 - teacher-guard 0.2.0: /teacher-mode activate|deactivate (repo = git root of the session cwd, per session in $.state; deactivate only from the prompt); hooks/bash.ts path-aware Bash analysis; fail-closed tool guards; status line; prompt.compose instruction. 8 tests.
-- mod-help 0.1.0: /help-skills (account synced skills, Claude Code + plugins from $.command.list, machine ~/.claude/skills, project .claude/skills) and /help-mods (marketplace + config/command lists). 3 tests.
+- skills/: account skills help-skills (list-skills.sh) and help-mods (list-mods.py), plus passation-projet and travail-econome copied from ~/.claude/skills; make skills zips them for claude.ai. The mod-help plugin was removed (replaced by these skills).
 - Makefile + scripts/install.sh: make install [mods], make <mod>..., install-<mod>, uninstall, teardown, list, setup, check, fix; MOD_LANG / MOD_SCOPE / CLAUDE from CLI, env or git-ignored config.mk. CLAUDE=echo for a dry run.
 - Plugins: usage-pace 0.2.0, sysmon 0.2.0, langmod 0.1.0 (new: `/langmod en|fr|ja|zh` sets `<plugin>.language` rows via $.config.set). Display i18n en/fr/ja/zh in `hooks/i18n.ts` of each mod; `language` userConfig picker (default en).
 - sysmon: GPU sources in hooks/gpu.ts (NVIDIA nvidia-smi, Jetson tegrastats [to validate], AMD rocm-smi [to validate]), `gpuBackend` auto detection; system.ts (/proc, df); util.ts `clean()` for untrusted text; throttling written out ("thermal (GPU too hot)" red, "power limit (max power draw reached)" orange).
@@ -34,7 +34,7 @@ teacher-guard v0.2 (/teacher-mode command), mod-help (/help-skills, /help-mods) 
 - Contract `types/index.d.ts` must have no import.
 
 ## Next action
-After the user checks teacher-guard, mod-help and make on screen: mod 4 project-hours (read the spec, check session events for active time and $.fs.write/$.store for JSONL storage).
+After the user uploads the skills and checks teacher-guard and make on screen: mod 4 project-hours (read the spec, check session events for active time and $.fs.write/$.store for JSONL storage).
 
 ## Missing info
 - GPU checks on the workstation (docs/hardware.md checklists); Jetson/AMD on real hardware.

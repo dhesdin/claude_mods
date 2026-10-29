@@ -3,7 +3,7 @@
   "owner": {
     "name": "ValentinD"
   },
-  "description": "Personal Claude Code mods: usage pace, machine monitor, teacher mode, help, display language",
+  "description": "Personal Claude Code mods: usage pace, machine monitor, teacher mode, display language",
   "plugins": [
     {
       "name": "usage-pace",
@@ -24,11 +24,6 @@
       "name": "langmod",
       "source": "./plugins/langmod",
       "description": "/langmod en|fr|ja|zh: display language of every mod at once"
-    },
-    {
-      "name": "mod-help",
-      "source": "./plugins/mod-help",
-      "description": "/help-skills and /help-mods: every skill and every mod, one line each"
     }
   ]
 }
