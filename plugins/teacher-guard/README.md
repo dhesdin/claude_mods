@@ -1,0 +1,53 @@
+# teacher-guard
+
+Teacher mode for the repos where **you** write the code (portfolio projects you will defend in interviews). In a protected repo, Claude cannot change your files: it explains, asks questions, gives hints and reviews.
+
+## Turn it on for a repo
+
+```bash
+cd ~/code/my-project
+touch .teacher-mode                          # the marker: this repo is protected
+echo .teacher-mode >> .git/info/exclude      # keep it out of every commit (local, never pushed)
+```
+
+To keep the marker out of every repo at once instead, add `.teacher-mode` to your global git ignore (`git config --global core.excludesFile`, usually `~/.config/git/ignore`).
+
+**Turn it off**: delete `.teacher-mode` by hand. There is deliberately no command for it. Deleting the file takes effect at once, without reloading anything.
+
+## What it does in a protected repo
+
+The repo is the folder holding `.teacher-mode` and everything below it (subfolders, nested repos).
+
+| Claude tries to… | Result |
+| --- | --- |
+| `Write`, `Edit`, `NotebookEdit` a file in the repo | refused |
+| a Bash command that writes into the repo: `>` / `>>`, `tee`, `rm`, `mv`, `cp` into it, `touch`, `mkdir`, `ln`, `chmod`, `sed -i`, `perl -i`, `dd of=`, `patch` | refused |
+| any git command that changes the repo or its history: `add`, `commit`, `push`, `apply`, `merge`, `rebase`, `reset`, `restore`, `checkout`, `stash`, `rm`, `mv`, `clean`, `pull`, `tag`… | refused |
+| read: `ls`, `cat`, `grep`, `git status` / `diff` / `log` | allowed |
+| run: tests (`pytest`), an existing script, a build | allowed |
+| anything in temporary folders (`/tmp/...`) or outside protected repos, including copying your code out to `/tmp` | allowed |
+
+- A refusal tells Claude: "Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code."
+- Status line under the prompt: `TEACHER MODE`, or a warning when `.teacher-mode` is tracked by git or not git-ignored (so it never lands in a commit).
+- At the start of a session in a protected repo, a two-line instruction tells Claude to act as a reviewer. It is the only token this mod spends.
+- Subagents are covered: their tool calls go through the same checks.
+
+## Limits: a guard against autopilot, not a security barrier
+
+The Bash check reads the command statically, best effort:
+- It cannot see what a program does once started: an inline `python -c "open('x','w')"`, a script, a `make` target or an alias can still write.
+- A target it cannot know (an unknown `$VARIABLE`, a `$(command)`) is judged by the folder the command runs in: refused there if that folder is protected.
+- The folder a command runs in is the session's folder (plus any `cd` inside the command); a `cd` from an earlier Bash call is not seen.
+- Only Claude's tools are checked: your own terminal, editor and git are untouched.
+
+## Options (`/config`)
+
+| Option | Default | Role |
+| --- | --- | --- |
+| `language` | `en` | status line language: `en`, `fr`, `ja`, `zh` (or `/langmod`) |
+
+## Disable the mod
+
+`claude plugin disable teacher-guard@claude-mods` (every repo becomes writable again).
+
+Spec: [docs/specs/03-teacher-guard.md](../../docs/specs/03-teacher-guard.md)

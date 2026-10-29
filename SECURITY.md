@@ -30,7 +30,7 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 ## Known limits
 
 - sysmon runs `nvidia-smi`, `tegrastats`, `rocm-smi` and `df` from your `PATH`, exactly as if you typed them: a malicious program placed earlier in `PATH` would run. Keep `PATH` clean.
-- The future `teacher-guard` mod filters Bash commands on a best-effort basis: it is a guard against autopilot, **not** a security barrier.
+- `teacher-guard` reads Bash commands statically, best effort: an inline interpreter, a script or an alias can still write. It is a guard against autopilot, **not** a security barrier (plugins/teacher-guard/README.md, Limits). It fails closed: a check that throws refuses the call.
 - The surface snapshot says *which* capabilities a plugin uses, not *how*: review code changes too.
 
 ## Updating safely

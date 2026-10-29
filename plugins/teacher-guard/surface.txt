@@ -1,0 +1,9 @@
+./register.ts hooks: session.start, prompt.submit, prompt.compose, tool.call{tool=Write}, tool.call{tool=Edit}, tool.call{tool=NotebookEdit}, tool.call{tool=Bash}
+./register.ts gating hook with .catch: prompt.submit
+./register.ts gating hook with .catch: tool.call{tool=Write}
+./register.ts gating hook with .catch: tool.call{tool=Edit}
+./register.ts gating hook with .catch: tool.call{tool=NotebookEdit}
+./register.ts gating hook with .catch: tool.call{tool=Bash}
+./register.ts calls: $.env.get, $.fs.read, $.process.run, $.session.cwd, $.ui.status
+./register.ts env writes: nothing
+./register.ts env reads: HOME, TMPDIR

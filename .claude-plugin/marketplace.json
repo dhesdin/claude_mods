@@ -3,7 +3,7 @@
   "owner": {
     "name": "ValentinD"
   },
-  "description": "Personal Claude Code mods: usage pace, machine monitor, display language",
+  "description": "Personal Claude Code mods: usage pace, machine monitor, teacher mode, display language",
   "plugins": [
     {
       "name": "usage-pace",
@@ -14,6 +14,11 @@
       "name": "sysmon",
       "source": "./plugins/sysmon",
       "description": "GPU / CPU / RAM / disk panel and a machine_status tool for Claude"
+    },
+    {
+      "name": "teacher-guard",
+      "source": "./plugins/teacher-guard",
+      "description": "Teacher mode: Claude cannot write in repos holding a .teacher-mode file"
     },
     {
       "name": "langmod",

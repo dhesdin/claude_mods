@@ -18,6 +18,15 @@ In the portfolio repos (SIP, 3D Vision, etc.), the user must write the code them
 ## Only token spending allowed
 At the start of a session in a protected repo, inject a short instruction (2 to 3 lines max) so Claude acts as a reviewer from the start, rather than attempting refused writes. If the API does not allow it, skip it: blocking is enough.
 
+## Implementation decisions (agreed with the user)
+- Scope: only writes **into** a protected repo are refused. Writes elsewhere (temporary folders, Claude's memory, other projects) stay allowed, including copying code out to `/tmp`.
+- Protected = the path or one of its parents holds `.teacher-mode`, read again on every check (deleting the file turns the mode off at once).
+- Bash is judged by **where** a command writes, not only by its name: write commands (`rm`, `mv`, `cp` destination, `touch`, `mkdir`, `ln`, `chmod`, `tee`, `sed -i`, `perl -i`, `dd of=`, `patch`, redirections) and git commands that change the repo (`add`, `commit`, `push`, `apply`, `merge`, `rebase`, `reset`, `restore`, `checkout`, `stash`, `rm`, `mv`, `clean`, `pull`, `tag`, `clone`, `init`, `worktree`…) are refused when their target is in a protected repo. Quotes, `cd`, `git -C`, `~`, `$HOME`, `$TMPDIR` and heredocs are understood; an unknown target is judged by the folder the command runs in.
+- The guard fails closed: if a check throws before the call is let through, the call is refused.
+- Band: the status line under the prompt (`$.ui.status`), which does not compete with other mods' bands. It also warns when `.teacher-mode` is tracked by git or not git-ignored.
+- The marker is created by hand in each repo the user wants protected, and kept out of commits through `.git/info/exclude` or the global git ignore (README).
+- Status line translated (`language` option); the refusal and the instruction stay English (read by the model).
+
 ## Cases to test
 - Protected repo: Edit refused, `cat` allowed, `echo x > f` refused, `pytest` allowed.
 - Unprotected repo: no behavior change.

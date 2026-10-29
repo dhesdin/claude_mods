@@ -52,7 +52,7 @@ else
 fi
 
 # hooks / calls / state lines of a validation: what the plugin is allowed to touch.
-surface_of() { sed -n -E 's/^ +❯ (\.\/[^ ]+ (hooks|calls|state reads|state writes|answers its own command|gating hook)[^:]*:.*)$/\1/p; s/^ +❯ (types \.\/.*)$/\1/p'; }
+surface_of() { sed -n -E 's/^ +❯ (\.\/[^ ]+ (hooks|calls|state reads|state writes|env reads|env writes|answers its own command|gating hook)[^:]*:.*)$/\1/p; s/^ +❯ (types \.\/.*)$/\1/p'; }
 
 echo "== marketplace"
 if out=$(claude plugin validate . 2>&1); then echo "  validate ok"; else echo "$out" | tail -20; fail "marketplace validation"; fi

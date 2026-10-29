@@ -1,11 +1,12 @@
 # Current context — claude-mods
 
-Updated: 2026-10-29 18:30
+Updated: 2026-10-29 19:30
 
 ## Current goal
-Repo restructured to "senior" standards (English everywhere, docs/, scripts/, CI, security audit). Next: mod 3 `teacher-guard` (docs/specs/03-teacher-guard.md), after the user has read the report.
+Mod 3 `teacher-guard` coded and committed, waiting for the user to check it on screen in a repo holding `.teacher-mode`. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
 
 ## Done
+- teacher-guard 0.1.0: hooks/bash.ts (static Bash write analysis: quotes, cd, git -C, ~/$HOME/$TMPDIR, heredocs), paths.ts, register.ts (Write/Edit/NotebookEdit/Bash refused into a protected repo, fail closed; status line with git-tracked/not-ignored warning; prompt.compose instruction). 8 tests.
 - Plugins: usage-pace 0.2.0, sysmon 0.2.0, langmod 0.1.0 (new: `/langmod en|fr|ja|zh` sets `<plugin>.language` rows via $.config.set). Display i18n en/fr/ja/zh in `hooks/i18n.ts` of each mod; `language` userConfig picker (default en).
 - sysmon: GPU sources in hooks/gpu.ts (NVIDIA nvidia-smi, Jetson tegrastats [to validate], AMD rocm-smi [to validate]), `gpuBackend` auto detection; system.ts (/proc, df); util.ts `clean()` for untrusted text; throttling written out ("thermal (GPU too hot)" red, "power limit (max power draw reached)" orange).
 - Repo: docs/{architecture,development,mods-api,hardware}.md, docs/specs/ (moved from specs/), README, per-plugin README, SECURITY.md, LICENSE (MIT), scripts/check.sh (validate + surface.txt snapshot + zero-network + tests + tsc), scripts/install.sh (--lang), .github CI (SHA-pinned actions, read-only) + Dependabot.
@@ -14,6 +15,7 @@ Repo restructured to "senior" standards (English everywhere, docs/, scripts/, CI
 - Checks: 13 tests pass, all surfaces match, tsc ok where engine types are laid.
 
 ## Decisions
+- teacher-guard: only writes INTO a protected repo are refused (user choice); temp folders free; marker created by hand per repo; status line instead of an AbovePrompt band; $.env.get takes literal names only (HOME, TMPDIR).
 - UI language per mod (userConfig `language`), model-facing text stays English.
 - Two nvidia-smi calls per cycle (GPU + processes), accepted by the user.
 - Surface snapshots (`surface.txt`) are the review gate for new capabilities.
@@ -29,7 +31,7 @@ Repo restructured to "senior" standards (English everywhere, docs/, scripts/, CI
 - Contract `types/index.d.ts` must have no import.
 
 ## Next action
-Mod 3 teacher-guard: read docs/specs/03-teacher-guard.md, check `tool.call` matchers for Write/Edit/NotebookEdit/Bash and `prompt.compose` in the types, then code.
+After the user checks teacher-guard on screen: mod 4 project-hours (read the spec, check session events for active time and $.fs.write/$.store for JSONL storage).
 
 ## Missing info
 - GPU checks on the workstation (docs/hardware.md checklists); Jetson/AMD on real hardware.

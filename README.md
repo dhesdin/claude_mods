@@ -8,6 +8,7 @@ A Claude Code marketplace of small, independent mods. Each mod is a plugin you c
 | --- | --- | --- |
 | [usage-pace](plugins/usage-pace) | Band above the prompt: 5-hour and weekly usage, time to reset, projected weekly pace | [spec](docs/specs/01-usage-pace.md) |
 | [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
+| [teacher-guard](plugins/teacher-guard) | Teacher mode: in a repo holding a `.teacher-mode` file, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
 | [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
 
 Display languages available: **English (en), French (fr), Japanese (ja), Chinese (zh)**. Other languages can be added (see [Internationalization](docs/architecture.md#internationalization)).
@@ -33,6 +34,7 @@ The same steps by hand:
 claude plugin marketplace add ~/claude-mods
 claude plugin install usage-pace@claude-mods
 claude plugin install sysmon@claude-mods
+claude plugin install teacher-guard@claude-mods
 claude plugin install langmod@claude-mods
 ```
 
