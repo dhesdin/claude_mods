@@ -1,9 +1,9 @@
-import { atom, read, update } from 'claude-code'
 import type { Register, SessionRateLimit } from 'claude-code'
+import { atom, read, update } from 'claude-code'
 
 import type { Limits } from '../types'
-import { strings } from './i18n'
 import type { DayKind, Strings } from './i18n'
+import { strings } from './i18n'
 
 // Windows received from the engine, and a counter that forces the countdown to redraw.
 const limits = atom({ plugin: 'usage-pace', key: 'limits' } as const, [] as Limits)

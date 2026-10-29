@@ -1,5 +1,5 @@
-import { expect, test } from 'claude-code/testing'
 import type { ConfigRow } from 'claude-code'
+import { expect, test } from 'claude-code/testing'
 
 const row = (key: string, value: string, options = ['en', 'fr', 'ja', 'zh']): ConfigRow => ({
   key,
@@ -18,7 +18,12 @@ const run = (args: string) => ({
   presentation: { isFullscreen: false, columns: 120 },
 })
 
-const ROWS = [row('sysmon.language', 'en'), row('usage-pace.language', 'en'), row('other.language', 'en', ['en', 'de']), row('theme', 'dark', [])]
+const ROWS = [
+  row('sysmon.language', 'en'),
+  row('usage-pace.language', 'en'),
+  row('other.language', 'en', ['en', 'de']),
+  row('theme', 'dark', []),
+]
 
 test('sets every mod language row, and only those', async ($, on) => {
   const set: string[] = []

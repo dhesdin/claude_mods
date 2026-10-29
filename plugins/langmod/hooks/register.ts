@@ -4,8 +4,7 @@ import type { ConfigRow, Register } from 'claude-code'
 // userConfig field whose options include all of them (see docs/architecture.md, i18n).
 export const LANGS = ['en', 'fr', 'ja', 'zh'] as const
 
-export const isModLanguageRow = (row: ConfigRow) =>
-  /^[a-z0-9-]+\.language$/i.test(row.key) && LANGS.every(l => row.options?.includes(l))
+export const isModLanguageRow = (row: ConfigRow) => /^[a-z0-9-]+\.language$/i.test(row.key) && LANGS.every(l => row.options?.includes(l))
 
 const pluginOf = (row: ConfigRow) => row.key.slice(0, row.key.indexOf('.'))
 

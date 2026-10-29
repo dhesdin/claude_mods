@@ -22,6 +22,9 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 | 3 | `/langmod` changes only `<plugin>.language` rows following the repo convention, never a locked row, and never echoes its argument | `plugins/langmod/hooks/register.ts` |
 | 4 | CI token read-only, checkout without persisted credentials, no secrets, no `pull_request_target`, actions pinned by commit SHA (Dependabot proposes updates), Claude Code version pinned | `.github/` |
 | 4 | `scripts/install.sh` only uses the local clone: nothing is downloaded and executed | `scripts/install.sh` |
+| 1 | Trojan Source: CI fails on any bidi-override or zero-width character in a tracked file (they can make code read differently than it runs) | `scripts/check.sh` |
+| 1 | Linter (Biome, recommended rules) and shellcheck in CI; exceptions are justified line by line | `biome.json`, `scripts/check.sh` |
+| 4 | Biome and TypeScript fetched at pinned versions, never a release younger than two weeks | `scripts/check.sh` |
 | 5 | Secrets and keys are git-ignored; the repository is scanned for key formats before publishing | `.gitignore` |
 
 ## Known limits

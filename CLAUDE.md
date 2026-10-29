@@ -59,7 +59,7 @@ One mod at a time, in this order. The next one starts only once the user has che
 
 ## Definition of done for each mod
 
-- [ ] `scripts/check.sh <mod>` passes (validate, surface snapshot, tests, type-check)
+- [ ] `scripts/check.sh` passes (lint, format, shellcheck, invisible characters, validate, surface snapshot, tests, type-check); `scripts/check.sh --fix` formats
 - [ ] The `hooks:` and `calls:` lines in `plugins/<mod>/surface.txt` match what the spec allows, nothing more
 - [ ] Tested loaded from disk with hot reload
 - [ ] Degraded cases tested (missing data, errors)

@@ -1,8 +1,8 @@
 import { expect, test } from 'claude-code/testing'
 
 import { parseNvidia, parseRocmSmi, parseTegrastats, parseThrottle } from '../hooks/gpu'
-import { cpuPercent, parseCores, parseCpuTimes, parseDf, parseMeminfo } from '../hooks/system'
 import { summary } from '../hooks/register'
+import { cpuPercent, parseCores, parseCpuTimes, parseDf, parseMeminfo } from '../hooks/system'
 import { clean } from '../hooks/util'
 
 const PANE = {
@@ -18,7 +18,8 @@ const GPU_CSV = `${UUID}, NVIDIA GeForce RTX 4070, 87, 11264, 12282, 182.35, 220
 const APPS_CSV = `${UUID}, 4821, /usr/bin/python3, 9318\nGPU-other, 99, /usr/bin/x, 10\n`
 const MEMINFO = 'MemTotal:       33554432 kB\nMemFree:  1 kB\nMemAvailable:   21810380 kB\nSwapTotal: 2097152 kB\nSwapFree: 2097152 kB\n'
 const STAT = 'cpu  100 0 100 800 0 0 0 0 0 0\ncpu0 1 1 1 1\ncpu1 1 1 1 1\n'
-const DF = 'Mounted on  1B-blocks        Avail\n/         413616971776 178430066688\n/         413616971776 178430066688\n/data 1000000000000 10000000000\n'
+const DF =
+  'Mounted on  1B-blocks        Avail\n/         413616971776 178430066688\n/         413616971776 178430066688\n/data 1000000000000 10000000000\n'
 // Real-format samples, not yet checked against hardware (docs/hardware.md, [to validate]).
 const TEGRA =
   'RAM 2448/7620MB (lfb 1x4MB) SWAP 0/3810MB (cached 0MB) CPU [2%@1510,1%@1510] EMC_FREQ 0%@2133 GR3D_FREQ 37%@[305,305] ' +
@@ -36,7 +37,9 @@ const ROCM = JSON.stringify({
   },
 })
 
-const ok = (stdout: string, exitCode = 0) => ({ value: { exitCode, stdout, stderr: '', isStdoutTruncated: false, isStderrTruncated: false } })
+const ok = (stdout: string, exitCode = 0) => ({
+  value: { exitCode, stdout, stderr: '', isStdoutTruncated: false, isStderrTruncated: false },
+})
 const PANES = [{ id: 'sysmon', title: 'Machine', isShown: true, isFocused: false, isPlaced: true }]
 
 test('parsers: NVIDIA, throttling, CPU, RAM, disk', () => {
@@ -91,7 +94,7 @@ test('parsers: Jetson tegrastats and AMD rocm-smi [to validate]', () => {
 })
 
 test('untrusted text is cleaned: no escape sequences, bounded length', () => {
-  expect(clean('evil\u001b[31mred\u0007‮')).toBe('evil[31mred')
+  expect(clean('evil\u001b[31mred\u0007\u202e')).toBe('evil[31mred')
   expect(clean('x'.repeat(100)).length).toBe(64)
   expect(parseNvidia(GPU_CSV, `${UUID}, 1, /tmp/\u001b]0;pwned\u0007name, 5\n`)?.processes?.[0]?.name).toBe(']0;pwnedname')
   // In the model-facing summary, a name cannot close its quotes.

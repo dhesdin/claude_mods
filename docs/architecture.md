@@ -14,8 +14,10 @@ claude-mods/
 │   └── specs/NN-<mod>.md             # functional spec, one per mod
 ├── plugins/<mod>/                    # one independent plugin per mod
 ├── scripts/
-│   ├── check.sh                      # everything CI runs, runnable locally
+│   ├── check.sh                      # everything CI runs, runnable locally (--fix formats)
 │   └── install.sh                    # add the marketplace and install every plugin
+├── biome.json                        # formatter and linter config
+├── .editorconfig                     # editor defaults matching the formatter
 ├── CLAUDE.md                         # rules for Claude Code working in this repo
 ├── SECURITY.md                       # threat model and reporting
 └── LICENSE                           # MIT

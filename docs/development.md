@@ -3,7 +3,8 @@
 ## Requirements
 
 - Claude Code (`claude --version`; this repo is checked against 2.1.312).
-- Node.js ≥ 20 with `npx`, only for the local type-check.
+- Node.js ≥ 20 with `npx` (Biome and the type-check are fetched by `npx` at pinned versions).
+- Optional: `shellcheck` (CI always runs it).
 - Linux for the sysmon samplers (`/proc`, `df`).
 
 ## The loop
@@ -11,9 +12,15 @@
 ```bash
 scripts/check.sh            # everything CI runs, on every plugin
 scripts/check.sh sysmon     # one plugin
+scripts/check.sh --fix      # format and apply safe lint fixes
 ```
 
-For each plugin, `scripts/check.sh`:
+Repository-wide, `scripts/check.sh` first runs:
+- **Biome** (`biome.json`): formatter (2 spaces, single quotes, no semicolons, width 140) and linter (recommended rules; `!` assertions allowed in tests only). An exception in code is a `// biome-ignore <rule>: <reason>` comment on the line, never a rule turned off globally.
+- **shellcheck** on `scripts/*.sh` (warnings and errors), skipped with a notice when not installed.
+- **Invisible characters**: fails if a tracked file holds a bidi-override or zero-width character (Trojan Source). Write such characters as `\u` escapes.
+
+Then, for each plugin:
 1. runs `claude plugin validate`;
 2. compares the `hooks:` / `calls:` / `state` lines of that validation with `plugins/<mod>/surface.txt`, and fails on any difference (a new hook or call is a reviewed decision, see SECURITY.md);
 3. fails if the plugin calls `$.http` (zero-network rule);
@@ -27,6 +34,10 @@ After a deliberate change of hooks or calls: `scripts/check.sh --update-surface 
 - In a terminal: `claude --plugin-dir ./plugins/<mod>` (repeat the flag for several). Saving a file reloads the plugin.
 - In a session where Claude edits the mods: ask Claude to load the `plugin-authoring` skill; it links `plugins/<mod>` into the session's mods folder, and the person accepts "Turn on the mods…" once. Every later edit reloads at the end of the turn.
 - From the installed marketplace (a local folder): edit, then `/reload-plugins` in the session.
+
+## Formatting pitfall
+
+The formatter collapses runs of spaces in JSX text (`<Text>GPU  {name}</Text>` becomes `GPU {name}`), which changes what is displayed. Keep significant spacing in strings: `<Text>{`GPU  ${name}`}</Text>` or a constant.
 
 ## Tests
 
@@ -49,9 +60,11 @@ Tests use `claude-code/testing`: the test registers hooks that stand for the eng
 
 `.github/workflows/ci.yml` runs `scripts/check.sh` on every push and pull request, with a pinned Claude Code version and read-only permissions. No secret is needed: validation and tests run without an account.
 
+Tool versions are pinned in one place each: Biome and TypeScript in `scripts/check.sh`, Claude Code and the actions in the workflow. Bump them deliberately, never to a release younger than two weeks (a fresh release is the usual window for a compromised package).
+
 ## Definition of done for a mod
 
-- [ ] `scripts/check.sh <mod>` green (validate, surface, tests, type-check)
+- [ ] `scripts/check.sh` green (lint, format, shell, invisible characters, validate, surface, tests, type-check)
 - [ ] `surface.txt` matches what the spec allows, nothing more
 - [ ] Tested on screen with hot reload
 - [ ] Degraded cases tested (missing data, errors)

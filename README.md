@@ -64,7 +64,8 @@ claude plugin marketplace remove claude-mods
 ## Develop
 
 ```bash
-scripts/check.sh                       # validate, surface snapshots, tests, type-check
+scripts/check.sh                       # lint, format, validate, surface snapshots, tests, type-check
+scripts/check.sh --fix                 # format and apply safe lint fixes
 claude --plugin-dir ./plugins/sysmon   # run one plugin from disk, hot reload
 ```
 

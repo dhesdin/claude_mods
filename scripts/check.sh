@@ -3,19 +3,53 @@
 #   scripts/check.sh                       all plugins
 #   scripts/check.sh sysmon usage-pace     some plugins
 #   scripts/check.sh --update-surface <mod>...   rewrite surface.txt after a reviewed change
+#   scripts/check.sh --fix                 format and apply safe lint fixes, then exit
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# Tool versions, pinned (bump deliberately, never to a release younger than two weeks).
 TS_VERSION=5.6.3
+BIOME_VERSION=2.5.15
+biome() { npx -y "@biomejs/biome@$BIOME_VERSION" "$@"; }
+
+if [[ "${1:-}" == "--fix" ]]; then
+  biome check --write --colors=off .
+  exit
+fi
+
 update=false
 if [[ "${1:-}" == "--update-surface" ]]; then
   update=true
   shift
 fi
-if (($# > 0)); then mods=("$@"); else mapfile -t mods < <(ls plugins); fi
+mods=()
+if (($# > 0)); then
+  mods=("$@")
+else
+  for d in plugins/*/; do mods+=("$(basename "$d")"); done
+fi
 
 failed=0
 fail() { echo "  FAIL: $*"; failed=1; }
+
+echo "== lint and format (Biome $BIOME_VERSION)"
+if out=$(biome ci --colors=off . 2>&1); then echo "  ok"; else echo "$out" | tail -40; fail "biome (fix with: scripts/check.sh --fix)"; fi
+
+echo "== shell scripts"
+if command -v shellcheck >/dev/null; then
+  if shellcheck --severity=warning scripts/*.sh; then echo "  ok"; else fail "shellcheck"; fi
+else
+  echo "  skipped (shellcheck not installed; CI runs it)"
+fi
+
+# Trojan Source: invisible bidi / zero-width characters can make code read differently than it runs.
+echo "== invisible characters"
+if hits=$(git ls-files -z | xargs -0 grep -lP '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}\x{FEFF}]' 2>/dev/null); then
+  echo "$hits"
+  fail "invisible bidi/zero-width characters (write them as \\u escapes)"
+else
+  echo "  ok"
+fi
 
 # hooks / calls / state lines of a validation: what the plugin is allowed to touch.
 surface_of() { sed -n -E 's/^ +❯ (\.\/[^ ]+ (hooks|calls|state reads|state writes|answers its own command|gating hook)[^:]*:.*)$/\1/p; s/^ +❯ (types \.\/.*)$/\1/p'; }

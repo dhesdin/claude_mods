@@ -1,12 +1,12 @@
-import { atom, read, update } from 'claude-code'
 import type { Register, RenderChildren, Timer } from 'claude-code'
+import { atom, read, update } from 'claude-code'
 
 import type { Disk, Gpu, GpuKind, GpuState, Ram, Snapshot, Throttle } from '../types'
-import { detectGpu, sampleGpu } from './gpu'
 import type { GpuBackend, Io } from './gpu'
+import { detectGpu, sampleGpu } from './gpu'
 import { strings } from './i18n'
-import { sampleDisks, sampleSystem } from './system'
 import type { CpuTimes } from './system'
+import { sampleDisks, sampleSystem } from './system'
 
 const PANE = 'sysmon'
 const TOOL = 'mcp__sysmon__machine_status'
@@ -19,6 +19,10 @@ const gbFromBytes = (b: number) => (b / 1024 ** 3).toFixed(1)
 const ratio = (used: number | null, total: number | null) => (used === null || !total ? null : (used / total) * 100)
 const fixed1 = (load: number[] | null, i: number) => load?.[i]?.toFixed(1) ?? 'n/a'
 const round = (x: number | null) => (x === null ? 'n/a' : Math.round(x))
+// Card labels padded with two spaces. Kept in strings: a formatter collapses runs of spaces in JSX text.
+const LABEL_GPU = 'GPU  '
+const LABEL_CPU = 'CPU  '
+const LABEL_RAM = 'RAM  '
 
 // Same scale as usage-pace: white < 50 %, yellow 50-75, orange 75-90, red >= 90.
 export function levelColor(percent: number | null): string {
@@ -41,7 +45,10 @@ export function summary(s: Snapshot): string {
     const g = s.gpu.gpu
     const free = g.memTotalMiB !== null && g.memUsedMiB !== null ? gib(g.memTotalMiB - g.memUsedMiB) : 'n/a'
     const mem = g.isSharedMemory ? 'shared memory (CPU + GPU)' : 'VRAM'
-    const procs = g.processes === null ? 'n/a' : g.processes.map(p => `${JSON.stringify(p.name)} (PID ${p.pid}) ${gib(p.memMiB)} GB`).join(', ') || 'none'
+    const procs =
+      g.processes === null
+        ? 'n/a'
+        : g.processes.map(p => `${JSON.stringify(p.name)} (PID ${p.pid}) ${gib(p.memMiB)} GB`).join(', ') || 'none'
     const throttle = g.throttle === null ? 'n/a' : g.throttle.join(', ') || 'none'
     parts.push(
       `GPU ${g.name} (${g.kind}): utilization ${round(g.utilPercent)}%, ${mem} ${gib(g.memUsedMiB)} / ${gib(g.memTotalMiB)} GB (${free} GB free), ` +
@@ -56,12 +63,16 @@ export function summary(s: Snapshot): string {
   )
   if (s.ram) {
     const swap = s.ram.swapTotalKiB === 0 ? 'no swap' : `swap ${gibFromKiB(s.ram.swapUsedKiB)} / ${gibFromKiB(s.ram.swapTotalKiB)} GB`
-    parts.push(`RAM available ${gibFromKiB(s.ram.availableKiB)} / ${gibFromKiB(s.ram.totalKiB)} GB (used ${gibFromKiB(s.ram.usedKiB)}), ${swap}.`)
+    parts.push(
+      `RAM available ${gibFromKiB(s.ram.availableKiB)} / ${gibFromKiB(s.ram.totalKiB)} GB (used ${gibFromKiB(s.ram.usedKiB)}), ${swap}.`,
+    )
   } else {
     parts.push('RAM n/a.')
   }
   if (s.disks) {
-    parts.push(`Disk: ${s.disks.map(d => `${JSON.stringify(d.mount)} ${gbFromBytes(d.availBytes)} GB free of ${gbFromBytes(d.sizeBytes)}`).join(', ')}.`)
+    parts.push(
+      `Disk: ${s.disks.map(d => `${JSON.stringify(d.mount)} ${gbFromBytes(d.availBytes)} GB free of ${gbFromBytes(d.sizeBytes)}`).join(', ')}.`,
+    )
   }
   return parts.join(' ')
 }
@@ -194,10 +205,10 @@ export const register: Register = (on, options) => {
     return { text: t.opened }
   })
 
-  on('ui.close', async ($, e, next) => {
+  on('ui.close', async (_, e, next) => {
     if (e.id === PANE) stop()
     return next(e)
-  }).catch(($, e, next) => next(e))
+  }).catch((_, e, next) => next(e))
 
   on('tool.call', { tool: TOOL }, async () => {
     if (!host) return { deny: 'sysmon is not ready yet' }
@@ -220,8 +231,8 @@ export const register: Register = (on, options) => {
     )
 
     const gpuCard = () => {
-      if (s.gpu.kind === 'absent') return hideMissingGpu ? null : card(false, <Text dimColor>GPU  {t.noGpu}</Text>)
-      if (s.gpu.kind === 'error') return card(true, <Text color="red">GPU  {t.gpuError(s.gpu.message)}</Text>)
+      if (s.gpu.kind === 'absent') return hideMissingGpu ? null : card(false, <Text dimColor>{`${LABEL_GPU}${t.noGpu}`}</Text>)
+      if (s.gpu.kind === 'error') return card(true, <Text color="red">{`${LABEL_GPU}${t.gpuError(s.gpu.message)}`}</Text>)
       const g: Gpu = s.gpu.gpu
       const mem = ratio(g.memUsedMiB, g.memTotalMiB)
       const isMemAlert = mem !== null && mem > vramAlert
@@ -230,7 +241,7 @@ export const register: Register = (on, options) => {
       return card(
         isMemAlert || isTempAlert,
         <>
-          <Text bold>GPU  {g.name}</Text>
+          <Text bold>{`${LABEL_GPU}${g.name}`}</Text>
           <Text>
             {t.utilization}{' '}
             <Text color={levelColor(g.utilPercent)} bold>
@@ -284,7 +295,7 @@ export const register: Register = (on, options) => {
           false,
           <>
             <Text>
-              <Text bold>CPU  </Text>
+              <Text bold>{LABEL_CPU}</Text>
               {t.cpuBusy}{' '}
               <Text color={levelColor(s.cpuPercent)} bold>
                 {t.pct(round(s.cpuPercent))}
@@ -304,7 +315,7 @@ export const register: Register = (on, options) => {
           s.ram ? (
             <>
               <Text>
-                <Text bold>RAM  </Text>
+                <Text bold>{LABEL_RAM}</Text>
                 {t.available}{' '}
                 <Text color={levelColor(ramPercent)} bold>
                   {gibFromKiB(s.ram.availableKiB)} {t.gb}
@@ -319,7 +330,7 @@ export const register: Register = (on, options) => {
               </Text>
             </>
           ) : (
-            <Text dimColor>RAM  n/a</Text>
+            <Text dimColor>{`${LABEL_RAM}n/a`}</Text>
           ),
         )}
         {s.disks

@@ -51,7 +51,9 @@ test('French: pace that hits the limit before the reset', { options: { language:
   // 72 % in 90 h -> 100 % 35 h later: tomorrow (Friday) around 23:00.
   expect((await ui.find({ type: 'Text', text: /^Rythme/ }))?.text).toBe('Rythme À ce rythme, limite atteinte demain vers 23h')
   expect((await ui.find({ type: 'Text', text: /^soit/ }))?.text).toBe('soit 1j 19h avant la réinitialisation')
-  expect((await ui.find({ type: 'Text', text: /^Réinitialisation dans : 3j/ }))?.text).toBe('Réinitialisation dans : 3j 06h (dimanche à 18h00)')
+  expect((await ui.find({ type: 'Text', text: /^Réinitialisation dans : 3j/ }))?.text).toBe(
+    'Réinitialisation dans : 3j 06h (dimanche à 18h00)',
+  )
   await ui.unmount()
 })
 
@@ -76,7 +78,16 @@ test('no data: band hidden, no crash', async ($, on) => {
 })
 
 test('level colors', () => {
-  expect([0, 49.9, 50, 74.9, 75, 89.9, 90, 100].map(levelColor)).toEqual(['text', 'text', 'yellow', 'yellow', '#ff8700', '#ff8700', 'red', 'red'])
+  expect([0, 49.9, 50, 74.9, 75, 89.9, 90, 100].map(levelColor)).toEqual([
+    'text',
+    'text',
+    'yellow',
+    'yellow',
+    '#ff8700',
+    '#ff8700',
+    'red',
+    'red',
+  ])
 })
 
 test('durations, moments and the minimum-data rule in every language', () => {

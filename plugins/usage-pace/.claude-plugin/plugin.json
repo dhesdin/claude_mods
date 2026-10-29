@@ -12,12 +12,7 @@
       "type": "string",
       "title": "Language",
       "description": "Display language of the band (also settable for every mod at once with /langmod)",
-      "options": [
-        "en",
-        "fr",
-        "ja",
-        "zh"
-      ],
+      "options": ["en", "fr", "ja", "zh"],
       "default": "en"
     },
     "paceMinHours": {

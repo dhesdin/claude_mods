@@ -192,7 +192,10 @@ async function sampleAmd(io: Io, index: number): Promise<GpuState> {
 // ---------------------------------------------------------------- selection
 
 const succeeds = (io: Io, argv: string[]) =>
-  io.run(argv, { timeoutMs: TIMEOUT_MS }).then(r => r.exitCode === 0, () => false)
+  io.run(argv, { timeoutMs: TIMEOUT_MS }).then(
+    r => r.exitCode === 0,
+    () => false,
+  )
 
 // Jetson first (a file read, and some JetPack versions ship a limited nvidia-smi), then NVIDIA, then AMD.
 export async function detectGpu(io: Io): Promise<GpuKind | null> {
