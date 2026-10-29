@@ -36,3 +36,8 @@
 - Decisions: test-before-done and retry-intelligence deferred (low value now); notify always notifies, replies under 15 s skipped; reminder at 250k, compaction at 300k.
 - Found: autoCompactEnabled was false and CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=70 set; the default notification channel does nothing in GNOME Terminal.
 - Pitfalls: test stubs must return a full result (turn.complete `{ text }`, session.measure `{ changed }`, session.compact needs one message with `toolUses`); process.run's stdin is under `init`.
+
+## 2026-10-29 (23:00) : rules and notes back to Claude Code, langmod memory, sysmon RAM programs, skills
+- Done: user/CLAUDE.md + user/hooks/load-context.sh installed by make user-settings (RULES=1); project-memory 0.2 reminder only; langmod 0.2 ($.store, applied at start); sysmon 0.3 (top 3 RAM programs, ps every 15 s); version-check and init-project updated on the account; langmod, sysmon, project-memory re-uploaded.
+- Decisions: plugin-injected context can be skipped by another plugin (cc-plugin-sec-default), so rules/notes use CLAUDE.md and a SessionStart hook.
+- Pitfalls: auto mode refuses Claude writing ~/.claude/settings.json hooks or CLAUDE.md: the user runs make user-settings; a python `open(p,'w').write(open(p).read())` truncates the file (sysmon register restored from git).

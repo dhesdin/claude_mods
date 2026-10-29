@@ -42,8 +42,8 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | langmod | yes | not yet | yes |
 | teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
 | project-hours | yes | yes | yes |
-| notify | yes | not yet | yes |
-| project-memory | yes | not yet | yes |
+| notify | yes | Linux test notification | yes |
+| project-memory | yes | yes (reminder seen) | yes |
 
 ## Build order
 
