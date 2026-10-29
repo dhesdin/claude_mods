@@ -41,3 +41,7 @@
 - Done: user/CLAUDE.md + user/hooks/load-context.sh installed by make user-settings (RULES=1); project-memory 0.2 reminder only; langmod 0.2 ($.store, applied at start); sysmon 0.3 (top 3 RAM programs, ps every 15 s); version-check and init-project updated on the account; langmod, sysmon, project-memory re-uploaded.
 - Decisions: plugin-injected context can be skipped by another plugin (cc-plugin-sec-default), so rules/notes use CLAUDE.md and a SessionStart hook.
 - Pitfalls: auto mode refuses Claude writing ~/.claude/settings.json hooks or CLAUDE.md: the user runs make user-settings; a python `open(p,'w').write(open(p).read())` truncates the file (sysmon register restored from git).
+
+## 2026-10-30 : init-project and version-check v3
+- Done: corrections reviewed by Claude Desktop applied and uploaded (diff shown first); versions.sh tested in 5 cases.
+- Decisions: modes merged into pro/perso and portfolio; description unchanged; Read deny rules also cover cat/head/tail/sed (docs), not grep -r or scripts.

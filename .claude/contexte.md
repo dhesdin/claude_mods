@@ -1,12 +1,12 @@
 # Current context: claude-mods
 
-Updated: 2026-10-29 23:00
+Updated: 2026-10-30 00:10
 
 ## Current goal
 Everything is coded, committed and on the claude.ai account. Remaining: the per-machine step the user runs (auto mode refuses Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md), then on-screen checks after a Claude Code restart.
 
 ## Done
-- Account: 7 mods (usage-pace 0.3, sysmon 0.3 with the 3 biggest RAM programs, teacher-guard 0.2, langmod 0.2 remembering the language per machine, project-hours 0.1, notify 0.1, project-memory 0.2 = reminder only) and skills version-check (versions.sh, supply-chain checks) and init-project (templates ci.yml, dependabot.yml weekly grouped, settings.json, AGENTS.md; /teacher-mode activate proposed after infra; test-command removed).
+- Account: 7 mods (usage-pace 0.3, sysmon 0.3 with the 3 biggest RAM programs, teacher-guard 0.2, langmod 0.2 remembering the language per machine, project-hours 0.1, notify 0.1, project-memory 0.2 = reminder only) and skills version-check v3 (versions.sh: project .venv, distribution names, scoped npm; supply-chain checks) and init-project v3 (modes pro/perso and portfolio; portfolio writes the teacher-mode reminder into the project's CLAUDE.md; architecture section, strict typing, config, errors/logging, test layout, docs/adr; templates ci.yml with audit step, dependabot.yml weekly grouped with uv, settings.json denying every forced push form).
 - Global rules in user/CLAUDE.md, hand-off notes hook user/hooks/load-context.sh; scripts/user-settings.sh installs both (hook copied, CLAUDE.md symlinked with --rules / RULES=1), backups, dry run; make doctor shows the state.
 - Laptop: compaction 300k already applied; dev-mods links removed.
 
