@@ -1,9 +1,9 @@
 # Current context — claude-mods
 
-Updated: 2026-10-29 20:50
+Updated: 2026-10-29 21:45
 
 ## Current goal
-All five mods done, validated on screen, on the user's claude.ai account (usage-pace 0.3 and project-hours uploaded 2026-10-29 evening; they sync at the next Claude Code start). No hot-reload link left. Next: the user's new questions.
+notify (05) and project-memory (06) coded, tested, on the account (uploaded 2026-10-29 night) and hot-linked in this session (~/.claude/dev-mods/4f3c1696-…/{notify,project-memory}); waiting for the user's on-screen check. Old-name skills deleted from the account; English ones kept.
 
 ## Done (repo public on github.com/dhesdin/claude_mods)
 - usage-pace 0.2, sysmon 0.2, teacher-guard 0.2, langmod: on the user's claude.ai account, synced as <mod>@synced on every machine.
@@ -12,6 +12,8 @@ All five mods done, validated on screen, on the user's claude.ai account (usage-
 - Directory (claude.ai/directory/manage): sysmon submitted, waiting for scan + review. usage-pace: steps 1-3 done (repo dhesdin/claude_mods, path plugins/usage-pace, validation passed at 07b767a with the known `types` warning; data handling: no personal data, nothing sent, not retained, not for minors). Step 4 (contact e-mail + 4 compliance ticks) and step 5 are the user's, in the open Chrome tab.
 
 ## Decisions
+- New mods are TypeScript mods (not shell hooks): notify uses classic.Notification + turn.complete and notify-send/osascript/PowerShell by argv; project-memory uses prompt.context (block sent at first request and after compaction), session.measure, tool.call/prompt.submit `context` for the reminder.
+- Settings no plugin can carry (autoCompactEnabled, autoCompactWindow 300000) go through scripts/user-settings.sh, once per machine; CLAUDE_AUTOCOMPACT_PCT_OVERRIDE removed.
 - docs/mods.md is the single catalog (commands, every option) read by users and /install-mods; scripts/check.sh "docs coverage" fails when a mod or option is missing from it, the mod README or the root README table.
 - Options set from a terminal with scripts/configure.sh (claude plugin configure --values-stdin; works for @synced too); values apply after a Claude Code restart.
 - project-hours multi-machine: dataFolder option pointing at a folder a user-installed sync tool shares (Syncthing recommended); the mod stays zero network. Alerts are rolling: no time in the last N weeks.
@@ -32,9 +34,11 @@ All five mods done, validated on screen, on the user's claude.ai account (usage-
 - tsc type-check of project-hours skipped until a session lays its types (after the hot-reload load).
 
 ## Next action
-1. After a Claude Code restart: `claude plugin list` should show usage-pace 0.3.0@synced and project-hours@synced.
-2. Directory: usage-pace and sysmon are "En cours d'examen" (held: the plugin includes a mod, Anthropic reviewer). The directory picks new commits about every 6 h (usage-pace 0.3 not yet seen). project-hours not submitted (offer it).
-3. CI not checked locally (no gh CLI): look at GitHub Actions.
+1. User checks notify (desktop notification after a reply ≥ 15 s) and project-memory (new session: Claude knows the notes without reading them).
+2. After a Claude Code restart on the laptop: `claude plugin list` shows notify@synced and project-memory@synced; then `make user-settings` again (removes the charger-contexte.sh hook) and remove the two rules from ~/.claude/CLAUDE.md (now in plugins/project-memory/rules.md); remove the dev-mods links. Same `make user-settings` on the workstation.
+3. Other repos edited for the skill rename, not committed: appli_quotidien/appli_tracker/CLAUDE.md, appli_quotidien/appli_jeu/double-regard/CLAUDE.md.
+4. Proposed, waiting for the user: fixes to the account skills version-check and init-project (init-project's `.teacher-mode` marker does not exist).
+5. Deferred by decision: test-before-done and retry-intelligence mods.
 
 ## Pending (remind the user)
 - Demo GIF for the README (Peek, short script) once all mods are done.

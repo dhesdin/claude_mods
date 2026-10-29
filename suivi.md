@@ -30,3 +30,9 @@
 - Done: usage-pace 0.3 (/usage-pace toggle); /hours panel; project-hours reads only needed weeks, dataFolder option (sync via Syncthing), rolling alerts; docs/mods.md catalog; scripts/configure.sh; /install-mods asks options per mod; AGENTS.md rewritten; CI docs-coverage check; help-mods skill fixed (v2 on the account).
 - Measures: a session file is 1-3 KB (~170 B per segment); 2,000 sessions = a few MB. Reads were the real cost (every file every turn), now bounded by the weeks shown.
 - Pitfalls: `claude plugin configure --values-stdin` takes string values and asks for a restart; a network share as dataFolder is refused by $.fs.
+
+## 2026-10-29 (late night) — notify, project-memory, per-machine settings, skill rename
+- Done: notify 0.1.0 and project-memory 0.1.0 (tests, icons, READMEs, specs 05/06), scripts/user-settings.sh, docs; skill names project-handoff / token-economy / industry-code-review in active files; French duplicates deleted from the account after checking the English ones contain them; both mods uploaded; laptop settings applied (backup settings.json.20261029-214415.bak).
+- Decisions: test-before-done and retry-intelligence deferred (low value now); notify always notifies, replies under 15 s skipped; reminder at 250k, compaction at 300k.
+- Found: autoCompactEnabled was false and CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=70 set; the default notification channel does nothing in GNOME Terminal.
+- Pitfalls: test stubs must return a full result (turn.complete `{ text }`, session.measure `{ changed }`, session.compact needs one message with `toolUses`); process.run's stdin is under `init`.
