@@ -4,8 +4,9 @@
 Skills come from several places (the claude.ai account, the machine, the project) and mods add commands and options: there is no single place listing them with what they do.
 
 ## Commands
-- `/skill-help`: every skill, in two sections.
+- `/help-skills`: every available skill. Both commands start with `help-` (one naming rule).
   - **Global**: the claude.ai account's skills (synced under `~/.claude/skills/synced/<account>/`, present on every machine where the account is logged in) and this machine's own (`~/.claude/skills/<name>/`, not synced: copy them, or ship them in a plugin, to have them elsewhere).
+  - **Claude Code and installed plugins**: `$.command.list()` entries with source `builtin` or `plugin` (the engine does not tell a skill from a command, so both are listed), without duplicates of the folder skills and without this repo's mods.
   - **Project**: `<project root>/.claude/skills/<name>/`.
   - One line per skill: its name and the first sentence of its `description` front matter.
 - `/help-mods`: each mod of the claude-mods marketplace: description, enabled or not, its commands, its options with their current values.

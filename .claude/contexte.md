@@ -3,12 +3,12 @@
 Updated: 2026-10-29 21:00
 
 ## Current goal
-teacher-guard v0.2 (/teacher-mode command), mod-help (/skill-help, /help-mods) and the modular Makefile are done and pushed; waiting for the user to check them on screen. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
+teacher-guard v0.2 (/teacher-mode command), mod-help (/help-skills, /help-mods) and the modular Makefile are done and pushed; waiting for the user to check them on screen. Next: mod 4 `project-hours` (docs/specs/04-project-hours.md).
 
 ## Done
 - teacher-guard 0.2.0: /teacher-mode activate|deactivate (repo = git root of the session cwd, per session in $.state; deactivate only from the prompt); hooks/bash.ts path-aware Bash analysis; fail-closed tool guards; status line; prompt.compose instruction. 8 tests.
-- mod-help 0.1.0: /skill-help (account synced skills, machine ~/.claude/skills, project .claude/skills) and /help-mods (marketplace + config/command lists). 3 tests.
-- Makefile + scripts/install.sh: make install [mods], install-<mod>, uninstall, teardown, list, setup, check, fix; MOD_LANG / MOD_SCOPE / CLAUDE from CLI, env or git-ignored config.mk. CLAUDE=echo for a dry run.
+- mod-help 0.1.0: /help-skills (account synced skills, Claude Code + plugins from $.command.list, machine ~/.claude/skills, project .claude/skills) and /help-mods (marketplace + config/command lists). 3 tests.
+- Makefile + scripts/install.sh: make install [mods], make <mod>..., install-<mod>, uninstall, teardown, list, setup, check, fix; MOD_LANG / MOD_SCOPE / CLAUDE from CLI, env or git-ignored config.mk. CLAUDE=echo for a dry run.
 - Plugins: usage-pace 0.2.0, sysmon 0.2.0, langmod 0.1.0 (new: `/langmod en|fr|ja|zh` sets `<plugin>.language` rows via $.config.set). Display i18n en/fr/ja/zh in `hooks/i18n.ts` of each mod; `language` userConfig picker (default en).
 - sysmon: GPU sources in hooks/gpu.ts (NVIDIA nvidia-smi, Jetson tegrastats [to validate], AMD rocm-smi [to validate]), `gpuBackend` auto detection; system.ts (/proc, df); util.ts `clean()` for untrusted text; throttling written out ("thermal (GPU too hot)" red, "power limit (max power draw reached)" orange).
 - Repo: docs/{architecture,development,mods-api,hardware}.md, docs/specs/ (moved from specs/), README, per-plugin README, SECURITY.md, LICENSE (MIT), scripts/check.sh (validate + surface.txt snapshot + zero-network + tests + tsc), scripts/install.sh (--lang), .github CI (SHA-pinned actions, read-only) + Dependabot.

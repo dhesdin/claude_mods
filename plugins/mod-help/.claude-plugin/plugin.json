@@ -1,7 +1,7 @@
 {
   "name": "mod-help",
   "version": "0.1.0",
-  "description": "/skill-help lists every skill (global and project) with one line each; /help-mods lists the mods, their commands and options",
+  "description": "/help-skills lists every available skill (account, Claude Code and plugins, machine, project); /help-mods lists the mods, their commands and options",
   "author": { "name": "ValentinD" },
   "license": "MIT",
   "userConfig": {

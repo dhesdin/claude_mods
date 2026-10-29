@@ -28,7 +28,7 @@
     {
       "name": "mod-help",
       "source": "./plugins/mod-help",
-      "description": "/skill-help and /help-mods: every skill and every mod, one line each"
+      "description": "/help-skills and /help-mods: every skill and every mod, one line each"
     }
   ]
 }

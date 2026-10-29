@@ -11,7 +11,7 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     try {
-      await $.command.register({ name: 'skill-help', description: t.skillHelp })
+      await $.command.register({ name: 'help-skills', description: t.helpSkills })
       await $.command.register({ name: 'help-mods', description: t.helpMods })
     } catch {
       // Commands refused: nothing else depends on them.
@@ -19,7 +19,7 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
-  on('command.run', { command: 'skill-help' }, async $ => {
+  on('command.run', { command: 'help-skills' }, async $ => {
     // Skill folders (a linked skill folder lists as `other`).
     const folders = async (path: string) => (await $.fs.list(path).catch(() => [])).filter(d => d.kind !== 'file').map(d => d.name)
     const skillsIn = async (root: string): Promise<Skill[]> => {
@@ -43,12 +43,25 @@ export const register: Register = (on, options) => {
     const project = await skillsIn(`${root}/.claude/skills`)
     const unique = (list: Skill[]) => list.filter((s, i) => list.findIndex(o => o.name === s.name) === i)
 
+    // Built into Claude Code, or from installed plugins. The engine does not tell a skill from a command,
+    // so both are listed; skills already found in a folder above, and this repo's mods (see /help-mods), are left out.
+    const known = new Set([...account, ...machine, ...project].map(s => s.name))
+    const siblings = new Set(await folders(`${$.plugin.root}/..`))
+    const builtIn = (await $.command.list())
+      .filter(c => c.source === 'builtin' || c.source === 'plugin')
+      .filter(c => !known.has(c.name) && !known.has(c.name.slice(c.name.indexOf(':') + 1)))
+      .filter(c => !siblings.has(c.plugin?.split('@')[0] ?? '') && !c.plugin?.endsWith('@claude-mods'))
+      .map(c => ({ name: c.name, summary: summarize(c.description) }))
+
     return {
       text: [
         t.skillsTitle,
         '',
         t.globalAccount,
         table(unique(account), t.none),
+        '',
+        t.builtIn,
+        table(unique(builtIn), t.none),
         '',
         t.globalMachine,
         table(machine, t.none),

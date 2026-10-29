@@ -3,7 +3,8 @@ export const LANGS = ['en', 'fr', 'ja', 'zh'] as const
 export type Lang = (typeof LANGS)[number]
 
 export type Strings = {
-  skillHelp: string
+  helpSkills: string
+  builtIn: string
   helpMods: string
   skillsTitle: string
   globalAccount: string
@@ -20,11 +21,12 @@ export type Strings = {
 
 const TABLES: Record<Lang, Strings> = {
   en: {
-    skillHelp: 'List every skill, global and project, with one line each',
+    helpSkills: 'List every available skill: account, Claude Code and plugins, machine, project; one line each',
+    builtIn: 'Global · Claude Code and installed plugins (skills and commands; come with Claude Code and the plugins installed)',
     helpMods: 'List the mods of claude-mods: what they do, their commands and options',
     skillsTitle: 'Skills',
     globalAccount: 'Global · claude.ai account (synced to every machine you log in on)',
-    globalMachine: 'Global · this machine (~/.claude/skills, not synced)',
+    globalMachine: 'This machine (~/.claude/skills, not synced: stays on this computer)',
     project: r => `Project (${r}/.claude/skills)`,
     none: '(none)',
     modsTitle: 'Mods (claude-mods)',
@@ -35,11 +37,12 @@ const TABLES: Record<Lang, Strings> = {
     noMarketplace: 'The claude-mods marketplace file was not found next to this mod.',
   },
   fr: {
-    skillHelp: 'Lister tous les skills, globaux et du projet, avec une ligne chacun',
+    helpSkills: 'Lister tous les skills disponibles : compte, Claude Code et plugins, machine, projet ; une ligne chacun',
+    builtIn: 'Global · Claude Code et plugins installés (skills et commandes ; viennent avec Claude Code et les plugins installés)',
     helpMods: 'Lister les mods de claude-mods : ce qu’ils font, leurs commandes et options',
     skillsTitle: 'Skills',
     globalAccount: 'Global · compte claude.ai (synchronisé sur chaque machine où tu es connecté)',
-    globalMachine: 'Global · cette machine (~/.claude/skills, non synchronisé)',
+    globalMachine: 'Cette machine (~/.claude/skills, non synchronisé : reste sur cet ordinateur)',
     project: r => `Projet (${r}/.claude/skills)`,
     none: '(aucun)',
     modsTitle: 'Mods (claude-mods)',
@@ -50,11 +53,12 @@ const TABLES: Record<Lang, Strings> = {
     noMarketplace: 'Le fichier de la marketplace claude-mods est introuvable à côté de ce mod.',
   },
   ja: {
-    skillHelp: 'すべてのスキル（グローバルとプロジェクト）を一行ずつ一覧表示',
+    helpSkills: '利用可能な全スキル（アカウント、Claude Code とプラグイン、マシン、プロジェクト）を一行ずつ表示',
+    builtIn: 'グローバル · Claude Code とインストール済みプラグイン（スキルとコマンド。Claude Code とプラグインに付属）',
     helpMods: 'claude-mods のモッド一覧：機能、コマンド、オプション',
     skillsTitle: 'スキル',
     globalAccount: 'グローバル · claude.ai アカウント（ログインした全マシンに同期）',
-    globalMachine: 'グローバル · このマシン（~/.claude/skills、同期なし）',
+    globalMachine: 'このマシン（~/.claude/skills、同期なし：このコンピューターのみ）',
     project: r => `プロジェクト（${r}/.claude/skills）`,
     none: '（なし）',
     modsTitle: 'モッド（claude-mods）',
@@ -65,11 +69,12 @@ const TABLES: Record<Lang, Strings> = {
     noMarketplace: 'このモッドの近くに claude-mods のマーケットプレイスファイルが見つかりません。',
   },
   zh: {
-    skillHelp: '列出所有技能（全局与项目），每个一行说明',
+    helpSkills: '列出所有可用技能：账户、Claude Code 与插件、本机、项目，每个一行说明',
+    builtIn: '全局 · Claude Code 与已安装插件（技能与命令，随 Claude Code 及已装插件提供）',
     helpMods: '列出 claude-mods 的模组：功能、命令与选项',
     skillsTitle: '技能',
     globalAccount: '全局 · claude.ai 账户（同步到你登录的每台机器）',
-    globalMachine: '全局 · 本机（~/.claude/skills，不同步）',
+    globalMachine: '本机（~/.claude/skills，不同步：仅限此电脑）',
     project: r => `项目（${r}/.claude/skills）`,
     none: '（无）',
     modsTitle: '模组（claude-mods）',

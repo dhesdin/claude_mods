@@ -31,7 +31,7 @@ test('front matter: plain, quoted and block descriptions; one-line summary', () 
   ).toBe('  a  A.\n  b  B.')
 })
 
-test('/skill-help: account, machine and project skills', async ($, on) => {
+test('/help-skills: account, Claude Code and plugins, machine and project', async ($, on) => {
   const files: Record<string, string> = {
     '/h/.claude/skills/synced/acc1/pdf/SKILL.md': '---\nname: pdf\ndescription: Work with PDF files. More.\n---',
     '/h/.claude/skills/passation-projet/SKILL.md': '---\nname: passation-projet\ndescription: Keep the hand-off notes up to date.\n---',
@@ -47,7 +47,16 @@ test('/skill-help: account, machine and project skills', async ($, on) => {
   on('command.register', (_, e) => ({ value: { command: e.name } }))
   on('env.get', () => ({ value: '/h' }))
   on('session.root', () => ({ value: '/repo' }))
+  on('command.list', () => ({
+    value: [
+      { name: 'simplify', description: 'Review the changed code for reuse. Then fix.', source: 'builtin' },
+      { name: 'anthropic-skills:pdf', description: 'Duplicate of an account skill.', source: 'plugin', plugin: 'anthropic-skills' },
+      { name: 'sysmon', description: 'A mod of this repo.', source: 'plugin', plugin: 'sysmon@claude-mods' },
+      { name: 'passation-projet', description: 'A machine skill, already listed.', source: 'user' },
+    ],
+  }))
   on('fs.list', (_, e) => {
+    if (e.path?.endsWith('/mod-help/..')) return { value: [dir('mod-help'), dir('sysmon')] }
     const names = dirs[e.path ?? '']
     if (!names) throw new Error('ENOENT')
     return { value: names.map(dir) }
@@ -59,14 +68,17 @@ test('/skill-help: account, machine and project skills', async ($, on) => {
   })
   await $.session.start({ cwd: '/repo', surface: 'terminal', isInteractive: true })
 
-  expect((await $.command.run(run('skill-help'))).text).toBe(
+  expect((await $.command.run(run('help-skills'))).text).toBe(
     [
       'Skills',
       '',
       'Global · claude.ai account (synced to every machine you log in on)',
       '  pdf  Work with PDF files.',
       '',
-      'Global · this machine (~/.claude/skills, not synced)',
+      'Global · Claude Code and installed plugins (skills and commands; come with Claude Code and the plugins installed)',
+      '  simplify  Review the changed code for reuse.',
+      '',
+      'This machine (~/.claude/skills, not synced: stays on this computer)',
       '  passation-projet  Keep the hand-off notes up to date.',
       '',
       'Project (/repo/.claude/skills)',

@@ -2,8 +2,9 @@
 ##
 ##   make setup                         add this folder as a Claude Code marketplace
 ##   make install                       install every mod
-##   make install sysmon teacher-guard  install some mods (or: make install-sysmon)
-##   make uninstall sysmon              uninstall some mods (all without names)
+##   make install <mod> [<mod>...]      install the mods you name, any number, any order
+##   make <mod> [<mod>...]              the same, shorter (or: make install-<mod>)
+##   make uninstall <mod> [<mod>...]    uninstall the mods you name (all without names)
 ##   make teardown                      uninstall every mod and remove the marketplace
 ##   make list                          mods, their description, installed or not
 ##   make check | make fix              every CI check | format and safe lint fixes
@@ -27,6 +28,13 @@ MODS := $(notdir $(wildcard plugins/*))
 ifneq ($(filter $(firstword $(MAKECMDGOALS)),install uninstall),)
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(eval $(ARGS):;@:)
+else ifneq ($(filter $(MODS),$(MAKECMDGOALS)),)
+# `make sysmon usage-pace`: mod names alone install those mods, in one run.
+MOD_GOALS := $(filter $(MODS),$(MAKECMDGOALS))
+.PHONY: $(MOD_GOALS)
+$(firstword $(MOD_GOALS)):
+	@scripts/install.sh $(MOD_GOALS)
+$(eval $(wordlist 2,$(words $(MOD_GOALS)),$(MOD_GOALS)):;@:)
 endif
 
 .DEFAULT_GOAL := help
