@@ -77,6 +77,35 @@ test('no data: band hidden, no crash', async ($, on) => {
   await ui.unmount()
 })
 
+test('/usage-pace hides the band, then shows it again', async ($, on) => {
+  on('clock.now', () => ({ value: NOW }))
+  on('clock.every', () => ({ value: undefined }))
+  on('command.register', () => ({ value: { command: 'usage-pace' } }))
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>engine</Text>
+  })
+  on('session.usage', () => ({ value: { startedAt: NOW, context: { window: 200000 }, rateLimits: limits(48) } }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+
+  const run = () =>
+    $.command.run({
+      command: 'usage-pace',
+      args: '',
+      origin: { kind: 'composer' } as never,
+      presentation: { isFullscreen: false, columns: 120 },
+    })
+  expect((await run()).text).toBe('usage-pace band hidden (/usage-pace to show it again).')
+  let ui = await $.ui.mount(BAND)
+  expect(await ui.find({ type: 'Text', text: /5h/ })).toBeUndefined()
+  await ui.unmount()
+  expect((await run()).text).toBe('usage-pace band shown.')
+  ui = await $.ui.mount(BAND)
+  expect(await ui.find({ type: 'Text', text: /^5h session/ })).toBeDefined()
+  await ui.unmount()
+})
+
 test('level colors', () => {
   expect([0, 49.9, 50, 74.9, 75, 89.9, 90, 100].map(levelColor)).toEqual([
     'text',

@@ -43,7 +43,7 @@
     "openOnStart": {
       "type": "boolean",
       "title": "Open the panel on start",
-      "description": "Open the Hours panel in every session (otherwise: /hours pane)",
+      "description": "Open the Hours panel in every session (otherwise: /hours panel)",
       "default": false
     }
   }

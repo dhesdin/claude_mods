@@ -8,6 +8,8 @@ import { strings } from './i18n'
 // Windows received from the engine, and a counter that forces the countdown to redraw.
 const limits = atom({ plugin: 'usage-pace', key: 'limits' } as const, [] as Limits)
 const tick = atom({ plugin: 'usage-pace', key: 'tick' } as const, 0)
+// Hidden with /usage-pace, for this session; kept across reloads.
+const hidden = atom({ plugin: 'usage-pace', key: 'hidden' } as const, false)
 
 const HOUR_MS = 3600 * 1000
 const DAY_MS = 24 * HOUR_MS
@@ -78,6 +80,7 @@ export const register: Register = (on, options) => {
     } catch {
       // No figures at start: the band waits for the first session.measure.
     }
+    await $.command.register({ name: 'usage-pace', description: t.commandDescription }).catch(() => {})
     if (refreshMs > 0) {
       $.clock.every(refreshMs, () => {
         void (async () => {
@@ -93,10 +96,15 @@ export const register: Register = (on, options) => {
     return next(e)
   })
 
+  on('command.run', { command: 'usage-pace' }, async $ => {
+    const isHidden = await update($, hidden, x => !x)
+    return { text: isHidden ? t.hidden : t.shown }
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const current = await read($, limits)
     await read($, tick)
-    if (e.props.hasSurvey || current.length === 0) return next(e)
+    if (e.props.hasSurvey || current.length === 0 || (await read($, hidden))) return next(e)
 
     const { Box, Text } = $.ui.resolve(e)
     const nowMs = await $.clock.now()

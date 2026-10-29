@@ -3,6 +3,6 @@ export type Limits = Limit[]
 
 declare module 'claude-code' {
   interface PluginState {
-    'usage-pace': { limits: Limits; tick: number }
+    'usage-pace': { limits: Limits; tick: number; hidden: boolean }
   }
 }

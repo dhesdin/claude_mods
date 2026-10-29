@@ -13,6 +13,7 @@ Band above the prompt with three framed cards:
 - Bar and % color: white < 50%, yellow 50-75%, orange 75-90%, red ≥ 90%.
 - **Pace**: linear projection of the weekly % at the average rate since the last reset: "~X% at reset" (colored by X), or "limit reached <day> around <hour>" in red with the margin before the reset.
 - No subscription or no measurement yet: band hidden; one window missing: `n/a`.
+- `/usage-pace`: hides the band for this session, or shows it again.
 
 ## What it does on your machine
 

@@ -13,7 +13,7 @@ Active time in Claude Code only, not time spent in your editor without Claude.
 
 - **Project** = the Git root of the session's folder (otherwise the folder itself), renamed by `aliases` when one matches.
 - **Active time** = the time between session events (session start, prompts, tool calls, end of each reply), cut when a gap is longer than `idleMinutes`. It measures time in Claude Code only, never time in your editor without Claude.
-- `/hours`: this week. `/hours 4`: the last 4 weeks, one column per week. `/hours pane`: opens or closes the "Hours" panel (or set `openOnStart`).
+- `/hours`: this week. `/hours 4`: the last 4 weeks, one column per week. `/hours panel`: opens or closes the "Hours" panel (or set `openOnStart`).
 - Projects listed in `toolingProjects` are flagged `← tooling` (time on tools rather than on the substance).
 - A project listed in `priorityProjects` with no time for more than its number of weeks gets a colored alert line. No notification.
 - No data yet, no Git repo, unreadable files: the mod shows what it has ("No Claude Code time recorded yet." at worst) and the session goes on.

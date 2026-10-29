@@ -120,7 +120,7 @@ export const register: Register = (on, options) => {
       // A reload runs session.start again: pick up what this session already wrote this week.
       const mine = fromJsonl((await m.read(`${dir}/${isoWeek(await m.now()).key}/${fileName}`)) ?? '')
       tracker = new Tracker(safe(await $.session.id()), host, idleMs, mine)
-      await $.command.register({ name: 'hours', description: t.commandDescription, argumentHint: '[weeks] | pane' })
+      await $.command.register({ name: 'hours', description: t.commandDescription, argumentHint: '[weeks] | panel' })
       await touch(m)
       await refresh(m)
       if (openOnStart) await m.open()
@@ -160,7 +160,7 @@ export const register: Register = (on, options) => {
     const m = machine
     if (!m) return { text: t.notReady }
     const arg = e.args.trim().toLowerCase()
-    if (arg === 'pane') {
+    if (arg === 'panel' || arg === 'pane') {
       if ((await m.panes()).some(p => p.id === PANE)) {
         await m.close()
         return { text: t.closed }

@@ -24,6 +24,9 @@ export type Strings = {
   margin: (duration: string) => string
   tooEarly: string
   tooEarlyDetail: (hours: number) => string
+  commandDescription: string
+  shown: string
+  hidden: string
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -47,6 +50,9 @@ const en: Strings = {
   margin: d => `i.e. ${d} before reset`,
   tooEarly: 'Not enough data yet to estimate',
   tooEarlyDetail: h => `(less than ${h}h since reset)`,
+  commandDescription: 'Show or hide the usage band above the prompt',
+  shown: 'usage-pace band shown.',
+  hidden: 'usage-pace band hidden (/usage-pace to show it again).',
 }
 
 const fr: Strings = {
@@ -68,6 +74,9 @@ const fr: Strings = {
   margin: d => `soit ${d} avant la réinitialisation`,
   tooEarly: 'Pas encore assez de recul pour estimer',
   tooEarlyDetail: h => `(moins de ${h}h depuis la réinitialisation)`,
+  commandDescription: 'Afficher ou masquer le bandeau d’usage au-dessus de la saisie',
+  shown: 'Bandeau usage-pace affiché.',
+  hidden: 'Bandeau usage-pace masqué (/usage-pace pour le réafficher).',
 }
 
 const ja: Strings = {
@@ -89,6 +98,9 @@ const ja: Strings = {
   margin: d => `リセットの ${d} 前`,
   tooEarly: 'まだ推定できるほどのデータがありません',
   tooEarlyDetail: h => `（リセットから ${h} 時間未満）`,
+  commandDescription: '入力欄の上の使用量バンドを表示・非表示にする',
+  shown: 'usage-pace バンドを表示しました。',
+  hidden: 'usage-pace バンドを非表示にしました（/usage-pace で再表示）。',
 }
 
 const zh: Strings = {
@@ -110,6 +122,9 @@ const zh: Strings = {
   margin: d => `即重置前 ${d}`,
   tooEarly: '数据不足，暂无法估算',
   tooEarlyDetail: h => `（距重置不足 ${h} 小时）`,
+  commandDescription: '显示或隐藏输入框上方的用量横幅',
+  shown: '已显示 usage-pace 横幅。',
+  hidden: '已隐藏 usage-pace 横幅（输入 /usage-pace 重新显示）。',
 }
 
 const TABLES: Record<Lang, Strings> = { en, fr, ja, zh }

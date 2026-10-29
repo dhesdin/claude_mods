@@ -22,7 +22,7 @@ claude-mods     1h10   ███   ← tooling
 ⚠ vision-app/edge: 0h for 3 weeks
 ```
 
-- `/hours` command: current week. `/hours 4`: last 4 weeks, per project.
+- `/hours` command: current week. `/hours 4`: last 4 weeks, per project. `/hours panel` (or `pane`): opens or closes the pane.
 - Projects marked as "tooling" in config are flagged as such (time spent on tools rather than on the substance).
 
 ## Priority project alert

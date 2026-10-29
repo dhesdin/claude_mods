@@ -19,6 +19,7 @@ A band above the prompt (`ui.render` on `AbovePrompt`): three separate framed ca
 - Color of the filled part of the bar and of the %: white (theme text color) < 50%, yellow 50-75%, orange 75-90%, red ≥ 90%. Empty part dimmed.
 - **Pace** card (weekly only), separate from the Week card.
 - Display language: `language` option (en, fr, ja, zh), or `/langmod` for every mod at once.
+- `/usage-pace` command: hides the band for the session, or shows it again (added on request, v0.3).
 
 ## Data
 - 5-hour and weekly windows: percentage and reset time.

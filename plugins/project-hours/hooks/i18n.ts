@@ -22,7 +22,7 @@ export type Strings = {
 const TABLES: Record<Lang, Strings> = {
   en: {
     paneTitle: 'Hours',
-    commandDescription: 'Claude Code time per project: /hours (this week), /hours 4 (last 4 weeks), /hours pane',
+    commandDescription: 'Claude Code time per project: /hours (this week), /hours 4 (last 4 weeks), /hours panel',
     week: n => `Week ${n} (Claude Code time)`,
     weeks: n => `Last ${n} weeks (Claude Code time)`,
     none: 'No Claude Code time recorded yet.',
@@ -34,11 +34,11 @@ const TABLES: Record<Lang, Strings> = {
     opened: 'Hours panel opened.',
     closed: 'Hours panel closed.',
     notReady: 'project-hours is not ready yet.',
-    usage: 'Usage: /hours [weeks] | /hours pane',
+    usage: 'Usage: /hours [weeks] | /hours panel',
   },
   fr: {
     paneTitle: 'Heures',
-    commandDescription: 'Temps Claude Code par projet : /hours (semaine), /hours 4 (4 semaines), /hours pane',
+    commandDescription: 'Temps Claude Code par projet : /hours (semaine), /hours 4 (4 semaines), /hours panel',
     week: n => `Semaine ${n} (temps Claude Code)`,
     weeks: n => `${n} dernières semaines (temps Claude Code)`,
     none: 'Aucun temps Claude Code enregistré pour l’instant.',
@@ -50,11 +50,11 @@ const TABLES: Record<Lang, Strings> = {
     opened: 'Panneau Heures ouvert.',
     closed: 'Panneau Heures fermé.',
     notReady: 'project-hours n’est pas encore prêt.',
-    usage: 'Usage : /hours [semaines] | /hours pane',
+    usage: 'Usage : /hours [semaines] | /hours panel',
   },
   ja: {
     paneTitle: '時間',
-    commandDescription: 'プロジェクト別の Claude Code 時間：/hours（今週）、/hours 4（直近4週）、/hours pane',
+    commandDescription: 'プロジェクト別の Claude Code 時間：/hours（今週）、/hours 4（直近4週）、/hours panel',
     week: n => `第${n}週（Claude Code 時間）`,
     weeks: n => `直近${n}週（Claude Code 時間）`,
     none: 'まだ Claude Code の時間は記録されていません。',
@@ -66,11 +66,11 @@ const TABLES: Record<Lang, Strings> = {
     opened: '時間パネルを開きました。',
     closed: '時間パネルを閉じました。',
     notReady: 'project-hours はまだ準備中です。',
-    usage: '使い方：/hours [週数] | /hours pane',
+    usage: '使い方：/hours [週数] | /hours panel',
   },
   zh: {
     paneTitle: '时长',
-    commandDescription: '按项目统计的 Claude Code 时间：/hours（本周）、/hours 4（最近4周）、/hours pane',
+    commandDescription: '按项目统计的 Claude Code 时间：/hours（本周）、/hours 4（最近4周）、/hours panel',
     week: n => `第${n}周（Claude Code 时间）`,
     weeks: n => `最近${n}周（Claude Code 时间）`,
     none: '尚未记录 Claude Code 时间。',
@@ -82,7 +82,7 @@ const TABLES: Record<Lang, Strings> = {
     opened: '时长面板已打开。',
     closed: '时长面板已关闭。',
     notReady: 'project-hours 尚未就绪。',
-    usage: '用法：/hours [周数] | /hours pane',
+    usage: '用法：/hours [周数] | /hours panel',
   },
 }
 

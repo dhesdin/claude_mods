@@ -135,13 +135,13 @@ test('session: tracks the git project, survives a reload, /hours and the pane ad
   await ui.unmount()
 })
 
-test('/hours pane toggles the panel; bad arguments get the usage line', async ($, on) => {
+test('/hours panel toggles the panel; bad arguments get the usage line', async ($, on) => {
   const m = machine(new Map(), '/h/code/app')
   m.install(on as never)
   await $.session.start(start)
-  expect((await $.command.run(hoursCommand('pane'))).text).toBe('Hours panel opened.')
+  expect((await $.command.run(hoursCommand('panel'))).text).toBe('Hours panel opened.')
   expect((await $.command.run(hoursCommand('pane'))).text).toBe('Hours panel closed.')
-  for (const bad of ['0', '53', 'abc']) expect((await $.command.run(hoursCommand(bad))).text).toBe('Usage: /hours [weeks] | /hours pane')
+  for (const bad of ['0', '53', 'abc']) expect((await $.command.run(hoursCommand(bad))).text).toBe('Usage: /hours [weeks] | /hours panel')
 })
 
 test(
