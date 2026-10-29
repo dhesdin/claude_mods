@@ -9,6 +9,7 @@ Small, independent mods for Claude Code. Each one is a plugin you install, confi
 | [usage-pace](plugins/usage-pace) | Band above the prompt: 5-hour and weekly usage, time to reset, projected weekly pace | [spec](docs/specs/01-usage-pace.md) |
 | [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
 | [teacher-guard](plugins/teacher-guard) | `/teacher-mode activate`: for the current repo and session, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
+| [project-hours](plugins/project-hours) | Claude Code time per project and per week (`/hours`, Hours panel), alert when a priority project goes quiet | [spec](docs/specs/04-project-hours.md) |
 | [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
 
 Display languages: **English (en), French (fr), Japanese (ja), Chinese (zh)**; others can be added ([how](docs/architecture.md#internationalization)).

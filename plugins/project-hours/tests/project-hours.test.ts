@@ -32,3 +32,141 @@ test('weeks, aliases and priority alerts', () => {
   expect(alerts(seg, new Map([['sip/edge', 3]]), T0 + 22 * 24 * 60 * MIN)).toEqual([{ project: 'sip/edge', weeks: 3 }])
   expect(alerts([], new Map([['x', 3]]), T0)).toEqual([{ project: 'x', weeks: null }])
 })
+
+const HOME = '/h'
+const DATA = `${HOME}/.claude/mod-data/project-hours`
+const WEEK = `${DATA}/2026-W44`
+const PANE = {
+  plugin: 'project-hours',
+  component: 'Pane',
+  requestId: 'project-hours',
+  surface: 'terminal',
+  props: { title: 'Hours', isFocused: false, bodyColumns: 60, placement: 'dock', scroll: { offset: 0, bodyRows: 40 }, view: {} },
+} as const
+
+// A fake machine: files in memory, a settable clock, the session folder and its git repo.
+function machine(files: Map<string, string>, gitRoot: string | null) {
+  const state = { now: T0, panes: [] as { id: string }[], registered: true }
+  const install = (on: (event: string, hook: (...args: never[]) => unknown) => void) => {
+    on('session.start', ((_: unknown, e: { cwd: string }) => ({ cwd: e.cwd })) as never)
+    on('session.cwd', (() => ({ value: '/h/code/app/src' })) as never)
+    on('session.id', (() => ({ value: 's1' })) as never)
+    on('env.get', ((_: unknown, e: { name: string }) => ({ value: e.name === 'HOME' ? HOME : undefined })) as never)
+    on('clock.now', (() => ({ value: state.now })) as never)
+    on('command.register', (() => {
+      if (!state.registered) throw new Error('refused')
+      return { value: { command: 'hours' } }
+    }) as never)
+    on('fs.read', ((_: unknown, e: { path: string }) => {
+      const text = e.path === '/etc/hostname' ? 'laptop\n' : files.get(e.path)
+      if (text === undefined) throw new Error('ENOENT')
+      return { value: text }
+    }) as never)
+    on('fs.write', ((_: unknown, e: { path: string; text: string }) => {
+      files.set(e.path, e.text)
+      return { value: undefined }
+    }) as never)
+    on('fs.list', ((_: unknown, e: { path: string }) => {
+      const names = new Set<string>()
+      for (const f of files.keys()) if (f.startsWith(`${e.path}/`)) names.add(f.slice(e.path.length + 1).split('/')[0]!)
+      if (names.size === 0) throw new Error('ENOENT')
+      return { value: [...names].map(name => ({ name, kind: name.endsWith('.jsonl') ? 'file' : 'dir' })) }
+    }) as never)
+    on('process.run', (() => ({
+      value: {
+        exitCode: gitRoot ? 0 : 128,
+        stdout: gitRoot ? `${gitRoot}\n` : '',
+        stderr: '',
+        isStdoutTruncated: false,
+        isStderrTruncated: false,
+      },
+    })) as never)
+    on('ui.panes', (() => ({ value: state.panes })) as never)
+    on('ui.open', (() => {
+      state.panes = [{ id: 'project-hours' }]
+      return { value: { isPlaced: true } }
+    }) as never)
+    on('ui.close', (() => {
+      state.panes = []
+      return { value: undefined }
+    }) as never)
+  }
+  return { state, install }
+}
+
+const hoursCommand = (args: string) => ({
+  command: 'hours',
+  args,
+  origin: { kind: 'composer' } as never,
+  presentation: { isFullscreen: false, columns: 120 },
+})
+const start = { cwd: '/h/code/app/src', surface: 'terminal', isInteractive: true } as const
+// Another session on another machine, earlier this week: web 2h, claude-mods 1h.
+const earlier = toJsonl([
+  { id: 'w-1', machine: 'work', project: 'web', start: T0 - 26 * 60 * MIN, end: T0 - 24 * 60 * MIN },
+  { id: 'w-2', machine: 'work', project: 'claude-mods', start: T0 - 23 * 60 * MIN, end: T0 - 22 * 60 * MIN },
+])
+
+test('session: tracks the git project, survives a reload, /hours and the pane add up every session', async ($, on) => {
+  const files = new Map([[`${WEEK}/work-s0.jsonl`, earlier]])
+  const m = machine(files, '/h/code/app')
+  m.install(on as never)
+  await $.session.start(start)
+  await $.command.run(hoursCommand(''))
+  expect(fromJsonl(files.get(`${WEEK}/laptop-s1.jsonl`)!).map(s => s.project)).toEqual(['app'])
+
+  // A reload runs session.start again: the segment written before goes on.
+  m.state.now = T0 + 5 * MIN
+  await $.session.start(start)
+  const text = (await $.command.run(hoursCommand(''))).text!
+  expect(text.split('\n')).toEqual([
+    'Week 44 (Claude Code time)',
+    'web             2h00  ██████████',
+    'claude-mods     1h00  █████  ← tooling',
+    'app             0h05  █',
+    '',
+    'Active time in Claude Code only, not time spent in your editor without Claude.',
+  ])
+  expect((await $.command.run(hoursCommand('2'))).text).toContain('app             0h00   0h05    0h05  █')
+
+  const ui = await $.ui.mount(PANE)
+  expect((await ui.find({ type: 'Text', text: /^Week/ }))?.text).toBe('Week 44 (Claude Code time)')
+  expect((await ui.find({ type: 'Text', text: /^claude-mods/ }))?.text).toBe('claude-mods     1h00  █████  ← tooling')
+  await ui.unmount()
+})
+
+test('/hours pane toggles the panel; bad arguments get the usage line', async ($, on) => {
+  const m = machine(new Map(), '/h/code/app')
+  m.install(on as never)
+  await $.session.start(start)
+  expect((await $.command.run(hoursCommand('pane'))).text).toBe('Hours panel opened.')
+  expect((await $.command.run(hoursCommand('pane'))).text).toBe('Hours panel closed.')
+  for (const bad of ['0', '53', 'abc']) expect((await $.command.run(hoursCommand(bad))).text).toBe('Usage: /hours [weeks] | /hours pane')
+})
+
+test(
+  'degraded: no git repo, no data folder, a priority never seen; French',
+  { options: { language: 'fr', priorityProjects: 'sip/edge=3' } },
+  async ($, on) => {
+    const files = new Map<string, string>()
+    const m = machine(files, null)
+    m.install(on as never)
+    await $.session.start(start)
+    const lines = (await $.command.run(hoursCommand(''))).text!.split('\n')
+    expect(lines[1]).toBe('src             0h00  ')
+    expect(lines[2]).toBe('⚠ sip/edge : aucun temps Claude Code enregistré')
+    const ui = await $.ui.mount(PANE)
+    expect((await ui.find({ type: 'Text', text: /^⚠/ }))?.text).toBe('⚠ sip/edge : aucun temps Claude Code enregistré')
+    await ui.unmount()
+  },
+)
+
+test('degraded: the command cannot be registered, the session goes on', async ($, on) => {
+  const m = machine(new Map(), '/h/code/app')
+  m.state.registered = false
+  m.install(on as never)
+  await $.session.start(start)
+  const ui = await $.ui.mount(PANE)
+  expect((await ui.find({ type: 'Text' }))?.text).toBe('No Claude Code time recorded yet.')
+  await ui.unmount()
+})
