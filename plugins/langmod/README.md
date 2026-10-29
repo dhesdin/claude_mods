@@ -9,4 +9,6 @@ One command for the display language of every mod:
 
 Available: `en`, `fr`, `ja`, `zh`. It changes each `/config` row named `<plugin>.language` whose options include all four codes (the convention of this repo, see [docs/architecture.md](../../docs/architecture.md#internationalization)); a locked row is left as is. Each mod's language can also be picked in `/config`.
 
+What it does: reads the `/config` rows and changes the `<plugin>.language` ones when you run `/langmod <code>`. Nothing else: no program, no file, no network, nothing sent to the model.
+
 Disable: `claude plugin disable langmod@claude-mods` (the `language` rows in `/config` keep working).

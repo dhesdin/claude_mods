@@ -46,6 +46,22 @@ Machine setup per hardware: [docs/hardware.md](../../docs/hardware.md).
 
 Claude can call `mcp__sysmon__machine_status` to get the same summary as one English sentence (for example before starting a training run). The tool is deferred behind ToolSearch: it costs tokens only when called.
 
+## What it does on your machine
+
+Everything stays on the machine: the mod makes no network request and reads no credential.
+
+| What | Why |
+| --- | --- |
+| Runs `nvidia-smi` (`-L`, `--query-gpu`, `--query-compute-apps`) | NVIDIA GPU utilization, memory, temperature, power, throttling, processes |
+| Runs `tegrastats --interval 200`, reads its first line, then stops it | Jetson GPU figures |
+| Runs `rocm-smi` (`--showid`, then the query listed in docs/hardware.md, `--json`) | AMD GPU figures |
+| Runs `df -B1 --output=target,size,avail -- <diskPaths>` | free disk space of the paths you configure |
+| Reads `/proc/stat`, `/proc/loadavg`, `/proc/meminfo`, `/proc/device-tree/model` | CPU, load, RAM, board name |
+
+Programs run with fixed arguments (never a shell), only while the panel is open, and only the GPU tool that exists on the machine.
+
+The only data that leaves the mod is the `machine_status` tool's answer, a one-sentence summary of the figures above, which goes to Claude when Claude calls the tool. The mod's `tool.call` hook answers that tool only; it does not see or change other tool calls.
+
 ## Cost
 
 Measures only while the panel is open and in front: nothing runs while it is closed. Disk every 60 s. A GPU tool that is not installed is not started again until the panel is reopened.

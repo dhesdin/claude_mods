@@ -38,6 +38,13 @@ The Bash check reads the command statically, best effort:
 - The folder a command runs in is the session's folder (plus any `cd` inside the command); a `cd` from an earlier Bash call is not seen.
 - Only Claude's tools are checked: your own terminal, editor and git are untouched.
 
+## What it does on your machine
+
+- Reads each `Write`, `Edit`, `NotebookEdit` and `Bash` call Claude makes, to refuse the writes into a protected repo; it never changes a call it lets through.
+- Runs `git -C <folder> rev-parse --show-toplevel` when you run `/teacher-mode activate`, to find the repo root.
+- Reads `HOME` and `TMPDIR` to resolve `~` and `$TMPDIR` in commands.
+- Sends to the model only the two-line reviewer instruction (while a repo is protected) and the refusal message. No network request, no credential.
+
 ## Options (`/config`)
 
 | Option | Default | Role |

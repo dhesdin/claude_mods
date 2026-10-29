@@ -14,6 +14,10 @@ Band above the prompt with three framed cards:
 - **Pace**: linear projection of the weekly % at the average rate since the last reset: "~X% at reset" (colored by X), or "limit reached <day> around <hour>" in red with the margin before the reset.
 - No subscription or no measurement yet: band hidden; one window missing: `n/a`.
 
+## What it does on your machine
+
+It reads the usage figures Claude Code already has (`session.measure`, `$.session.usage()`) and draws them. It runs no program, reads no file or credential, makes no network request, and sends nothing to the model.
+
 ## Options (`/config`)
 
 | Option | Default | Role |
