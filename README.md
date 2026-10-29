@@ -11,15 +11,6 @@ A Claude Code marketplace of small, independent mods. Each mod is a plugin you c
 | [teacher-guard](plugins/teacher-guard) | `/teacher-mode activate`: for the current repo and session, Claude cannot write your code; it explains and reviews | [spec](docs/specs/03-teacher-guard.md) |
 | [langmod](plugins/langmod) | `/langmod en\|fr\|ja\|zh`: display language of every mod at once | [architecture](docs/architecture.md#internationalization) |
 
-Plus **account skills** in [skills/](skills), meant to live on your claude.ai account so they follow you to every machine:
-
-| Skill | What it does |
-| --- | --- |
-| `help-skills` | every available skill, one line each, grouped by origin (account, machine, project, Claude Code and plugins) |
-| `help-mods` | the mods on this machine: installed or not, enabled or not, what each does; how to install them when missing |
-| `passation-projet` | keeps `.claude/contexte.md` and `suivi.md` up to date (hand-off notes; kept in its original French) |
-| `travail-econome` | rules to code with as few tokens as possible (kept in its original French) |
-
 Display languages available: **English (en), French (fr), Japanese (ja), Chinese (zh)**. Other languages can be added (see [Internationalization](docs/architecture.md#internationalization)).
 
 ## Requirements
@@ -29,6 +20,19 @@ Display languages available: **English (en), French (fr), Japanese (ja), Chinese
 - `git`, `make` (or run `scripts/install.sh` directly)
 
 ## Install
+
+### On your claude.ai account (recommended: every machine, nothing to install)
+
+```bash
+git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
+make dist          # one zip per mod in dist/plugins/, built from the last commit
+```
+
+Upload each zip on claude.ai: **Customize > Plugins > Add > Upload plugin**. The mods then sync to Claude Code on every machine where you sign in with your claude.ai account, at the next start (as `<mod>@synced`, enabled). Requires Claude Code 2.1.273 or later, signed in with claude.ai (not an API key). To update a mod: commit, `make dist`, upload the zip again (same name = new version). To stop one on a machine: `/plugin`, Installed tab, or `claude plugin disable <mod>@synced`.
+
+Per machine still: each mod's options (`/config`, stored in that machine's `~/.claude/settings.json`) and the hardware tools sysmon reads (NVIDIA driver…, see [docs/hardware.md](docs/hardware.md)).
+
+### On one machine only (development, or without a claude.ai account)
 
 ```bash
 git clone https://github.com/dhesdin/claude_mods.git ~/claude-mods
@@ -83,17 +87,7 @@ make uninstall sysmon                        # or: claude plugin uninstall sysmo
 make teardown                                # every mod and the marketplace
 ```
 
-In a session, `/help-mods` lists the mods and `/help-skills` lists every skill (account skills, see below).
 
-## Account skills
-
-```bash
-make skills        # zips each folder of skills/ into dist/skills/<name>.zip
-```
-
-Upload each zip once on claude.ai (Settings > Capabilities > Skills > Upload skill): the skill is then synced to `~/.claude/skills/synced/` on every machine where you log in to Claude Code, with its bundled scripts. After uploading, remove any copy of the same skill from `~/.claude/skills/` so it is not listed twice. Re-upload after changing a skill.
-
-A skill costs a few tokens when used (Claude reads it and the script's output), unlike a mod's display.
 
 ## What follows you from one machine to another
 
@@ -101,8 +95,9 @@ A skill costs a few tokens when used (Claude reads it and the script's output), 
 | --- | --- | --- |
 | Skills of your claude.ai account | your account (synced to `~/.claude/skills/synced/`) | there as soon as you log in |
 | Claude Code's built-in skills and commands | Claude Code itself | there once Claude Code is installed |
-| **These mods** | plugins installed on each machine (`~/.claude/plugins`) | **not synced**: clone this repo and `make install` |
-| Your machine skills | `~/.claude/skills/<name>/` | **not synced**: stay on the machine; keep yours in `skills/` and upload them to claude.ai (above) |
+| **These mods**, uploaded to the account (above) | your account (synced to `~/.claude/plugins/synced/`) | there at the next start after you log in |
+| These mods, installed with `make install` | that machine (`~/.claude/plugins`) | **not synced**: clone and `make install` again |
+| Your machine skills | `~/.claude/skills/<name>/` | **not synced**: stay on the machine; upload a skill on claude.ai (Customize > Skills) to have it everywhere |
 | Your global instructions | `~/.claude/CLAUDE.md` | **not synced**: copy it |
 | Project skills and instructions | `<repo>/.claude/skills/`, `<repo>/CLAUDE.md` | travel with the repo when committed: there after `git clone` |
 

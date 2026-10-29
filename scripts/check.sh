@@ -37,7 +37,7 @@ if out=$(biome ci --colors=off . 2>&1); then echo "  ok"; else echo "$out" | tai
 
 echo "== shell scripts"
 if command -v shellcheck >/dev/null; then
-  if shellcheck --severity=warning scripts/*.sh skills/*/scripts/*.sh; then echo "  ok"; else fail "shellcheck"; fi
+  if shellcheck --severity=warning scripts/*.sh; then echo "  ok"; else fail "shellcheck"; fi
 else
   echo "  skipped (shellcheck not installed; CI runs it)"
 fi
@@ -53,19 +53,6 @@ fi
 
 # hooks / calls / state lines of a validation: what the plugin is allowed to touch.
 surface_of() { sed -n -E 's/^ +❯ (\.\/[^ ]+ (hooks|calls|state reads|state writes|env reads|env writes|answers its own command|gating hook)[^:]*:.*)$/\1/p; s/^ +❯ (types \.\/.*)$/\1/p'; }
-
-# Account skills: front matter name = folder, a description, bundled scripts that run.
-echo "== skills"
-for f in skills/*/SKILL.md; do
-  s="$(basename "$(dirname "$f")")"
-  name="$(sed -n '2,/^---$/s/^name:[[:space:]]*//p' "$f" | head -1)"
-  [[ "$name" == "$s" ]] || fail "$f: front matter name '$name' differs from the folder"
-  grep -q '^description:' "$f" || fail "$f: no description"
-done
-for py in skills/*/scripts/*.py; do python3 -I -m py_compile "$py" 2>/dev/null || fail "$py does not compile"; done
-for sh in skills/*/scripts/*.sh; do bash "$sh" >/dev/null 2>&1 || fail "$sh fails"; done
-find skills -name '__pycache__' -type d -prune -exec rm -rf {} +
-echo "  checked"
 
 echo "== marketplace"
 if out=$(claude plugin validate . 2>&1); then echo "  validate ok"; else echo "$out" | tail -20; fail "marketplace validation"; fi

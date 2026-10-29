@@ -24,7 +24,6 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.
 - `docs/hardware.md`: machine setup per hardware and validation checklists (GPU checks still to run on the workstation, Jetson and AMD marked [to validate]).
 - `docs/specs/`: one functional spec per mod.
-- `skills/`: account skills, zipped by `make skills` and uploaded to claude.ai by the user.
 - `SECURITY.md`: threat model and the controls the repo relies on.
 - `suivi.md`: dated session log.
 
@@ -47,7 +46,7 @@ One mod at a time, in this order. The next one starts only once the user has che
 3. `teacher-guard` (docs/specs/03-teacher-guard.md)
 4. `project-hours` (docs/specs/04-project-hours.md)
 
-Added on request along the way: `langmod` (display language), and the account skills of `skills/` (docs/specs/05-account-skills.md): `help-skills`, `help-mods`, and the user's `passation-projet` and `travail-econome` (kept in their original French).
+Added on request along the way: `langmod` (display language). The user's skills (`help-skills`, `help-mods`, `passation-projet`, `travail-econome`) live on their claude.ai account, not in this repo.
 
 ## Constraints common to every mod
 
@@ -71,4 +70,4 @@ Added on request along the way: `langmod` (display language), and the account sk
 
 ## Installing on another machine
 
-The README explains it in copyable commands: clone, `make install [mod...]` (variables `MOD_LANG`, `MOD_SCOPE`, `CLAUDE`, or a git-ignored `config.mk`), then `/reload-plugins` in an open session. Test install changes with `CLAUDE=echo` (prints the commands, changes nothing).
+The README explains it in copyable commands: on the claude.ai account (`make dist`, upload each zip: synced to every machine), or per machine: clone, `make install [mod...]` (variables `MOD_LANG`, `MOD_SCOPE`, `CLAUDE`, or a git-ignored `config.mk`), then `/reload-plugins` in an open session. Test install changes with `CLAUDE=echo` (prints the commands, changes nothing).

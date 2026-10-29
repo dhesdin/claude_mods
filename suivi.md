@@ -9,3 +9,4 @@
 - Makefile for modular installs (make install sysmon …, MOD_LANG/MOD_SCOPE/CLAUDE, config.mk); teacher-guard v0.2 with /teacher-mode activate|deactivate per session instead of a marker file; mod-help (/skill-help, /help-mods). An install smoke test without a dry run installed every mod once: undone, CLAUDE=echo documented.
 - mod-help: /skill-help renamed /help-skills (both commands start with help-), Claude Code + plugins section added; make <mod>... shortcut.
 - help-skills / help-mods moved from a mod to account skills (skills/, make skills, upload on claude.ai) so they are there on any machine; passation-projet and travail-econome moved into skills/ too; mod-help plugin removed.
+- Distribution moved to the claude.ai account: 4 mods uploaded as plugins (synced as <mod>@synced, verified after a start), 4 skills uploaded (synced, verified). skills/ removed from the repo; make dist kept; make install stays for per-machine installs.

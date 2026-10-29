@@ -31,7 +31,6 @@ A mod is code that runs inside Claude Code with the mods `$` API: depending on w
 
 - sysmon runs `nvidia-smi`, `tegrastats`, `rocm-smi` and `df` from your `PATH`, exactly as if you typed them: a malicious program placed earlier in `PATH` would run. Keep `PATH` clean.
 - `teacher-guard` reads Bash commands statically, best effort: an inline interpreter, a script or an alias can still write. It is a guard against autopilot, **not** a security barrier (plugins/teacher-guard/README.md, Limits). It fails closed: a check that throws refuses the call. Only the person at the prompt can turn it off (`/teacher-mode deactivate` run by a plugin or the model is refused).
-- The account skills' scripts (`skills/*/scripts/`) only read: skill folders, `claude plugin list`. They strip control characters from what they print; CI compiles and runs them.
 - The surface snapshot says *which* capabilities a plugin uses, not *how*: review code changes too.
 
 ## Updating safely

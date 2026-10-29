@@ -13,7 +13,6 @@ claude-mods/
 │   ├── hardware.md                   # machine setup per hardware, validation checklists
 │   └── specs/NN-<mod>.md             # functional spec, one per mod
 ├── plugins/<mod>/                    # one independent plugin per mod
-├── skills/<name>/                    # account skills: SKILL.md (+ scripts/), zipped by `make skills` for claude.ai
 ├── scripts/
 │   ├── check.sh                      # everything CI runs, runnable locally (--fix formats)
 │   └── install.sh                    # what the Makefile runs: setup, install/uninstall some or all mods
@@ -51,11 +50,9 @@ Rules:
 - **Persistent data**, when a mod needs it, goes in `~/.claude/mod-data/<mod>/`.
 - **Degrade, never crash**: missing data shows `n/a` or hides a card; every `$` call that can fail is caught.
 
-## Mods or account skills
+## Distribution
 
-- **Mod** (plugin): code run by Claude Code, zero tokens, can draw, guard tools, register commands. Installed per machine (`make install`).
-- **Account skill** (`skills/<name>/`): instructions for Claude, optionally with scripts it runs. Uploaded once to claude.ai, then synced to every machine where the account logs in. Costs tokens when used.
-- Rule of thumb: something to *show* or *enforce* is a mod; something that must be *available everywhere without installing* is an account skill. Bundled scripts read only and strip control characters from what they print; `scripts/check.sh` checks each skill's front matter and runs its scripts.
+The repository is the source: code, tests, CI, versions. Users get the mods either from their claude.ai account (`make dist`, then upload each zip: synced to every machine where they sign in) or per machine (`make install`). Avoid both on one machine: an installed marketplace copy takes precedence over the synced one.
 
 ## Common constraints
 
