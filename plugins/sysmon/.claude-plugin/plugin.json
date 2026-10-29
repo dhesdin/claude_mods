@@ -1,0 +1,78 @@
+{
+  "name": "sysmon",
+  "version": "0.2.0",
+  "description": "GPU / CPU / RAM / disk panel: is the machine free, and what is loading it",
+  "author": { "name": "ValentinD" },
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Display language of the panel (also settable for every mod at once with /langmod)",
+      "options": ["en", "fr", "ja", "zh"],
+      "default": "en"
+    },
+    "gpuBackend": {
+      "type": "string",
+      "title": "GPU source",
+      "description": "auto: detect Jetson, then NVIDIA, then AMD; jetson and amd are not validated on real hardware yet",
+      "options": ["auto", "nvidia", "jetson", "amd", "none"],
+      "default": "auto"
+    },
+    "intervalSeconds": {
+      "type": "number",
+      "title": "Refresh interval (s)",
+      "description": "Measurement period while the panel is visible; nothing is measured while it is closed",
+      "default": 3
+    },
+    "vramAlertPercent": {
+      "type": "number",
+      "title": "VRAM alert threshold (%)",
+      "description": "GPU memory use above which the GPU card turns red",
+      "default": 90
+    },
+    "tempAlertC": {
+      "type": "number",
+      "title": "GPU temperature alert threshold (°C)",
+      "description": "GPU temperature above which the GPU card turns red",
+      "default": 80
+    },
+    "hideMissingGpu": {
+      "type": "boolean",
+      "title": "Hide the GPU card when there is no GPU",
+      "description": "Without a supported GPU: hide the card instead of showing 'No supported GPU'",
+      "default": false
+    },
+    "gpuIndex": {
+      "type": "number",
+      "title": "GPU index",
+      "description": "Which GPU to follow on a multi-GPU machine (nvidia-smi -L / rocm-smi card index)",
+      "default": 0
+    },
+    "openOnStart": {
+      "type": "boolean",
+      "title": "Open on start",
+      "description": "Open the panel in every session (otherwise: /sysmon)",
+      "default": true
+    },
+    "diskPaths": {
+      "type": "string",
+      "title": "Disks to watch",
+      "description": "Comma-separated paths; a mount point shared by several paths is shown once",
+      "default": "/,/home"
+    },
+    "diskIntervalSeconds": {
+      "type": "number",
+      "title": "Disk refresh interval (s)",
+      "description": "Disk space moves slowly: measured less often than the rest",
+      "default": 60
+    },
+    "diskAlertGb": {
+      "type": "number",
+      "title": "Disk alert threshold (GB free)",
+      "description": "Free space below which the disk card turns red",
+      "default": 20
+    }
+  }
+}
