@@ -2,8 +2,10 @@ import { atom, read, update } from 'claude-code'
 import type { Register, SessionRateLimit } from 'claude-code'
 
 import type { Limits } from '../types'
+import { strings } from './i18n'
+import type { DayKind, Strings } from './i18n'
 
-// Fenêtres reçues de l'engine, et un compteur qui force le redessin du compte à rebours.
+// Windows received from the engine, and a counter that forces the countdown to redraw.
 const limits = atom({ plugin: 'usage-pace', key: 'limits' } as const, [] as Limits)
 const tick = atom({ plugin: 'usage-pace', key: 'tick' } as const, 0)
 
@@ -11,10 +13,8 @@ const HOUR_MS = 3600 * 1000
 const DAY_MS = 24 * HOUR_MS
 const WEEK_MS = 7 * DAY_MS
 const BAR_WIDTH = 12
-const DAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x))
-const pad = (n: number) => String(n).padStart(2, '0')
 const resetTime = (limit: SessionRateLimit) => (limit.resetsAt ? Date.parse(limit.resetsAt) : NaN)
 
 export function bar(percent: number): string {
@@ -22,7 +22,7 @@ export function bar(percent: number): string {
   return '█'.repeat(full) + '░'.repeat(BAR_WIDTH - full)
 }
 
-// Blanc < 50 %, jaune 50-75, orange 75-90, rouge >= 90 ('text' suit le thème clair/sombre).
+// White < 50 %, yellow 50-75, orange 75-90, red >= 90 ('text' follows the light/dark theme).
 export function levelColor(percent: number): string {
   if (percent >= 90) return 'red'
   if (percent >= 75) return '#ff8700'
@@ -30,38 +30,30 @@ export function levelColor(percent: number): string {
   return 'text'
 }
 
-// Durée : "00h42", "01h42", "3j 06h".
-export function duration(ms: number): string {
+export function duration(t: Strings, ms: number): string {
   const minutes = Math.max(0, Math.floor(ms / 60000))
-  const days = Math.floor(minutes / 1440)
-  const hours = Math.floor((minutes % 1440) / 60)
-  return days > 0 ? `${days}j ${pad(hours)}h` : `${pad(hours)}h${pad(minutes % 60)}`
+  return t.duration(Math.floor(minutes / 1440), Math.floor((minutes % 1440) / 60), minutes % 60)
 }
 
-// Moment local : "14h30" aujourd'hui, sinon "demain 14h30" ou "dimanche 14h30".
-export function moment(atMs: number, nowMs: number, withMinutes = true): string {
+// Local time ("14:30", "tomorrow at 14:30", "Sunday at 18:00"), or the rounded hour with `isApprox`.
+export function moment(t: Strings, atMs: number, nowMs: number, isApprox = false): string {
   const at = new Date(atMs)
-  const time = withMinutes ? `${pad(at.getHours())}h${pad(at.getMinutes())}` : `${at.getHours()}h`
-  const today = new Date(nowMs)
-  today.setHours(0, 0, 0, 0)
-  const dayOffset = Math.round((new Date(atMs).setHours(0, 0, 0, 0) - today.getTime()) / DAY_MS)
-  if (dayOffset === 0) return withMinutes ? `à ${time}` : `aujourd'hui vers ${time}`
-  if (dayOffset === 1) return withMinutes ? `demain à ${time}` : `demain vers ${time}`
-  return withMinutes ? `${DAYS[at.getDay()]} à ${time}` : `${DAYS[at.getDay()]} vers ${time}`
+  const today = new Date(nowMs).setHours(0, 0, 0, 0)
+  const offset = Math.round((new Date(atMs).setHours(0, 0, 0, 0) - today) / DAY_MS)
+  const day: DayKind = offset === 0 ? 'today' : offset === 1 ? 'tomorrow' : 'later'
+  const weekday = t.weekdays[at.getDay()] ?? ''
+  return isApprox ? t.around(day, weekday, t.hour(at.getHours())) : t.at(day, weekday, t.time(at.getHours(), at.getMinutes()))
 }
 
-export function resetPhrase(limit: SessionRateLimit, nowMs: number): string {
+export function resetPhrase(t: Strings, limit: SessionRateLimit, nowMs: number): string {
   const at = resetTime(limit)
-  if (!Number.isFinite(at)) return 'Réinitialisation : n/a'
-  return `Réinitialisation dans : ${duration(at - nowMs)} (${moment(at, nowMs)})`
+  if (!Number.isFinite(at)) return t.resetUnknown
+  return t.resetsIn(duration(t, at - nowMs), moment(t, at, nowMs))
 }
 
-export type Pace =
-  | { kind: 'too-early' }
-  | { kind: 'hits-limit'; atMs: number; marginMs: number }
-  | { kind: 'ok'; projected: number }
+export type Pace = { kind: 'too-early' } | { kind: 'hits-limit'; atMs: number; marginMs: number } | { kind: 'ok'; projected: number }
 
-// Projection linéaire du % hebdo au rythme moyen depuis le dernier reset.
+// Linear projection of the weekly % at the average rate since the last reset.
 export function pace(week: SessionRateLimit, nowMs: number, minHours: number): Pace | null {
   const resetAt = resetTime(week)
   if (!Number.isFinite(resetAt)) return null
@@ -75,6 +67,7 @@ export function pace(week: SessionRateLimit, nowMs: number, minHours: number): P
 }
 
 export const register: Register = (on, options) => {
+  const t = strings(options.language)
   const minHours = Number(options.paceMinHours ?? 3)
   const refreshMs = Number(options.refreshSeconds ?? 60) * 1000
 
@@ -83,7 +76,7 @@ export const register: Register = (on, options) => {
       const { rateLimits } = await $.session.usage()
       await update($, limits, () => rateLimits)
     } catch {
-      // Pas de figure au démarrage : le bandeau attend le premier session.measure.
+      // No figures at start: the band waits for the first session.measure.
     }
     if (refreshMs > 0) {
       $.clock.every(refreshMs, () => {
@@ -110,7 +103,7 @@ export const register: Register = (on, options) => {
     const fiveHour = current.find(l => l.kind === 'five_hour')
     const week = current.find(l => l.kind === 'seven_day')
 
-    // Carte encadrée : titre, barre et % colorés selon le niveau, phrase de réinitialisation.
+    // Framed card: title, bar and % colored by level, reset sentence.
     const usageCard = (title: string, limit: SessionRateLimit | undefined) => {
       if (!limit) {
         return (
@@ -131,10 +124,10 @@ export const register: Register = (on, options) => {
             <Text dimColor>{filled.slice(full.length)}</Text>
             <Text color={color} bold>
               {' '}
-              {Math.round(limit.percentUsed)} %
+              {t.pct(Math.round(limit.percentUsed))}
             </Text>
           </Text>
-          <Text>{resetPhrase(limit, nowMs)}</Text>
+          <Text>{resetPhrase(t, limit, nowMs)}</Text>
         </Box>
       )
     }
@@ -144,23 +137,27 @@ export const register: Register = (on, options) => {
       let main = <Text dimColor>n/a</Text>
       let detail = <Text dimColor> </Text>
       if (p?.kind === 'too-early') {
-        main = <Text dimColor>Pas encore assez de recul pour estimer</Text>
-        detail = <Text dimColor>(moins de {minHours}h depuis la réinitialisation)</Text>
+        main = <Text dimColor>{t.tooEarly}</Text>
+        detail = <Text dimColor>{t.tooEarlyDetail(minHours)}</Text>
       } else if (p?.kind === 'hits-limit') {
-        main = <Text color="red" bold>À ce rythme, limite atteinte {moment(p.atMs, nowMs, false)}</Text>
-        detail = <Text>soit {duration(p.marginMs)} avant la réinitialisation</Text>
+        main = (
+          <Text color="red" bold>
+            {t.hitsLimit(moment(t, p.atMs, nowMs, true))}
+          </Text>
+        )
+        detail = <Text>{t.margin(duration(t, p.marginMs))}</Text>
       } else if (p?.kind === 'ok') {
         main = (
           <Text color={levelColor(p.projected)} bold>
-            À ce rythme, ~{Math.round(p.projected)} % à la réinitialisation
+            {t.projected(Math.round(p.projected))}
           </Text>
         )
-        detail = <Text>limite non atteinte cette semaine</Text>
+        detail = <Text>{t.notReached}</Text>
       }
       return (
         <Box borderStyle="round" borderColor="subtle" paddingX={1} flexDirection="column">
           <Text>
-            <Text bold>Rythme </Text>
+            <Text bold>{t.pace} </Text>
             {main}
           </Text>
           {detail}
@@ -170,8 +167,8 @@ export const register: Register = (on, options) => {
 
     return (
       <Box flexDirection="row" flexWrap="wrap" columnGap={1}>
-        {usageCard('Session 5h', fiveHour)}
-        {usageCard('Semaine   ', week)}
+        {usageCard(t.fiveHour, fiveHour)}
+        {usageCard(t.week, week)}
         {paceCard()}
       </Box>
     )
