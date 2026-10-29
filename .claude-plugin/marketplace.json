@@ -1,0 +1,8 @@
+{
+  "name": "claude-mods",
+  "owner": { "name": "ValentinD" },
+  "description": "Marketplace perso de mods Claude Code (laptop + tour)",
+  "plugins": [
+    { "name": "usage-pace", "source": "./plugins/usage-pace", "description": "Usage 5 h / hebdo et rythme au-dessus du prompt" }
+  ]
+}

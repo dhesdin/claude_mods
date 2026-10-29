@@ -1,0 +1,23 @@
+{
+  "name": "usage-pace",
+  "version": "0.1.0",
+  "description": "Bandeau au-dessus du prompt : usage 5 h et hebdo, temps avant reset, rythme hebdo",
+  "author": {
+    "name": "ValentinD"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "paceMinHours": {
+      "type": "number",
+      "title": "Recul minimal pour le rythme (h)",
+      "description": "Heures écoulées depuis la réinitialisation hebdo avant d'afficher une projection",
+      "default": 3
+    },
+    "refreshSeconds": {
+      "type": "number",
+      "title": "Rafraîchissement du compte à rebours (s)",
+      "description": "Intervalle de mise à jour des temps avant reset entre deux tours ; 0 = seulement après chaque tour",
+      "default": 60
+    }
+  }
+}
