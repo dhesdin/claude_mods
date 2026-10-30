@@ -74,7 +74,7 @@ window="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(
 ok "compaction window" "$window"
 if grep -q 'load-context.sh' "$cfg/settings.json" 2>/dev/null && [[ -x "$cfg/hooks/load-context.sh" ]]; then ok "hand-off notes hook" "installed"; else ok "hand-off notes hook" "missing"; fi
 if [[ -L "$cfg/CLAUDE.md" ]]; then
-  if [[ -e "$cfg/CLAUDE.md" ]]; then ok "global rules" "linked to $(readlink "$cfg/CLAUDE.md")"; else ok "global rules" "BROKEN link"; next+=("~/.claude/CLAUDE.md points to a missing file: make user-settings RULES=1"); fi
+  if [[ -e "$cfg/CLAUDE.md" ]]; then ok "global rules" "linked to $(readlink "$cfg/CLAUDE.md")"; else ok "global rules" "BROKEN link"; next+=("$cfg/CLAUDE.md points to a missing file: make user-settings RULES=1"); fi
 elif [[ -f "$cfg/CLAUDE.md" ]]; then ok "global rules" "own file (not linked to this repository)"; else ok "global rules" "none"; fi
 [[ "$window" == 300000 && "$(grep -c 'load-context.sh' "$cfg/settings.json" 2>/dev/null)" != 0 ]] || next+=("per-machine settings: make user-settings (see docs/install.md)")
 

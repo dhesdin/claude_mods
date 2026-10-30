@@ -53,4 +53,5 @@
 - Fixed: install.sh gave langmod a language option it lacks (grep matched its keyword); CLAUDE=echo dry run read state through echo and missed account mods; check.sh said "--fix" when npx was missing; docs/install.md (userConfig messages, teardown removes options, autoCompactEnabled, tested 2.1.314), README Develop needs Node.js.
 - Measures: under load 100%, 7.3 / 8.0 GB VRAM, ~298 / 310 W, 72 °C, throttle bit 0x4 (power cap) on and off.
 - Decisions: no GPU load script in the repository; any CUDA program serves step 3.
+- Found: CI red since b8bc3da (shellcheck SC2088, a `~` in a doctor.sh message), never seen locally because shellcheck was skipped; fixed, full check passes with Node.js 22 and shellcheck 0.10 run from a temporary folder.
 - Pitfalls: one ~7 GB cuMemAlloc fails on an 8 GB card (chunks work); an isolated config dir has no login, so mods loading in a session were checked only through the account copies.

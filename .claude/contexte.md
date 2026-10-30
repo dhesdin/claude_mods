@@ -21,7 +21,7 @@ Both machines set up and checked. Remaining: the README demo GIF on the workstat
 - Auto mode refuses Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md: the user runs make user-settings.
 - An isolated CLAUDE_CONFIG_DIR has no login: install can be tested there, a session cannot.
 - One cuMemAlloc of ~7 GB fails on the 8 GB card; allocate in chunks.
-- No local `gh`, Node.js or shellcheck on the workstation: biome, shellcheck and CI results unseen locally.
+- CI was red from b8bc3da to 3fa0f3b: shellcheck SC2088 in scripts/doctor.sh, unseen because shellcheck is missing locally (no Node.js, shellcheck or `gh` installed on the workstation). Check status: GitHub API `commits/<sha>/check-runs` (public, no login); job logs need a login.
 
 ## Next action
 Answer the Windows question (native Windows: sysmon reads /proc, scripts are bash), then record the README demo GIF.
