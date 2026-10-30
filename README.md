@@ -54,6 +54,8 @@ Step by step, with what you should see and troubleshooting: **[docs/install.md](
 
 ## Develop
 
+Needs Node.js ≥ 20 (`npx`) on top of the install requirements; `shellcheck` is optional ([docs/development.md](docs/development.md#requirements)).
+
 ```bash
 make check                             # lint, format, validate, surface snapshots, tests, type-check
 make fix                               # format and apply safe lint fixes

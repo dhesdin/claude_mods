@@ -4,7 +4,7 @@
 
 Git repository used as a Claude Code marketplace. Installed on two machines:
 - **laptop**: Linux Mint, no NVIDIA GPU
-- **workstation**: NVIDIA GPU machine (OS to confirm, Linux assumed)
+- **workstation**: Linux Mint 22.3, NVIDIA GeForce RTX 3070 Ti (driver 595.99.02)
 
 Each mod is an independent plugin, enabled and disabled on its own. Everything in the repo (code, comments, docs, specs, commit messages) is in English; only the mods' display text is translated (docs/architecture.md, Internationalization).
 
@@ -28,7 +28,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 - `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
 - `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.
-- `docs/hardware.md`: machine setup per hardware and validation checklists (GPU checks still to run on the workstation, Jetson and AMD marked [to validate]).
+- `docs/hardware.md`: machine setup per hardware and validation checklists (NVIDIA checked on the workstation; Jetson and AMD marked [to validate]).
 - `docs/specs/`: one functional spec per mod.
 - `SECURITY.md`: threat model and the controls the repo relies on.
 - `suivi.md`: dated session log.
@@ -38,7 +38,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | Mod | Coded | Checked on screen | Committed |
 | --- | --- | --- | --- |
 | usage-pace | yes | yes | yes |
-| sysmon | yes | laptop yes; GPU [to validate] | yes |
+| sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Jetson, AMD [to validate] | yes |
 | langmod | yes | yes (laptop) | yes |
 | teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
 | project-hours | yes | yes | yes |

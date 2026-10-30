@@ -46,13 +46,16 @@ for m in "${mods[@]}"; do
 done
 
 description() { sed -n -E 's/^  "description": "(.*)",?$/\1/p' "$repo/plugins/$1/.claude-plugin/plugin.json"; }
-plugins="$("$claude" plugin list 2>/dev/null || true)"
+# CLAUDE=echo prints the changes; the current state is still read from the real binary.
+reader="$claude"
+if [[ "$claude" == echo ]] && command -v claude >/dev/null; then reader=claude; fi
+plugins="$("$reader" plugin list 2>/dev/null || true)"
 installed() { grep -qF "$1@$marketplace" <<<"$plugins"; }
 # Already coming from the claude.ai account (uploaded there): installing it here too would duplicate it.
 synced() { grep -qF "$1@synced" <<<"$plugins"; }
 
 setup() {
-  if "$claude" plugin marketplace list 2>/dev/null | grep -qF "$repo"; then
+  if "$reader" plugin marketplace list 2>/dev/null | grep -qF "$repo"; then
     echo "marketplace already added: $repo"
   else
     "$claude" plugin marketplace add --scope "$scope" "$repo"
@@ -71,7 +74,7 @@ case "$action" in
     setup
     for m in "${mods[@]}"; do
       args=(--scope "$scope")
-      if [[ -n "$lang" ]] && grep -q '"language"' "$repo/plugins/$m/.claude-plugin/plugin.json"; then args+=(--config "language=$lang"); fi
+      if [[ -n "$lang" ]] && grep -q '"language": *{' "$repo/plugins/$m/.claude-plugin/plugin.json"; then args+=(--config "language=$lang"); fi
       if installed "$m"; then
         echo "$m: already installed"
       elif synced "$m"; then

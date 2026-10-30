@@ -47,3 +47,10 @@
 - Decisions: README demo GIF recorded on the GPU workstation, so the sysmon GPU card shows.
 - Done: notes, log and docs keep only this repository (no account skills); bash requirement and Windows route in docs/install.md; project-memory 0.2.1: the reminder names .claude/contexte.md instead of a skill outside the repo.
 - Decisions: user/CLAUDE.md stays (global rules, linked from ~/.claude/CLAUDE.md, loaded in every project); it is what ties the notes to the user's own skill.
+
+## 2026-10-30 (evening) : workstation checked, fresh-clone test
+- Done: fresh clone from GitHub tested in an isolated CLAUDE_CONFIG_DIR (install, configure, reinstall, uninstall, teardown, user-settings, dist); workstation make user-settings RULES=1 and make doctor all set; sysmon NVIDIA checklist passed on the RTX 3070 Ti (driver 595.99.02), [to validate] removed for NVIDIA.
+- Fixed: install.sh gave langmod a language option it lacks (grep matched its keyword); CLAUDE=echo dry run read state through echo and missed account mods; check.sh said "--fix" when npx was missing; docs/install.md (userConfig messages, teardown removes options, autoCompactEnabled, tested 2.1.314), README Develop needs Node.js.
+- Measures: under load 100%, 7.3 / 8.0 GB VRAM, ~298 / 310 W, 72 °C, throttle bit 0x4 (power cap) on and off.
+- Decisions: no GPU load script in the repository; any CUDA program serves step 3.
+- Pitfalls: one ~7 GB cuMemAlloc fails on an 8 GB card (chunks work); an isolated config dir has no login, so mods loading in a session were checked only through the account copies.

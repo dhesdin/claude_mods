@@ -26,7 +26,7 @@ The other mods (usage-pace, teacher-guard, langmod) need nothing from the hardwa
 | `/proc/stat`, `/proc/loadavg` | CPU busy %, core count, load | every Linux: PC, laptop, WSL2, Jetson, Raspberry Pi | validated (laptop) |
 | `/proc/meminfo` | RAM available / used, swap | every Linux | validated (laptop) |
 | `df` | free disk space | every Linux (coreutils) | validated (laptop) |
-| `nvidia-smi` | NVIDIA GPU: utilization, VRAM, temperature, power, throttling, processes | Linux with an NVIDIA GPU and the proprietary driver; WSL2 with the Windows driver | parsers tested on recorded output; **[to validate]** on a real GPU |
+| `nvidia-smi` | NVIDIA GPU: utilization, VRAM, temperature, power, throttling, processes | Linux with an NVIDIA GPU and the proprietary driver; WSL2 with the Windows driver | validated (workstation: RTX 3070 Ti, driver 595.99.02) |
 | `tegrastats` | Jetson GPU: utilization, shared memory, temperature, input power | NVIDIA Jetson (JetPack / L4T) | **[to validate]** |
 | `rocm-smi` | AMD GPU: utilization, VRAM, temperature, power | Linux with ROCm | **[to validate]** |
 
@@ -139,8 +139,8 @@ A tool that never exits (like `tegrastats`) is read with `io.spawn` and closed a
 
 ### NVIDIA workstation
 1. `nvidia-smi --query-gpu=uuid,name,utilization.gpu,memory.used,memory.total,power.draw,power.limit,temperature.gpu,clocks_throttle_reasons.active --format=csv,noheader,nounits` prints one line per GPU. A field printing `[N/A]` or `[Not Supported]` shows as `n/a` (normal on some cards).
-2. If that command refuses `clocks_throttle_reasons.active` (renamed on some drivers), the Throttling line disappears: note the accepted name (`nvidia-smi --help-query-gpu | grep -i reasons`).
-3. `nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_memory --format=csv,noheader,nounits` while a PyTorch script runs: the process appears in the GPU card.
+2. If that command refuses `clocks_throttle_reasons.active` (renamed on some drivers), the Throttling line disappears: note the accepted name (`nvidia-smi --help-query-gpu | grep -i reasons`). Driver 595 accepts both `clocks_throttle_reasons.active` and `clocks_event_reasons.active`.
+3. `nvidia-smi --query-compute-apps=gpu_uuid,pid,process_name,used_memory --format=csv,noheader,nounits` while a CUDA program runs (a PyTorch script or any other CUDA program): the process appears in the GPU card.
 4. `/sysmon`: GPU name, utilization, VRAM used / total + free, temperature, power / limit, Throttling line.
 5. Under load (short training run): VRAM > 90% or temperature > 80 °C turns the card red; throttling reads "thermal (GPU too hot)" in red or "power limit (max power draw reached)" in orange.
 6. Several GPUs: set `gpuIndex` and check the card follows the right one.

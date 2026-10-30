@@ -33,7 +33,9 @@ failed=0
 fail() { echo "  FAIL: $*"; failed=1; }
 
 echo "== lint and format (Biome $BIOME_VERSION)"
-if out=$(biome ci --colors=off . 2>&1); then echo "  ok"; else echo "$out" | tail -40; fail "biome (fix with: scripts/check.sh --fix)"; fi
+if ! command -v npx >/dev/null; then
+  fail "npx not found: install Node.js >= 20 (docs/development.md#requirements)"
+elif out=$(biome ci --colors=off . 2>&1); then echo "  ok"; else echo "$out" | tail -40; fail "biome (fix with: scripts/check.sh --fix)"; fi
 
 echo "== shell scripts"
 if command -v shellcheck >/dev/null; then

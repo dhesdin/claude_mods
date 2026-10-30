@@ -15,7 +15,7 @@ Everything `/install-mods` does for you, step by step, with no AI involved. Ten 
 
 | | Needed for |
 | --- | --- |
-| [Claude Code](https://code.claude.com/docs) 2.1.287 or later (tested on 2.1.312) | every mod |
+| [Claude Code](https://code.claude.com/docs) 2.1.287 or later (tested on 2.1.314) | every mod |
 | signed in with a claude.ai account (not an API key), Claude Code 2.1.273 or later | the account route only |
 | `git`, `make` (or bash for `scripts/install.sh`), `python3` | cloning and installing |
 | Linux or WSL2 | sysmon (it reads `/proc`); the other mods run anywhere Claude Code runs |
@@ -48,7 +48,7 @@ What each section tells you:
 | Needs | a claude.ai account | the clone stays on the machine (the marketplace points at it) |
 | Best for | your own machines | development, a shared or offline machine, no claude.ai account |
 
-Do not use both for the same mod on one machine: the machine copy takes precedence and you get a duplicate. `make install` skips a mod that already comes from the account.
+Do not use both for the same mod on one machine: the machine copy takes precedence and you get a duplicate. `make install` skips a mod that already comes from the account (it still registers the clone as a marketplace, which is harmless).
 
 ## 4a. Install on your claude.ai account
 
@@ -69,7 +69,7 @@ make sysmon usage-pace               # the same, shorter
 make install MOD_LANG=fr             # with a display language: en, fr, ja, zh
 ```
 
-Then `/reload-plugins` in a session that was already open, and set the options you want ([Configure](#configure)).
+Each install may print `N userConfig options not yet set — run /plugin configure ...`: expected, every option has a default, set only the ones you want to change. Then `/reload-plugins` in a session that was already open, and set the options you want ([Configure](#configure)).
 
 | Command | Does |
 | --- | --- |
@@ -78,7 +78,7 @@ Then `/reload-plugins` in a session that was already open, and set the options y
 | `make list` | each mod, its description, where it comes from |
 | `make setup` | only register this clone as a marketplace |
 | `make uninstall <mod>...` | uninstall the mods you name (all without names) |
-| `make teardown` | uninstall every mod and remove the marketplace |
+| `make teardown` | uninstall every mod and remove the marketplace (the options of those mods are removed too) |
 
 Variables, on the command line, in the environment, or in a git-ignored `config.mk` (copy `config.mk.example`):
 
@@ -111,7 +111,7 @@ scripts/user-settings.sh --dry-run [--rules] [--window 300000]   # show the chan
 
 | What | Where | How |
 | --- | --- | --- |
-| automatic compaction at 300,000 tokens; `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` removed | `~/.claude/settings.json` | merged, every other key kept |
+| automatic compaction on (`autoCompactEnabled`) at 300,000 tokens; `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` removed | `~/.claude/settings.json` | merged, every other key kept |
 | loading the project's `.claude/contexte.md` + a git snapshot at each start, `/clear`, resume and after compaction | `~/.claude/hooks/load-context.sh` + a SessionStart hook in `settings.json` | **copied** from `user/hooks/`: keeps working if the clone moves |
 | your rules for every project | `~/.claude/CLAUDE.md` | with `RULES=1`, a **symbolic link** to `user/CLAUDE.md`: one source, an edit on either side is the same file, `git pull` updates it |
 
