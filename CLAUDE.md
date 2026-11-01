@@ -39,7 +39,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | --- | --- | --- | --- |
 | sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Jetson, AMD [to validate] | yes |
 | langmod | yes | yes (laptop) | yes |
-| teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
+| teacher-guard | yes (v0.3: no copyable code in replies) | yes | yes |
 | project-hours | yes | yes | yes |
 | notify | yes | yes (laptop) | yes |
 | project-memory | yes | yes (reminder seen) | yes |

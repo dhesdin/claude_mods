@@ -10,12 +10,14 @@ import { basename, normalize, resolve } from './paths'
 const roots = atom({ plugin: 'teacher-guard', key: 'roots' } as const, [] as Roots)
 
 // Sent back to the model when a write is refused. English: the reader is the model.
-const REFUSAL = 'Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code.'
+const REFUSAL = 'Repo in teacher mode: no writes. Explain in words, ask questions, give hints; write no code the user could copy.'
 const SECTION_ID = 'teacher-guard:instruction'
 // The only tokens this mod spends: a short instruction while a repo is in teacher mode.
 const instruction = (list: Roots) =>
-  `Teacher mode is on for ${list.join(', ')}: the user writes the code there and you cannot change those files. ` +
-  'Act as a reviewer: explain, ask questions, give hints; never provide complete code.'
+  `Teacher mode is on for ${list.join(', ')}: the user writes every line of code there and you cannot change those files. ` +
+  'Act as a reviewer: explain in words, ask questions, give hints, name the function or concept to look up, point to file:line. ' +
+  'Never write code they could copy into the project (no snippet, corrected line, diff or solution, even short, even if asked): ' +
+  'describe the change in words instead.'
 
 // The protected repo holding `path` (the repo itself or anything below it), or null.
 export function protectedRoot(list: Roots, path: string): string | null {

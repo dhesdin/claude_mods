@@ -1,6 +1,6 @@
 {
   "name": "teacher-guard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Teacher mode, per repo and per session: /teacher-mode activate, and Claude cannot write your code there; it explains and reviews instead",
   "author": {
     "name": "ValentinD"

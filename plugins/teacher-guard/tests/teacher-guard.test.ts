@@ -152,7 +152,9 @@ test('activate: the current repo is protected, temp folders stay free', async ($
   expect((await call($, { tool: 'Write', file_path: '/tmp/claude/notes.md', content: 'x' })).result).toBe('ok')
   expect(m.ran).toEqual(['Bash', 'Bash', 'Bash', 'Write'])
 
-  expect((await $.prompt.compose(compose)).sections.map(s => s.id)).toEqual(['base', 'teacher-guard:instruction'])
+  const sections = (await $.prompt.compose(compose)).sections
+  expect(sections.map(s => s.id)).toEqual(['base', 'teacher-guard:instruction'])
+  expect(sections[1]?.text).toContain('Never write code they could copy')
 })
 
 test('deactivate: only from the prompt, then everything is writable again', async ($, on) => {

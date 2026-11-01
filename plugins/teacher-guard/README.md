@@ -25,9 +25,9 @@ Teacher mode for the repos where **you** write the code (learning or portfolio p
 | run: tests (`pytest`), an existing script, a build | allowed |
 | anything in temporary folders (`/tmp/...`) or outside protected repos, including copying your code out to `/tmp` | allowed |
 
-- A refusal tells Claude: "Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code."
+- A refusal tells Claude: "Repo in teacher mode: no writes. Explain in words, ask questions, give hints; write no code the user could copy."
 - Status line under the prompt: `TEACHER MODE · <repo>`.
-- While a repo is on, a two-line instruction in the system prompt tells Claude to act as a reviewer. It is the only token this mod spends.
+- While a repo is on, a short instruction in the system prompt (about 80 tokens) tells Claude to act as a reviewer and to write no code you could copy into the project: no snippet, corrected line, diff or solution, even short, even if you ask; it describes the change in words. It is an instruction, not a filter: the mods API cannot rewrite Claude's replies. It is the only token this mod spends.
 - Subagents are covered: their tool calls go through the same checks.
 
 ## Limits: a guard against autopilot, not a security barrier
@@ -43,7 +43,7 @@ The Bash check reads the command statically, best effort:
 - Reads each `Write`, `Edit`, `NotebookEdit` and `Bash` call Claude makes, to refuse the writes into a protected repo; it never changes a call it lets through.
 - Runs `git -C <folder> rev-parse --show-toplevel` when you run `/teacher-mode activate`, to find the repo root.
 - Reads `HOME` and `TMPDIR` to resolve `~` and `$TMPDIR` in commands.
-- Sends to the model only the two-line reviewer instruction (while a repo is protected) and the refusal message. No network request, no credential.
+- Sends to the model only the short reviewer instruction (while a repo is protected) and the refusal message. No network request, no credential.
 
 ## Options (`/config`, or `scripts/configure.sh teacher-guard key=value`)
 

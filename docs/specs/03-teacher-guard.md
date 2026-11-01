@@ -15,12 +15,14 @@ In some repositories (learning projects, portfolio projects), the user must writ
 2. **Bash, best effort**: refuse commands whose write target is in the repo. Write commands: `>` and `>>` redirections, `tee`, `rm`, `mv`, `cp` (destination), `touch`, `mkdir`, `ln`, `chmod`, `sed -i`, `perl -i`, `dd of=`, `patch`. Git commands that change the repo or its history: `add`, `commit`, `push`, `apply`, `merge`, `rebase`, `reset`, `restore`, `checkout`, `stash`, `rm`, `mv`, `clean`, `pull`, `tag`, `clone`, `init`, `worktree`, `am`, `cherry-pick`, `revert`, `switch`. Quotes, `cd`, `git -C`, `~`, `$HOME`, `$TMPDIR` and heredocs are understood; an unknown target is judged by the folder the command runs in.
    - Allowed: reading and running (`ls`, `cat`, `git status/diff/log`, tests, existing scripts), and anything outside protected repos (temporary folders, copying code out to `/tmp`).
    - This filter is **not a security barrier**, only a guard against autopilot. Documented as such in the README.
-3. Clear refusal message sent back to Claude: "Repo in teacher mode: no writes. Explain, ask questions, give hints, do not provide complete code."
+3. Clear refusal message sent back to Claude: "Repo in teacher mode: no writes. Explain in words, ask questions, give hints; write no code the user could copy."
 4. Permanent discreet indicator: the status line `TEACHER MODE · <repo>` (does not compete with other mods' bands).
 5. The guard fails closed: if a check throws before the call is let through, the call is refused.
 
 ## Only token spending allowed
-While a repo is protected, a short instruction (2 lines) is added to the system prompt (`prompt.compose`, scope `session`) so Claude acts as a reviewer rather than attempting refused writes. Removed as soon as nothing is protected.
+While a repo is protected, a short instruction (about 80 tokens) is added to the system prompt (`prompt.compose`, scope `session`) so Claude acts as a reviewer rather than attempting refused writes. Removed as soon as nothing is protected.
+- It forbids code the user could copy into the project, in the reply too: no snippet, corrected line, diff or solution, even short, even if asked; the change is described in words, with the function or concept to look up and file:line. (v0.3, at the user's request: v0.2 said "never provide complete code" and Claude still gave the code in its replies.)
+- An instruction, not a guarantee: no verified hook rewrites the model's reply text.
 
 ## Cases to test
 - Off by default: nothing refused, no status, no instruction.
