@@ -1,16 +1,17 @@
 # Current context: claude-mods
 
-Updated: 2026-11-01 12:24 (usage-pace replaced by a status line)
+Updated: 2026-11-01 12:40 (status line with token count, teacher-guard 0.3)
 
 ## Current goal
 Status line `user/statusline.py` replaces the usage-pace mod; waiting for the user's on-screen check of the square bars, then the workstation.
 
 ## Done
-- user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
+- user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, tokens in context after the ctx % (`· 24k`, total_input_tokens), time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
 - scripts/user-settings.sh copies it to ~/.claude/statusline.py and sets statusLine (`python3 -I ... <lang>`, refreshInterval 60); keeps a status line of one's own unless --statusline (make: STATUSLINE=1); --lang (make: MOD_LANG).
 - teacher-guard TEACHER MODE checked next to the custom status line (laptop).
 - usage-pace deleted from the repository (plugin, spec 01, marketplace, docs, README, langmod test); disabled on the laptop (`claude plugin disable usage-pace@synced`).
 - Detection after a `git pull`: make doctor shows "status line: older than user/statusline.py"; user/hooks/load-context.sh prints a line asking for `make user-settings` when the ~/.claude copies differ from user/ (only in this clone).
+- teacher-guard 0.3: the system prompt instruction forbids code the user could copy (snippet, corrected line, diff, even if asked); zip built, not yet uploaded.
 - Laptop: make user-settings run with --lang fr --statusline (backup ~/.claude/settings.json.20261101-121743.bak).
 
 ## Recent decisions
