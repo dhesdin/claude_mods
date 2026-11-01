@@ -20,7 +20,7 @@ const run = (args: string) => ({
 
 const ROWS = [
   row('sysmon.language', 'en'),
-  row('usage-pace.language', 'en'),
+  row('teacher-guard.language', 'en'),
   row('other.language', 'en', ['en', 'de']),
   row('theme', 'dark', []),
 ]
@@ -37,8 +37,8 @@ test('sets every mod language row, and only those', async ($, on) => {
   await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
 
   const r = await $.command.run(run(' FR '))
-  expect(set).toEqual(['sysmon.language=fr', 'usage-pace.language=fr'])
-  expect(r.text).toBe('Language set to fr for: sysmon, usage-pace.')
+  expect(set).toEqual(['sysmon.language=fr', 'teacher-guard.language=fr'])
+  expect(r.text).toBe('Language set to fr for: sysmon, teacher-guard.')
 })
 
 test('no argument lists the current languages; an unknown one is refused', async ($, on) => {
@@ -50,7 +50,7 @@ test('no argument lists the current languages; an unknown one is refused', async
   })
   await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
 
-  expect((await $.command.run(run(''))).text).toBe('sysmon: en\nusage-pace: en\nUsage: /langmod en|fr|ja|zh')
+  expect((await $.command.run(run(''))).text).toBe('sysmon: en\nteacher-guard: en\nUsage: /langmod en|fr|ja|zh')
   expect((await $.command.run(run('klingon'))).text).toBe('Unknown language. Available: en, fr, ja, zh.')
 })
 

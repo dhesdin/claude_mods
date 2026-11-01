@@ -4,13 +4,14 @@ One page for everything a user can see or set. Each mod is independent: install,
 
 | Mod | In one line | Command |
 | --- | --- | --- |
-| [usage-pace](#usage-pace) | band above the prompt: 5-hour and weekly usage, time to reset, projected pace | `/usage-pace`: hide or show the band |
 | [sysmon](#sysmon) | "Machine" panel: GPU, CPU, RAM, disk; a `machine_status` tool Claude can call | `/sysmon`: open or close the panel |
 | [teacher-guard](#teacher-guard) | teacher mode: in the protected repo, Claude explains and reviews but cannot write | `/teacher-mode activate` / `deactivate` |
 | [langmod](#langmod) | display language of every mod at once | `/langmod en\|fr\|ja\|zh` |
 | [project-hours](#project-hours) | Claude Code time per project and per week, alert when a priority project goes quiet | `/hours`, `/hours 4`, `/hours panel` |
 | [notify](#notify) | desktop notification when Claude finishes a reply or waits for you | none |
 | [project-memory](#project-memory) | reminder to update the project's hand-off notes before the automatic compaction | none |
+
+The 5-hour and weekly usage with the pace is the status line, not a mod (a plugin cannot set it): `make user-settings`, see [docs/install.md](install.md#the-status-line).
 
 Two of them write to the model on purpose, briefly: **project-memory** (one reminder per compaction cycle) and **sysmon** (only when Claude calls its tool). The others cost no tokens.
 
@@ -24,17 +25,6 @@ Options are **per machine**, even for mods that come from your claude.ai account
 
 A value set from the terminal applies when Claude Code restarts. Each mod's README (`plugins/<mod>/README.md`) has more detail: what it runs and reads on your machine, its limits.
 
-## usage-pace
-
-Three framed cards above the prompt: the 5-hour session window, the week, and the pace (where the weekly percentage will be at the reset if you keep the same rate). Figures come from Claude Code itself, never estimated. Needs a Claude subscription; without one the band stays hidden.
-
-- `/usage-pace`: hides the band for this session, or shows it again.
-
-| Option | Default | Effect |
-| --- | --- | --- |
-| `language` | `en` | `en`, `fr`, `ja`, `zh` |
-| `paceMinHours` | `3` | hours after the weekly reset before the pace card shows a projection |
-| `refreshSeconds` | `60` | how often the countdowns are redrawn between replies; `0` = only after each reply |
 
 ## sysmon
 

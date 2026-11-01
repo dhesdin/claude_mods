@@ -3,13 +3,8 @@
   "owner": {
     "name": "ValentinD"
   },
-  "description": "Personal Claude Code mods: usage pace, machine monitor, teacher mode, display language",
+  "description": "Personal Claude Code mods: machine monitor, teacher mode, display language, project hours, notifications",
   "plugins": [
-    {
-      "name": "usage-pace",
-      "source": "./plugins/usage-pace",
-      "description": "5-hour and weekly usage above the prompt, time to reset, projected pace"
-    },
     {
       "name": "sysmon",
       "source": "./plugins/sysmon",

@@ -24,7 +24,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 - `docs/mods.md`: every mod, its command and its options (the catalog users and `/install-mods` read).
 - `docs/install.md`: the install guide for humans (the same steps as `/install-mods`).
 - `scripts/configure.sh <mod> key=value`: set options of an installed mod (repo or account copy).
-- `scripts/user-settings.sh` (`make user-settings [RULES=1]`): per-machine setup no plugin can carry: compaction window, the SessionStart hook `user/hooks/load-context.sh`, and with RULES=1 `~/.claude/CLAUDE.md` linked to `user/CLAUDE.md` (the owner's global rules).
+- `scripts/user-settings.sh` (`make user-settings [RULES=1]`): per-machine setup no plugin can carry (a plugin cannot set `statusLine`): compaction window, the SessionStart hook `user/hooks/load-context.sh`, the status line `user/statusline.py` (model, folder, branch, context, 5-hour and weekly usage, weekly pace), and with RULES=1 `~/.claude/CLAUDE.md` linked to `user/CLAUDE.md` (the owner's global rules).
 - `docs/architecture.md`: layout, anatomy of a mod, conventions, i18n, adding a mod.
 - `docs/development.md`: dev loop, `scripts/check.sh`, tests and their pitfalls, CI, definition of done.
 - `docs/mods-api.md`: verified API. **Read before coding a mod**, instead of exploring the types again.
@@ -37,7 +37,6 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 
 | Mod | Coded | Checked on screen | Committed |
 | --- | --- | --- | --- |
-| usage-pace | yes | yes | yes |
 | sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Jetson, AMD [to validate] | yes |
 | langmod | yes | yes (laptop) | yes |
 | teacher-guard | yes (v0.2: /teacher-mode command) | yes | yes |
@@ -49,7 +48,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 
 One mod at a time, in this order. The next one starts only once the user has checked the previous one on screen.
 
-1. `usage-pace` (docs/specs/01-usage-pace.md)
+1. `usage-pace` (removed on 2026-11-01: replaced by the status line `user/statusline.py`, since the status line receives the same usage figures)
 2. `sysmon` (docs/specs/02-sysmon.md)
 3. `teacher-guard` (docs/specs/03-teacher-guard.md)
 4. `project-hours` (docs/specs/04-project-hours.md)

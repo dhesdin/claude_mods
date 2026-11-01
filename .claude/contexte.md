@@ -1,33 +1,32 @@
 # Current context: claude-mods
 
-Updated: 2026-10-30 19:17 (workstation checked)
+Updated: 2026-11-01 12:24 (usage-pace replaced by a status line)
 
 ## Current goal
-Both machines set up and checked. Remaining: the README demo GIF on the workstation; Windows support under discussion.
+Status line `user/statusline.py` replaces the usage-pace mod; waiting for the user's on-screen check of the square bars, then the workstation.
 
 ## Done
-- Account: 7 mods (usage-pace 0.3, sysmon 0.3, teacher-guard 0.2, langmod 0.2, project-hours 0.1, notify 0.1, project-memory 0.2.1); versions match the repository.
-- Workstation (Linux Mint 22.3, RTX 3070 Ti, driver 595.99.02): make user-settings RULES=1 run (backup ~/.claude/settings.json.20261030-190808.bak), make doctor all set after restart, hand-off hook seen at resume.
-- sysmon NVIDIA checklist passed (docs/hardware.md): idle and loaded values equal nvidia-smi, card red over 90% VRAM, power limit shown, python3 listed; machine_status matches. [to validate] removed for NVIDIA.
-- Fresh-clone test in an isolated CLAUDE_CONFIG_DIR: install, configure, reinstall, uninstall, teardown, user-settings, dist all behave as documented.
-- Fixed: scripts/install.sh passed language= to langmod (matched its keyword) and its CLAUDE=echo dry run ignored account mods; scripts/check.sh names a missing Node.js; docs/install.md and README gaps filled.
+- user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
+- scripts/user-settings.sh copies it to ~/.claude/statusline.py and sets statusLine (`python3 -I ... <lang>`, refreshInterval 60); keeps a status line of one's own unless --statusline (make: STATUSLINE=1); --lang (make: MOD_LANG).
+- usage-pace deleted from the repository (plugin, spec 01, marketplace, docs, README, langmod test); disabled on the laptop (`claude plugin disable usage-pace@synced`).
+- Detection after a `git pull`: make doctor shows "status line: older than user/statusline.py"; user/hooks/load-context.sh prints a line asking for `make user-settings` when the ~/.claude copies differ from user/ (only in this clone).
+- Laptop: make user-settings run with --lang fr --statusline (backup ~/.claude/settings.json.20261101-121743.bak).
 
 ## Recent decisions
+- Status line, not a mod: a plugin can only set `agent` and `subagentStatusLine` (plugin manifest reference), so it is per machine through make user-settings, not on the claude.ai account.
+- Python, not jq: jq is missing on the laptop.
 - Rules and notes are loaded by Claude Code itself (user/CLAUDE.md, SessionStart hook), not by a mod.
-- No GPU load script in the repository: any CUDA program serves the checklist.
 
 ## Known pitfalls
-- Languages are stored per installed copy: /langmod once per machine (not yet run on the workstation).
-- Auto mode refuses Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md: the user runs make user-settings.
-- An isolated CLAUDE_CONFIG_DIR has no login: install can be tested there, a session cannot.
-- One cuMemAlloc of ~7 GB fails on the 8 GB card; allocate in chunks.
-- CI was red from b8bc3da to 3fa0f3b: shellcheck SC2088 in scripts/doctor.sh, unseen because shellcheck is missing locally (no Node.js, shellcheck or `gh` installed on the workstation). Check status: GitHub API `commits/<sha>/check-runs` (public, no login); job logs need a login.
+- Auto mode may refuse Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md: the user runs make user-settings.
+- teacher-guard shows TEACHER MODE through $.ui.status: not yet seen next to the custom status line.
+- Languages are stored per installed copy: /langmod once per machine.
+- No Node.js, shellcheck or gh on the workstation; Biome lint runs in CI only there. CI status: GitHub API `commits/<sha>/check-runs`.
 
 ## Next action
-Answer the Windows question (native Windows: sysmon reads /proc, scripts are bash), then record the README demo GIF.
+On the workstation: `git pull`, then `make user-settings MOD_LANG=fr STATUSLINE=1`, restart Claude Code, check the status line.
 
 ## Waiting for the user
-- Windows: whether to add a native Windows route and a Windows sysmon sampler (needs a Windows machine to validate).
-
-## Missing info
-- Whether a Windows machine is available for testing.
+- On-screen check of the status line (square bars) on the laptop.
+- Remove usage-pace from claude.ai (Customize > Plugins, usage-pace menu, Remove).
+- Windows question still open (native route, Windows sysmon sampler).

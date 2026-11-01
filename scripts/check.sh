@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Every check CI runs, runnable locally.
 #   scripts/check.sh                       all plugins
-#   scripts/check.sh sysmon usage-pace     some plugins
+#   scripts/check.sh sysmon notify         some plugins
 #   scripts/check.sh --update-surface <mod>...   rewrite surface.txt after a reviewed change
 #   scripts/check.sh --fix                 format and apply safe lint fixes, then exit
 set -euo pipefail

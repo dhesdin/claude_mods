@@ -7,8 +7,9 @@
 ##   make uninstall <mod> [<mod>...]    uninstall the mods you name (all without names)
 ##   make teardown                      uninstall every mod and remove the marketplace
 ##   make doctor                        check this machine: system, Claude Code, GPU, what to do next
-##   make user-settings [RULES=1]       once per machine: compaction window, hand-off notes hook (RULES=1: link
-##                                      ~/.claude/CLAUDE.md to user/CLAUDE.md, this repository owner's rules)
+##   make user-settings [RULES=1]       once per machine: compaction window, hand-off notes hook, status line
+##                                      (RULES=1: link ~/.claude/CLAUDE.md to user/CLAUDE.md, the owner's rules;
+##                                      STATUSLINE=1: replace a status line of your own)
 ##   make list                          mods, their description, installed or not
 ##   make dist                          zip each mod (committed state) into dist/plugins/, to upload to claude.ai
 ##   make check | make fix              every CI check | format and safe lint fixes
@@ -34,7 +35,7 @@ ifneq ($(filter $(firstword $(MAKECMDGOALS)),install uninstall),)
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(eval $(ARGS):;@:)
 else ifneq ($(filter $(MODS),$(MAKECMDGOALS)),)
-# `make sysmon usage-pace`: mod names alone install those mods, in one run.
+# `make sysmon notify`: mod names alone install those mods, in one run.
 MOD_GOALS := $(filter $(MODS),$(MAKECMDGOALS))
 .PHONY: $(MOD_GOALS)
 $(firstword $(MOD_GOALS)):
@@ -66,7 +67,7 @@ list:
 	@scripts/install.sh --list
 
 user-settings:
-	@scripts/user-settings.sh $(if $(RULES),--rules)
+	@scripts/user-settings.sh $(if $(RULES),--rules) $(if $(STATUSLINE),--statusline)
 
 doctor:
 	@scripts/doctor.sh

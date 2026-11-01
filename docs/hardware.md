@@ -17,7 +17,7 @@ Run `make doctor` first: it detects most of this for you.
 | Linux + Intel GPU only | nothing | CPU, RAM, disk; Intel GPU not supported |
 | macOS, Windows native | nothing (use WSL2 on Windows) | sysmon shows `n/a`; the other mods work |
 
-The other mods (usage-pace, teacher-guard, langmod) need nothing from the hardware.
+The other mods (teacher-guard, langmod, project-hours, notify, project-memory) need nothing from the hardware.
 
 ## What sysmon reads
 

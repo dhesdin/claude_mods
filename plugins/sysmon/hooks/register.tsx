@@ -26,7 +26,7 @@ const LABEL_RAM = 'RAM  '
 const TOP_RAM_MS = 15000
 const topText = (top: readonly MemUser[], gb: string) => top.map(p => `${p.name} ${gibFromKiB(p.kib)} ${gb}`).join(' · ')
 
-// Same scale as usage-pace: white < 50 %, yellow 50-75, orange 75-90, red >= 90.
+// Scale shared by the mods: white < 50 %, yellow 50-75, orange 75-90, red >= 90.
 export function levelColor(percent: number | null): string {
   if (percent === null) return 'subtle'
   if (percent >= 90) return 'red'

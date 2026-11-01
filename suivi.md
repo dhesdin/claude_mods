@@ -55,3 +55,8 @@
 - Decisions: no GPU load script in the repository; any CUDA program serves step 3.
 - Found: CI red since b8bc3da (shellcheck SC2088, a `~` in a doctor.sh message), never seen locally because shellcheck was skipped; fixed, full check passes with Node.js 22 and shellcheck 0.10 run from a temporary folder.
 - Pitfalls: one ~7 GB cuMemAlloc fails on an 8 GB card (chunks work); an isolated config dir has no login, so mods loading in a session were checked only through the account copies.
+
+## 2026-11-01 : usage-pace replaced by a status line
+- Done: user/statusline.py (model, project folder, git branch, context, 5h and 7d bars of 10 squares, time to reset, weekly pace with 💀 when the limit falls before the reset); installed by scripts/user-settings.sh (--lang, --statusline; make user-settings MOD_LANG= STATUSLINE=1); usage-pace deleted (plugin, spec 01, marketplace, docs, README, langmod test); make doctor and the SessionStart hook flag a machine whose ~/.claude copies are behind user/.
+- Decisions: a status line, not a mod, because the status line JSON carries rate_limits (five_hour, seven_day: used_percentage, resets_at) and context_window.used_percentage; it is per machine because a plugin can only set `agent` and `subagentStatusLine` (plugin manifest reference), so the claude.ai account cannot carry it. Python, not jq (jq missing on this machine). Scale kept from usage-pace, with green instead of white under 50 %.
+- Pitfalls: the first status line (from PS1) used jq and would have shown nothing; usage-pace still comes from the claude.ai account until removed there (disabled on this machine with `claude plugin disable usage-pace@synced`).

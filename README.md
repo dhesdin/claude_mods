@@ -6,7 +6,6 @@ Small, independent mods for Claude Code. Each one is a plugin you install, confi
 
 | Mod | What it does | Command | Docs |
 | --- | --- | --- | --- |
-| [usage-pace](plugins/usage-pace) | Band above the prompt: 5-hour and weekly usage, time to reset, projected weekly pace | `/usage-pace` hides or shows the band | [spec](docs/specs/01-usage-pace.md) |
 | [sysmon](plugins/sysmon) | "Machine" panel: GPU (NVIDIA; Jetson and AMD [to validate]), CPU, RAM, disk; `machine_status` tool for Claude | `/sysmon` opens or closes the panel | [spec](docs/specs/02-sysmon.md), [hardware](docs/hardware.md) |
 | [teacher-guard](plugins/teacher-guard) | Teacher mode: in the protected repo, Claude cannot write your code; it explains and reviews | `/teacher-mode activate` / `deactivate` | [spec](docs/specs/03-teacher-guard.md) |
 | [langmod](plugins/langmod) | Display language of every mod at once | `/langmod en\|fr\|ja\|zh` | [architecture](docs/architecture.md#internationalization) |
@@ -43,8 +42,8 @@ The agent checks the machine (system, Claude Code version, GPU and driver), asks
 ```bash
 git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
 make doctor                      # what this machine has, what to fix
-make user-settings               # once per machine: compaction at 300k tokens, hand-off notes hook (RULES=1: your global rules)
-make install MOD_LANG=fr         # every mod on this machine (or: make install sysmon usage-pace)
+make user-settings MOD_LANG=fr   # once per machine: compaction at 300k tokens, hand-off notes hook, status line (RULES=1: your global rules)
+make install MOD_LANG=fr         # every mod on this machine (or: make install sysmon notify)
 scripts/configure.sh project-hours priorityProjects='sip/edge=3'   # any option, see docs/mods.md
 ```
 

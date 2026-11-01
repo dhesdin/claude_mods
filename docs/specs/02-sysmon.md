@@ -48,7 +48,7 @@ Without a supported GPU: the GPU card shows "No supported GPU" or is hidden (con
 - Text from other programs (process names, GPU names, mount points) is cleaned of control characters and length-capped before display or before reaching the model.
 
 ## Visual thresholds
-- Common scale with usage-pace (white < 50%, yellow 50-75, orange 75-90, red ≥ 90) for GPU utilization, GPU memory, CPU, load (against the core count), RAM used, disk used.
+- Common scale (white < 50%, yellow 50-75, orange 75-90, red ≥ 90) for GPU utilization, GPU memory, CPU, load (against the core count), RAM used, disk used.
 - Red alert (value + card border): GPU memory > threshold, GPU temperature > threshold, swap > 0 while a process runs on the GPU, disk below the free-space threshold.
 - Throttling, always written out: thermal or hardware in red ("thermal (GPU too hot)"), power limit alone in orange ("power limit (max power draw reached)").
 

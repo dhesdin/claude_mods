@@ -43,7 +43,7 @@ The facts come from the repository, not from memory: `docs/mods.md` (each mod, i
 
 7. **Configure**, one command per mod, only the options that change: `scripts/configure.sh <mod> key=value [key=value...]` (values with `;` or spaces in single quotes). It finds the installed copy (`@claude-mods` or `@synced`) and refuses an unknown key. Check with `scripts/configure.sh <mod>`; the values apply when Claude Code restarts. Options are per machine: on another machine, run step 7 again there.
 
-7b. **Per-machine settings**, if they agree: `scripts/user-settings.sh --dry-run`, show the changes, then `scripts/user-settings.sh` (it backs up every file first). Add `--rules` only for the owner of this repository (it links `~/.claude/CLAUDE.md` to `user/CLAUDE.md`); anyone else keeps their own `CLAUDE.md`.
+7b. **Per-machine settings** (compaction window, hand-off notes hook, the status line with model, folder, branch, context, 5-hour and weekly usage and pace), if they agree: `scripts/user-settings.sh --dry-run --lang <lang>`, show the changes, then `scripts/user-settings.sh --lang <lang>`, with `--statusline` only if they want to replace a status line of their own (it backs up every file first). Add `--rules` only for the owner of this repository (it links `~/.claude/CLAUDE.md` to `user/CLAUDE.md`); anyone else keeps their own `CLAUDE.md`.
 
 8. **Hardware, for sysmon.** If the doctor reports a GPU without its tool, point to the matching section of `docs/hardware.md` and quote its commands for their distribution. Mention the sections still marked **[to validate]** (Jetson, AMD).
 

@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 # Per-machine Claude Code setup that no plugin can carry. Run once per machine, again after a `git pull`
 # that changes user/ (safe to run again: it only changes what differs, after a timestamped backup).
-#   scripts/user-settings.sh              compaction window + hand-off notes hook
+#   scripts/user-settings.sh              compaction window + hand-off notes hook + status line
 #   scripts/user-settings.sh --rules      also link ~/.claude/CLAUDE.md to this repository's user/CLAUDE.md
 #   scripts/user-settings.sh --dry-run    show what would change, write nothing
 #   scripts/user-settings.sh --window N   auto-compact window in tokens (default 300000)
+#   scripts/user-settings.sh --lang fr    status line language: en, fr, ja, zh (default $MOD_LANG, else en)
+#   scripts/user-settings.sh --statusline replace a status line that is not this repository's
 # What it does, in ~/.claude (or $CLAUDE_CONFIG_DIR):
 #   - settings.json, merged, every other key kept: autoCompactEnabled true, autoCompactWindow N;
 #     env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE removed (it can only lower the threshold);
 #     one SessionStart hook (startup, resume, /clear, compaction) running hooks/load-context.sh,
 #     replacing an older charger-contexte.sh or load-context.sh entry;
+#     statusLine running statusline.py, unless the user already has a status line of their own (--statusline);
 #   - hooks/load-context.sh: a copy of user/hooks/load-context.sh (a copy keeps working if the clone moves);
+#   - statusline.py: a copy of user/statusline.py;
 #   - with --rules, CLAUDE.md: a symbolic link to user/CLAUDE.md (one source: an edit on either side is the
 #     same file, a `git pull` updates the rules); a different existing file is backed up first.
 set -euo pipefail
@@ -20,11 +24,15 @@ dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 window=300000
 dry=0
 rules=0
+lang="${MOD_LANG:-en}"
+force_line=0
 while (($# > 0)); do
   case "$1" in
     --dry-run) dry=1; shift ;;
     --rules) rules=1; shift ;;
     --window) window="${2:-}"; shift 2 ;;
+    --lang) lang="${2:-}"; shift 2 ;;
+    --statusline) force_line=1; shift ;;
     *) sed -n '2,7s/^# \{0,1\}//p' "$0" >&2; exit 2 ;;
   esac
 done
@@ -32,6 +40,7 @@ if ! [[ "$window" =~ ^[0-9]+$ ]] || ((window < 100000 || window > 1000000)); the
   echo "--window: 100000 to 1000000 tokens" >&2
   exit 2
 fi
+case "$lang" in en | fr | ja | zh) ;; *) echo "--lang: en, fr, ja or zh" >&2; exit 2 ;; esac
 command -v python3 >/dev/null || { echo "python3 is needed (it edits the JSON safely)" >&2; exit 1; }
 
 stamp="$(date +%Y%m%d-%H%M%S)"
@@ -48,12 +57,23 @@ if ! cmp -s "$repo/user/hooks/load-context.sh" "$hook"; then
   fi
 fi
 
-# 2. settings.json.
+# 2. The status line script, copied.
+line="$dir/statusline.py"
+if ! cmp -s "$repo/user/statusline.py" "$line"; then
+  say "copy user/statusline.py -> $line"
+  if ((!dry)); then
+    [[ -f "$line" ]] && cp -p "$line" "$line.$stamp.bak"
+    install -m 755 "$repo/user/statusline.py" "$line"
+  fi
+fi
+
+# 3. settings.json.
 settings="$dir/settings.json"
 [[ -f "$settings" ]] || ((dry)) || echo '{}' >"$settings"
-python3 -I - "$settings" "$window" "$hook" "$dry" "$stamp" <<'PY'
-import json, os, shutil, sys
+python3 -I - "$settings" "$window" "$hook" "$dry" "$stamp" "$line" "$lang" "$force_line" <<'PY'
+import json, os, shlex, shutil, sys
 path, window, hook, dry, stamp = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4] == "1", sys.argv[5]
+line, lang, force_line = sys.argv[6], sys.argv[7], sys.argv[8] == "1"
 data = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 before = json.dumps(data, sort_keys=True)
 changes = []
@@ -81,6 +101,12 @@ if hooks.get("SessionStart", []) != others + [wanted]:
     hooks["SessionStart"] = others + [wanted]
     data["hooks"] = hooks
 
+current = data.get("statusLine")
+if current and "statusline.py" not in str(current.get("command", "")) and not force_line:
+    print("  statusLine: kept your own (--statusline replaces it)")
+else:
+    put("statusLine", {"type": "command", "command": f"python3 -I {shlex.quote(line)} {lang}", "refreshInterval": 60})
+
 if json.dumps(data, sort_keys=True) == before:
     print(f"  {path}: up to date")
     sys.exit(0)
@@ -97,7 +123,7 @@ os.replace(path + ".tmp", path)
 print(f"  backup: {path}.{stamp}.bak")
 PY
 
-# 3. The global rules, linked (only when asked: they are this repository owner's own rules).
+# 4. The global rules, linked (only when asked: they are this repository owner's own rules).
 if ((rules)); then
   target="$repo/user/CLAUDE.md"
   link="$dir/CLAUDE.md"
