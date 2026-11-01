@@ -8,6 +8,7 @@ Status line `user/statusline.py` replaces the usage-pace mod; waiting for the us
 ## Done
 - user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
 - scripts/user-settings.sh copies it to ~/.claude/statusline.py and sets statusLine (`python3 -I ... <lang>`, refreshInterval 60); keeps a status line of one's own unless --statusline (make: STATUSLINE=1); --lang (make: MOD_LANG).
+- teacher-guard TEACHER MODE checked next to the custom status line (laptop).
 - usage-pace deleted from the repository (plugin, spec 01, marketplace, docs, README, langmod test); disabled on the laptop (`claude plugin disable usage-pace@synced`).
 - Detection after a `git pull`: make doctor shows "status line: older than user/statusline.py"; user/hooks/load-context.sh prints a line asking for `make user-settings` when the ~/.claude copies differ from user/ (only in this clone).
 - Laptop: make user-settings run with --lang fr --statusline (backup ~/.claude/settings.json.20261101-121743.bak).
@@ -19,7 +20,6 @@ Status line `user/statusline.py` replaces the usage-pace mod; waiting for the us
 
 ## Known pitfalls
 - Auto mode may refuse Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md: the user runs make user-settings.
-- teacher-guard shows TEACHER MODE through $.ui.status: not yet seen next to the custom status line.
 - Languages are stored per installed copy: /langmod once per machine.
 - No Node.js, shellcheck or gh on the workstation; Biome lint runs in CI only there. CI status: GitHub API `commits/<sha>/check-runs`.
 
