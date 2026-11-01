@@ -32,7 +32,7 @@ def level(pct):
 
 def clean(text):
     # Folder names and model names are outside text: no control or bidi characters reach the terminal.
-    return re.sub(r"[\x00-\x1f\x7f-\x9f​-‏‪-‮⁦-⁩]", "", str(text))[:40]
+    return re.sub(r"[\x00-\x1f\x7f-\x9f\u200b-\u200f\u202a-\u202e\u2066-\u2069]", "", str(text))[:40]
 
 
 def bar(pct):
