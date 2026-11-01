@@ -46,6 +46,10 @@ def duration(s, seconds):
     return f"{d}{s['day']}{h:02d}h" if d else f"{h}h{m:02d}"
 
 
+def tokens(n):
+    return f"{n / 1e6:.1f}M" if n >= 1e6 else f"{n / 1e3:.0f}k" if n >= 1e3 else str(int(n))
+
+
 def branch(folder):
     try:
         out = subprocess.run(["git", "-C", folder, "branch", "--show-current"], capture_output=True, text=True, timeout=1)
@@ -87,8 +91,14 @@ def main():
         if b:
             head.append(f"🌿 {GREEN}{b}{RESET}")
     lines = [f" {DIM}│{RESET} ".join(head)]
-    ctx = (data.get("context_window") or {}).get("used_percentage")
-    lines.append(f"🧠 ctx {bar(float(ctx))}" if isinstance(ctx, (int, float)) else f"🧠 ctx {DIM}n/a{RESET}")
+    cw = data.get("context_window") or {}
+    ctx, used = cw.get("used_percentage"), cw.get("total_input_tokens")
+    if isinstance(ctx, (int, float)):
+        # total_input_tokens is what used_percentage is computed from (input + cache writes + cache reads).
+        count = f" {DIM}·{RESET} {tokens(used)}" if isinstance(used, (int, float)) and used > 0 else ""
+        lines.append(f"🧠 ctx {bar(float(ctx))}{count}")
+    else:
+        lines.append(f"🧠 ctx {DIM}n/a{RESET}")
     five = window(data, "five_hour")
     if five:
         lines.append(f"⏳ 5h {bar(five[0])} {DIM}·{RESET} {duration(s, five[1] - now)}")

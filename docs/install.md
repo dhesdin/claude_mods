@@ -123,13 +123,13 @@ Every file is backed up (`<file>.<date>.bak`) before a change; run again, nothin
 
 ```
 🤖 Opus 5.5 │ 📁 claude_mods │ 🌿 main
-🧠 ctx ■■□□□□□□□□  12%
+🧠 ctx ■■□□□□□□□□  12% · 24k
 ⏳ 5h ■□□□□□□□□□  9% · 4h21
 📅 7j 💀 ■■■■■■■■■□  86% · 2h51 → 100% ven. 14:00
 ```
 
 - Line 1: model, project folder, git branch.
-- Lines 2 to 4: context window, 5-hour session and week, each with a 10-square bar, the percentage and the time to reset. Colors: green < 50 %, yellow 50-75, orange 75-90, red ≥ 90; empty squares dimmed.
+- Lines 2 to 4: context window, 5-hour session and week, each with a 10-square bar and the percentage, then the tokens in context (`total_input_tokens`, what the percentage is computed from) or the time to reset. Colors: green < 50 %, yellow 50-75, orange 75-90, red ≥ 90; empty squares dimmed.
 - After the week: the pace, a linear projection of the weekly percentage at the reset (`→ ~72%`), shown 3 hours after the weekly reset. When it reaches 100 % before the reset, 💀 and the day and time of the limit.
 - Figures come from Claude Code itself (the status line's JSON input), never estimated. Without a Claude subscription, the 5h and 7j lines are absent.
 - Needs `python3` (no `jq`). Language: `MOD_LANG` (en, fr, ja, zh). Redrawn after each reply and every 60 seconds.
