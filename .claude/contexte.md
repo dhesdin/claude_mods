@@ -28,5 +28,6 @@ On the workstation: `git pull`, then `make user-settings MOD_LANG=fr STATUSLINE=
 
 ## Waiting for the user
 - On-screen check of the status line (square bars) on the laptop.
-- Remove usage-pace from claude.ai (Customize > Plugins, usage-pace menu, Remove).
+- Upload dist/plugins/teacher-guard.zip (0.3: no copyable code in replies) on claude.ai, then check it in teacher mode. usage-pace removed from the account (2026-11-01).
+- git push (no GitHub credentials in this shell), then git pull on the workstation.
 - Windows question still open (native route, Windows sysmon sampler).
