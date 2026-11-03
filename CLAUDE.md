@@ -38,7 +38,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 
 | Mod | Coded | Checked on screen | Committed |
 | --- | --- | --- | --- |
-| sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Windows 11 native yes (CPU, RAM, GPU; disks [to validate]); Jetson, AMD [to validate] | yes (Windows source uncommitted) |
+| sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Windows 11 native yes (CPU, RAM, GPU; disks [to validate]); Jetson, AMD [to validate] | yes |
 | langmod | yes | yes (laptop) | yes |
 | teacher-guard | yes (v0.3: no copyable code in replies) | yes | yes |
 | project-hours | yes | yes | yes |

@@ -1,6 +1,6 @@
 # Current context: claude-mods
 
-Updated: 2026-11-03 22:30 (sysmon Windows CPU/RAM source coded, uncommitted)
+Updated: 2026-11-03 23:30 (Windows install and sysmon Windows committed, not pushed)
 
 ## Current goal
 Windows 11 native support. Install docs done (approved by the user). sysmon CPU/RAM on Windows done and checked on screen by the user.
@@ -17,9 +17,9 @@ Previous: Status line `user/statusline.py` replaces the usage-pace mod; checked 
 - Laptop: make user-settings run with --lang fr --statusline (backup ~/.claude/settings.json.20261101-121743.bak).
 - 2026-11-03, valentin-vivobook (Mint 22.2, Intel GPU): pull to 5b70aa7; status line was missing and usage-pace@synced 0.3.0 still loaded; usage-pace disabled, `make user-settings MOD_LANG=fr` (backup settings.json.20261103-152929.bak); make doctor all set. After a restart: usage-pace gone, teacher-guard 0.3.0 loaded.
 
-- 2026-11-03 Windows (uncommitted): .gitattributes `* text=auto eol=lf` (autocrlf=true checked out CRLF, broke surface snapshots); doctor/user-settings/check.sh find a Python 3 that runs (python3 is the Store alias here, python works); user-settings on Git Bash writes C:/ paths, `bash <hook>`, `python -X utf8 -I` (cp1252 crash on emojis), and without Developer Mode ~/.claude/CLAUDE.md = `@C:/.../user/CLAUDE.md` import instead of a symlink; install.sh recognises the C:\ marketplace path.
+- 2026-11-03 Windows : .gitattributes `* text=auto eol=lf` (autocrlf=true checked out CRLF, broke surface snapshots); doctor/user-settings/check.sh find a Python 3 that runs (python3 is the Store alias here, python works); user-settings on Git Bash writes C:/ paths, `bash <hook>`, `python -X utf8 -I` (cp1252 crash on emojis), and without Developer Mode ~/.claude/CLAUDE.md = `@C:/.../user/CLAUDE.md` import instead of a symlink; install.sh recognises the C:\ marketplace path.
 
-- 2026-11-03 sysmon Windows (uncommitted): hooks/system.ts windowsScript/parseWindows/parseWindowsLines (one powershell.exe via $.process.spawn while the pane measures, one JSON line per interval: raw idle counter + 100 ns clock -> existing cpuPercent, AvailableKBytes, page file, cores, top 3 by WorkingSet every 15 s; CIM classes, not localized counter paths); register.tsx: hasProc once at the first shown refresh, sampler started after the await (no double start), stopped by stop(); isWindowsOff after it ends; machine_status without a live sample = one PowerShell run (2 samples 500 ms); Snapshot.isWindows?: Load line = cores only, no swap alert. Tests: 2 new pass (spawn stub must return { value: { code, signal } }); the 2 old /proc tests still fail on Windows only (known artefact).
+- 2026-11-03 sysmon Windows : hooks/system.ts windowsScript/parseWindows/parseWindowsLines (one powershell.exe via $.process.spawn while the pane measures, one JSON line per interval: raw idle counter + 100 ns clock -> existing cpuPercent, AvailableKBytes, page file, cores, top 3 by WorkingSet every 15 s; CIM classes, not localized counter paths); register.tsx: hasProc once at the first shown refresh, sampler started after the await (no double start), stopped by stop(); isWindowsOff after it ends; machine_status without a live sample = one PowerShell run (2 samples 500 ms); Snapshot.isWindows?: Load line = cores only, no swap alert. Tests: 2 new pass (spawn stub must return { value: { code, signal } }); the 2 old /proc tests still fail on Windows only (known artefact).
 
 ## Recent decisions
 - sysmon Windows: a long-running PowerShell, not one per cycle (cold start ~1.8 s, warm sample ~560 ms, ~130 ms per loop sample).
