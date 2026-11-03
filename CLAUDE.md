@@ -5,6 +5,7 @@
 Git repository used as a Claude Code marketplace. Installed on two machines:
 - **laptop**: Linux Mint, no NVIDIA GPU
 - **workstation**: Linux Mint 22.3, NVIDIA GeForce RTX 3070 Ti (driver 595.99.02)
+- **Windows test PC**: Windows 11 Home, native (Git Bash, no WSL2, no `make`), NVIDIA GeForce RTX 3070 Ti (docs/install.md, Windows 11)
 
 Each mod is an independent plugin, enabled and disabled on its own. Everything in the repo (code, comments, docs, specs, commit messages) is in English; only the mods' display text is translated (docs/architecture.md, Internationalization).
 
@@ -37,7 +38,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 
 | Mod | Coded | Checked on screen | Committed |
 | --- | --- | --- | --- |
-| sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Jetson, AMD [to validate] | yes |
+| sysmon | yes | laptop yes; NVIDIA GPU yes (workstation); Windows 11 native yes (CPU, RAM, GPU; disks [to validate]); Jetson, AMD [to validate] | yes (Windows source uncommitted) |
 | langmod | yes | yes (laptop) | yes |
 | teacher-guard | yes (v0.3: no copyable code in replies) | yes | yes |
 | project-hours | yes | yes | yes |

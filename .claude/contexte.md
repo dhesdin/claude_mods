@@ -1,9 +1,11 @@
 # Current context: claude-mods
 
-Updated: 2026-11-03 16:00 (status line checked on screen on valentin-vivobook)
+Updated: 2026-11-03 22:30 (sysmon Windows CPU/RAM source coded, uncommitted)
 
 ## Current goal
-Status line `user/statusline.py` replaces the usage-pace mod; checked on screen on valentin-vivobook; the workstation is next.
+Windows 11 native support. Install docs done (approved by the user). sysmon CPU/RAM on Windows done and checked on screen by the user.
+
+Previous: Status line `user/statusline.py` replaces the usage-pace mod; checked on screen on valentin-vivobook; the workstation is next.
 
 ## Done
 - user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, tokens in context after the ctx % (`· 24k`, total_input_tokens), time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
@@ -15,7 +17,12 @@ Status line `user/statusline.py` replaces the usage-pace mod; checked on screen 
 - Laptop: make user-settings run with --lang fr --statusline (backup ~/.claude/settings.json.20261101-121743.bak).
 - 2026-11-03, valentin-vivobook (Mint 22.2, Intel GPU): pull to 5b70aa7; status line was missing and usage-pace@synced 0.3.0 still loaded; usage-pace disabled, `make user-settings MOD_LANG=fr` (backup settings.json.20261103-152929.bak); make doctor all set. After a restart: usage-pace gone, teacher-guard 0.3.0 loaded.
 
+- 2026-11-03 Windows (uncommitted): .gitattributes `* text=auto eol=lf` (autocrlf=true checked out CRLF, broke surface snapshots); doctor/user-settings/check.sh find a Python 3 that runs (python3 is the Store alias here, python works); user-settings on Git Bash writes C:/ paths, `bash <hook>`, `python -X utf8 -I` (cp1252 crash on emojis), and without Developer Mode ~/.claude/CLAUDE.md = `@C:/.../user/CLAUDE.md` import instead of a symlink; install.sh recognises the C:\ marketplace path.
+
+- 2026-11-03 sysmon Windows (uncommitted): hooks/system.ts windowsScript/parseWindows/parseWindowsLines (one powershell.exe via $.process.spawn while the pane measures, one JSON line per interval: raw idle counter + 100 ns clock -> existing cpuPercent, AvailableKBytes, page file, cores, top 3 by WorkingSet every 15 s; CIM classes, not localized counter paths); register.tsx: hasProc once at the first shown refresh, sampler started after the await (no double start), stopped by stop(); isWindowsOff after it ends; machine_status without a live sample = one PowerShell run (2 samples 500 ms); Snapshot.isWindows?: Load line = cores only, no swap alert. Tests: 2 new pass (spawn stub must return { value: { code, signal } }); the 2 old /proc tests still fail on Windows only (known artefact).
+
 ## Recent decisions
+- sysmon Windows: a long-running PowerShell, not one per cycle (cold start ~1.8 s, warm sample ~560 ms, ~130 ms per loop sample).
 - Status line, not a mod: a plugin can only set `agent` and `subagentStatusLine` (plugin manifest reference), so it is per machine through make user-settings, not on the claude.ai account.
 - Python, not jq: jq is missing on the laptop.
 - Rules and notes are loaded by Claude Code itself (user/CLAUDE.md, SessionStart hook), not by a mod.
@@ -28,7 +35,9 @@ Status line `user/statusline.py` replaces the usage-pace mod; checked on screen 
 - No Node.js, shellcheck or gh on the workstation; Biome lint runs in CI only there. CI status: GitHub API `commits/<sha>/check-runs`.
 
 ## Next action
-On the workstation: `git pull`, then `make user-settings MOD_LANG=fr STATUSLINE=1`, restart Claude Code, check the status line.
+sysmon Windows checked on screen and documented (spec 02, hardware.md, mods.md, install.md, README, CLAUDE.md). Everything Windows is uncommitted: commit when the user asks. GPU process names fixed (split on \ too). Possible follow-up: disk card on Windows (df / diskPaths).
+
+Workstation, still pending: On the workstation: `git pull`, then `make user-settings MOD_LANG=fr STATUSLINE=1`, restart Claude Code, check the status line.
 
 ## Waiting for the user
 - Check teacher-guard 0.3 in teacher mode: asked for a function's code, Claude answers in words. usage-pace removed from the account (2026-11-01).

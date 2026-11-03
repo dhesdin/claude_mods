@@ -48,7 +48,8 @@ export function parseNvidia(gpuCsv: string, appsCsv: string): Gpu | null {
     .filter(([appUuid]) => appUuid === uuid)
     .map(([, pid, path, mem]) => ({
       pid: Number(pid),
-      name: clean((path ?? '?').split('/').pop() || '?'),
+      // Program name only: Linux gives a path, Windows a C:\... one.
+      name: clean((path ?? '?').split(/[\\/]/).pop() || '?'),
       memMiB: num(mem),
     }))
     .sort((a, b) => (b.memMiB ?? 0) - (a.memMiB ?? 0))

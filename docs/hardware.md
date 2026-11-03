@@ -15,7 +15,8 @@ Run `make doctor` first: it detects most of this for you.
 | Linux + AMD GPU | install ROCm, check `rocm-smi` | GPU utilization, VRAM, temperature, power **[to validate]** |
 | Raspberry Pi | nothing | CPU, RAM, disk; no GPU card |
 | Linux + Intel GPU only | nothing | CPU, RAM, disk; Intel GPU not supported |
-| macOS, Windows native | nothing (use WSL2 on Windows) | sysmon shows `n/a`; the other mods work |
+| Windows 11 native + NVIDIA GPU | the Windows NVIDIA driver (it ships `nvidia-smi`) ([below](#windows-native)) | GPU card, CPU busy % and cores, RAM and page file (through PowerShell); no load average; no disk card **[to validate]** |
+| macOS | nothing | sysmon shows `n/a`; the other mods work |
 
 The other mods (teacher-guard, langmod, project-hours, notify, project-memory) need nothing from the hardware.
 
@@ -26,13 +27,14 @@ The other mods (teacher-guard, langmod, project-hours, notify, project-memory) n
 | `/proc/stat`, `/proc/loadavg` | CPU busy %, core count, load | every Linux: PC, laptop, WSL2, Jetson, Raspberry Pi | validated (laptop) |
 | `/proc/meminfo` | RAM available / used, swap | every Linux | validated (laptop) |
 | `df` | free disk space | every Linux (coreutils) | validated (laptop) |
-| `nvidia-smi` | NVIDIA GPU: utilization, VRAM, temperature, power, throttling, processes | Linux with an NVIDIA GPU and the proprietary driver; WSL2 with the Windows driver | validated (workstation: RTX 3070 Ti, driver 595.99.02) |
+| `nvidia-smi` | NVIDIA GPU: utilization, VRAM, temperature, power, throttling, processes | Linux with an NVIDIA GPU and the proprietary driver; WSL2 with the Windows driver; Windows native | validated (workstation: RTX 3070 Ti, driver 595.99.02; Windows 11 native, same card) |
+| `powershell.exe` (CIM classes) | Windows native: CPU busy %, cores, RAM available / total, page file, the 3 programs using the most RAM | Windows (ships with it) | validated (Windows 11 Home, 2026-11-03) |
 | `tegrastats` | Jetson GPU: utilization, shared memory, temperature, input power | NVIDIA Jetson (JetPack / L4T) | **[to validate]** |
 | `rocm-smi` | AMD GPU: utilization, VRAM, temperature, power | Linux with ROCm | **[to validate]** |
 
 `gpuBackend = auto` (default) tries Jetson (`/proc/device-tree/model`), then `nvidia-smi -L`, then `rocm-smi --showid`, once each time the pane opens. Force a source with `gpuBackend = nvidia | jetson | amd | none`.
 
-No `/proc` on macOS or native Windows: sysmon shows `n/a` there.
+No `/proc` on macOS or native Windows. Windows: one PowerShell process, started while the pane measures and stopped with it, prints one sample per `intervalSeconds`. macOS: CPU and RAM show `n/a`.
 
 ## One-minute machine check
 
@@ -117,7 +119,11 @@ vcgencmd get_throttled     # throttling and under-voltage (0x0 = no problem)
 **Not implemented.** No `/proc`, no `nvidia-smi`. Possible sources: `sysctl -n hw.ncpu hw.memsize vm.loadavg`, `vm_stat`, `df`, and for Apple Silicon `sudo powermetrics --samplers gpu_power` (needs root).
 
 ### Windows native
-Not supported: use WSL2.
+Checked on screen on Windows 11 Home, RTX 3070 Ti (2026-11-03). `make doctor` (`bash scripts/doctor.sh` in Git Bash) finds `nvidia-smi` and `auto` picks `nvidia`.
+- GPU card: the `nvidia-smi` the Windows driver installs, same queries as on Linux. GPU processes show the program name (`explorer.exe`) and `n/a GB`: the Windows driver does not report per-process memory.
+- CPU and RAM: one `powershell.exe`, started when the pane measures and killed when it closes, prints one JSON sample per `intervalSeconds` (CIM classes, the same in every Windows language): CPU busy % from the raw idle counter, cores, RAM available / total, page file (shown as swap), the 3 programs using the most RAM every 15 s. Starting PowerShell costs 0.2 to 1.8 s, so it is started once, not per sample. `machine_status` with the pane closed runs it once (two samples 0.5 s apart).
+- No load average on Windows: the CPU card shows the core count instead. No swap alert: the page file is in use on any running Windows.
+- Disks: no card on the machine tested (`df` comes from Git Bash; `/,/home` are Linux paths) **[to validate]**.
 
 ### Robot with several computers
 A humanoid often has several computers (real-time motor control on one, perception on a Jetson or GPU PC on another). sysmon watches only the machine where Claude Code runs and makes no network request: watching another computer remotely (SSH, ROS) is out of scope.

@@ -40,6 +40,7 @@ Without a supported GPU: the GPU card shows "No supported GPU" or is hidden (con
 | CPU | busy % (difference between two reads), core count, load 1/5/15 min | `/proc/stat`, `/proc/loadavg` |
 | RAM | available (MemAvailable), used = total - available, swap used/total | `/proc/meminfo` |
 | Disk | free space / size per mount point | `df -B1 --output=target,size,avail` |
+| CPU, RAM, top programs, Windows native | busy % (raw idle counter, two samples), cores, RAM available/total, page file as swap, 3 biggest programs | one `powershell.exe` (CIM classes) started while the pane measures, one JSON line per interval; no load average, no swap alert |
 
 - Two `nvidia-smi` calls per cycle, run in parallel: nvidia-smi cannot return GPU state and process list in one query. Each query takes all its fields at once.
 - The throttle field was renamed on some drivers: if refused, the query is retried without it and the Throttling line disappears.
@@ -64,6 +65,6 @@ Exposed to Claude (`mcp__sysmon__machine_status`, deferred behind ToolSearch): t
 
 ## Out of scope
 - Consumption history and charts.
-- Intel GPUs, macOS, Windows native: see docs/hardware.md.
+- Intel GPUs, macOS: see docs/hardware.md.
 - Watching another computer over the network (zero-network rule).
 - **Inference benchmarks (FPS, latency, CPU/GPU/TensorRT comparison)**: measured reproducibly in the project's own code, not in a display mod.

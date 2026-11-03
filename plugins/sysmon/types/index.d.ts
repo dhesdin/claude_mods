@@ -39,6 +39,8 @@ export type Snapshot = {
   // The programs using the most RAM, biggest first; null = not measured (no `ps`).
   topRam: MemUser[] | null
   disks: Disk[] | null
+  // Measured through PowerShell (no /proc): no load average, no swap alert.
+  isWindows?: boolean
 }
 
 declare module 'claude-code' {

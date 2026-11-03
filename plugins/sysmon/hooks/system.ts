@@ -89,6 +89,76 @@ export async function sampleDisks(io: Io, paths: readonly string[]): Promise<Dis
   }
 }
 
+// ---------------------------------------------------------------- Windows (no /proc)
+
+// One PowerShell process prints one JSON line every `ms` (`count` lines, or until stopped when < 0).
+// CIM classes rather than counter paths, which Windows translates into its display language.
+// idle / ts: the raw idle counter and its 100 ns clock, so cpuPercent works as on /proc/stat.
+// The 3 programs using the most RAM are listed every `topEvery` lines; the numbers are ours, not options.
+export function windowsScript(ms: number, count: number, topEvery: number): string {
+  return `$ErrorActionPreference = 'SilentlyContinue'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
+$cores = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
+$top = @(); $n = 0
+while (${count} -lt 0 -or $n -lt ${count}) {
+  $p = Get-CimInstance Win32_PerfRawData_PerfOS_Processor -Filter "Name='_Total'"
+  $m = Get-CimInstance Win32_PerfRawData_PerfOS_Memory
+  $o = Get-CimInstance Win32_OperatingSystem
+  $f = @(Get-CimInstance Win32_PageFileUsage)
+  if ($n % ${topEvery} -eq 0) {
+    $top = @(Get-Process | Group-Object ProcessName | ForEach-Object { [pscustomobject]@{ kib = [long](($_.Group | Measure-Object WorkingSet64 -Sum).Sum / 1024); name = $_.Name } } | Sort-Object kib -Descending | Select-Object -First 3)
+  }
+  $s = [ordered]@{ idle = [double]$p.PercentProcessorTime; ts = [double]$p.Timestamp_Sys100NS; cores = $cores
+    totalKiB = [long]$o.TotalVisibleMemorySize; availKiB = [long]$m.AvailableKBytes
+    swapUsedKiB = [long](($f | Measure-Object CurrentUsage -Sum).Sum * 1024); swapTotalKiB = [long](($f | Measure-Object AllocatedBaseSize -Sum).Sum * 1024)
+    top = $top }
+  [Console]::Out.WriteLine(($s | ConvertTo-Json -Compress -Depth 3))
+  $n++
+  if (${count} -lt 0 -or $n -lt ${count}) { Start-Sleep -Milliseconds ${ms} }
+}`
+}
+
+export const windowsArgv = (script: string) => ['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', script]
+
+export type WindowsSample = { cpu: CpuTimes; cores: number | null; ram: Ram; top: MemUser[] | null }
+
+export function parseWindows(line: string): WindowsSample | null {
+  let v: Record<string, unknown>
+  try {
+    v = JSON.parse(line)
+  } catch {
+    return null
+  }
+  const n = (key: string) => (typeof v[key] === 'number' && Number.isFinite(v[key]) ? (v[key] as number) : null)
+  const [idle, ts, total, avail] = [n('idle'), n('ts'), n('totalKiB'), n('availKiB')]
+  if (idle === null || ts === null || total === null || avail === null || total <= 0) return null
+  // PowerShell 5.1 writes a one-item list as the item itself.
+  const raw = Array.isArray(v.top) ? v.top : v.top ? [v.top] : []
+  const top = raw
+    .map(p => p as { kib?: unknown; name?: unknown })
+    .filter(p => typeof p.kib === 'number' && typeof p.name === 'string')
+    .map(p => ({ name: clean(p.name as string).slice(0, 24), kib: p.kib as number }))
+  return {
+    cpu: { idle, total: ts },
+    cores: n('cores'),
+    ram: {
+      usedKiB: total - avail,
+      availableKiB: avail,
+      totalKiB: total,
+      swapUsedKiB: n('swapUsedKiB') ?? 0,
+      swapTotalKiB: n('swapTotalKiB') ?? 0,
+    },
+    top: top.length > 0 ? top : null,
+  }
+}
+
+// Every JSON line of a PowerShell output, in order; partial or broken lines are skipped.
+export const parseWindowsLines = (text: string) =>
+  text
+    .split('\n')
+    .map(parseWindows)
+    .filter((s): s is WindowsSample => s !== null)
+
 // `ps -eo rss=,comm=` lines: resident KiB and program name. Processes of one program are added up
 // (a browser runs dozens), then the `count` biggest are kept.
 export function parsePs(text: string, count = 3): MemUser[] {

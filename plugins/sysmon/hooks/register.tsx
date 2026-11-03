@@ -5,8 +5,11 @@ import type { Disk, Gpu, GpuKind, GpuState, MemUser, Ram, Snapshot, Throttle } f
 import type { GpuBackend, Io } from './gpu'
 import { detectGpu, sampleGpu } from './gpu'
 import { strings } from './i18n'
-import type { CpuTimes } from './system'
-import { sampleDisks, sampleSystem, sampleTopRam } from './system'
+import type { CpuTimes, WindowsSample } from './system'
+import { cpuPercent, parseWindowsLines, sampleDisks, sampleSystem, sampleTopRam, windowsArgv, windowsScript } from './system'
+
+// Windows: the latest PowerShell sample and the CPU % between it and the one before.
+type WindowsNow = { sample: WindowsSample | null; cpuPercent: number | null }
 
 const PANE = 'sysmon'
 const TOOL = 'mcp__sysmon__machine_status'
@@ -60,8 +63,10 @@ export function summary(s: Snapshot): string {
     parts.push(s.gpu.kind === 'absent' ? 'No supported GPU.' : `GPU error (${s.gpu.message}).`)
   }
   parts.push(
-    `CPU busy ${round(s.cpuPercent)}%, load ${fixed1(s.load, 0)} for ${s.cores ?? 'n/a'} cores ` +
-      `(5 min: ${fixed1(s.load, 1)}, 15 min: ${fixed1(s.load, 2)}).`,
+    s.isWindows
+      ? `CPU busy ${round(s.cpuPercent)}%, ${s.cores ?? 'n/a'} cores (Windows: no load average).`
+      : `CPU busy ${round(s.cpuPercent)}%, load ${fixed1(s.load, 0)} for ${s.cores ?? 'n/a'} cores ` +
+          `(5 min: ${fixed1(s.load, 1)}, 15 min: ${fixed1(s.load, 2)}).`,
   )
   if (s.ram) {
     const swap = s.ram.swapTotalKiB === 0 ? 'no swap' : `swap ${gibFromKiB(s.ram.swapUsedKiB)} / ${gibFromKiB(s.ram.swapTotalKiB)} GB`
@@ -118,6 +123,43 @@ export const register: Register = (on, options) => {
   // Which programs use the RAM: every TOP_RAM_MS, it moves slowly and `ps` reads every process.
   let topRam: MemUser[] | null = null
   let topRamAt = 0
+  // Windows has no /proc: a PowerShell sampler runs while the pane measures (null on Linux, or stopped).
+  let win: (WindowsNow & { isStopped: boolean }) | null = null
+  // The sampler ended by itself (no PowerShell, macOS): not started again until the pane is reopened.
+  let isWindowsOff = false
+
+  const startWindows = (machine: Host) => {
+    const w: WindowsNow & { isStopped: boolean } = { sample: null, cpuPercent: null, isStopped: false }
+    win = w
+    const script = windowsScript(intervalMs, -1, Math.max(1, Math.round(TOP_RAM_MS / intervalMs)))
+    void (async () => {
+      let buffer = ''
+      try {
+        // Leaving the loop kills PowerShell; so does unloading the module.
+        for await (const { stream, text } of machine.spawn(windowsArgv(script))) {
+          if (w.isStopped) break
+          if (stream !== 'stdout') continue
+          buffer = (buffer + text).slice(-65536)
+          const end = buffer.lastIndexOf('\n')
+          if (end < 0) continue
+          for (const s of parseWindowsLines(buffer.slice(0, end))) {
+            w.cpuPercent = cpuPercent(w.sample?.cpu ?? null, s.cpu)
+            w.sample = s
+          }
+          buffer = buffer.slice(end + 1)
+        }
+      } catch {
+        // No PowerShell (macOS) or refused: CPU and RAM stay n/a.
+      } finally {
+        if (!w.isStopped) isWindowsOff = true
+        // PowerShell ended after answering: still Windows, figures n/a. Never answered (macOS): as before.
+        if (!w.isStopped && w.sample) {
+          w.sample = null
+          w.cpuPercent = null
+        } else if (win === w) win = null
+      }
+    })()
+  }
 
   const measureGpu = async (machine: Host): Promise<GpuState> => {
     if (gpuKind === undefined) gpuKind = gpuBackend === 'auto' ? await detectGpu(machine) : gpuBackend === 'none' ? null : gpuBackend
@@ -128,27 +170,48 @@ export const register: Register = (on, options) => {
     return state
   }
 
-  const measure = async (machine: Host): Promise<Snapshot> => {
+  // `ws`: Windows figures (from the sampler, or one PowerShell run); null = Linux, read /proc.
+  const measure = async (machine: Host, ws: WindowsNow | null = win): Promise<Snapshot> => {
     const now = await machine.now()
     const isDiskDue = diskPaths.length > 0 && now - disksAt >= diskIntervalMs
-    const isTopDue = now - topRamAt >= TOP_RAM_MS
+    const isTopDue = !ws && now - topRamAt >= TOP_RAM_MS
+    const fromWindows = (w: WindowsNow) => ({
+      cpu: null,
+      cpuPercent: w.cpuPercent,
+      cores: w.sample?.cores ?? null,
+      load: null,
+      ram: w.sample?.ram ?? null,
+    })
     const [gpu, sys, newDisks, newTop] = await Promise.all([
       measureGpu(machine),
-      sampleSystem(machine, prevCpu),
+      ws ? Promise.resolve(fromWindows(ws)) : sampleSystem(machine, prevCpu),
       isDiskDue ? sampleDisks(machine, diskPaths) : Promise.resolve(disks),
-      isTopDue ? sampleTopRam(machine) : Promise.resolve(topRam),
+      ws ? Promise.resolve(ws.sample?.top ?? null) : isTopDue ? sampleTopRam(machine) : Promise.resolve(topRam),
     ])
     if (isDiskDue) disksAt = now
     if (isTopDue) topRamAt = now
     topRam = newTop
     prevCpu = sys.cpu
     disks = newDisks
-    return { gpu, cpuPercent: sys.cpuPercent, cores: sys.cores, load: sys.load, ram: sys.ram, topRam, disks }
+    const isWindows = ws !== null
+    return { gpu, cpuPercent: sys.cpuPercent, cores: sys.cores, load: sys.load, ram: sys.ram, topRam, disks, isWindows }
   }
 
   const stop = () => {
     timer?.cancel()
     timer = null
+    if (win) win.isStopped = true
+    win = null
+  }
+
+  // /proc or not, found out once, at the first measurement (undefined = not known yet).
+  let hasProcFs: boolean | undefined
+  const hasProc = async (machine: Host) => {
+    hasProcFs ??= await machine.read('/proc/stat').then(
+      () => true,
+      () => false,
+    )
+    return hasProcFs
   }
 
   // Measures only while the pane is open, placed and in front.
@@ -156,12 +219,15 @@ export const register: Register = (on, options) => {
     const pane = (await machine.panes()).find(p => p.id === PANE)
     if (!pane) return stop()
     if (!pane.isPlaced || !pane.isShown) return
+    // Checked after the await: two refreshes in flight must not start two samplers.
+    if (!(await hasProc(machine)) && !win && !isWindowsOff) startWindows(machine)
     await machine.save(await measure(machine))
   }
 
   const start = (machine: Host) => {
     if (timer) return
     gpuKind = undefined
+    isWindowsOff = false
     timer = machine.every(intervalMs, () => void refresh(machine).catch(() => {}))
     void refresh(machine).catch(() => {})
     // A second read soon after, so the CPU % shows without waiting a full cycle.
@@ -222,6 +288,14 @@ export const register: Register = (on, options) => {
 
   on('tool.call', { tool: TOOL }, async () => {
     if (!host) return { deny: 'sysmon is not ready yet' }
+    if (!win?.sample && !(await hasProc(host))) {
+      // Windows with no live sample (pane closed, sampler not answering yet or ended):
+      // one PowerShell run, two samples 500 ms apart for the CPU %.
+      const r = await host.run(windowsArgv(windowsScript(500, 2, 1)), { timeoutMs: 15000 }).catch(() => null)
+      const [a, b] = r ? parseWindowsLines(r.stdout) : []
+      const ws = a ? { sample: b ?? a, cpuPercent: b ? cpuPercent(a.cpu, b.cpu) : null } : null
+      if (ws) return { result: summary(await measure(host, ws)) }
+    }
     if (!prevCpu) {
       await measure(host)
       await host.sleep(300)
@@ -292,7 +366,8 @@ export const register: Register = (on, options) => {
     }
 
     const isGpuBusy = s.gpu.kind === 'ok' && (s.gpu.gpu.processes?.length ?? 0) > 0
-    const isSwapAlert = s.ram !== null && s.ram.swapUsedKiB > 0 && isGpuBusy
+    // Not on Windows: its page file is in use on any running machine.
+    const isSwapAlert = s.ram !== null && s.ram.swapUsedKiB > 0 && isGpuBusy && !s.isWindows
     const ramPercent = s.ram ? ratio(s.ram.usedKiB, s.ram.totalKiB) : null
     // 1-minute load against the core count: 100 % = every core busy.
     const loadPercent = s.load?.[0] !== undefined && s.cores ? (s.load[0] / s.cores) * 100 : null
@@ -311,13 +386,18 @@ export const register: Register = (on, options) => {
                 {t.pct(round(s.cpuPercent))}
               </Text>
             </Text>
-            <Text>
-              {t.load}{' '}
-              <Text color={levelColor(loadPercent)} bold>
-                {fixed1(s.load, 0)} / {t.cores(s.cores ?? 'n/a')}
+            {s.isWindows ? (
+              // Windows has no load average: the core count alone.
+              <Text dimColor>{t.cores(s.cores ?? 'n/a')}</Text>
+            ) : (
+              <Text>
+                {t.load}{' '}
+                <Text color={levelColor(loadPercent)} bold>
+                  {fixed1(s.load, 0)} / {t.cores(s.cores ?? 'n/a')}
+                </Text>
+                <Text dimColor> {t.loadTrend(fixed1(s.load, 1), fixed1(s.load, 2))}</Text>
               </Text>
-              <Text dimColor> {t.loadTrend(fixed1(s.load, 1), fixed1(s.load, 2))}</Text>
-            </Text>
+            )}
           </>,
         )}
         {card(

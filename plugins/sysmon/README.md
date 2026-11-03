@@ -41,6 +41,8 @@
 | Jetson (`tegrastats`) | **[to validate]** |
 | AMD (`rocm-smi`) | **[to validate]** |
 
+Windows native: GPU through `nvidia-smi`, CPU and RAM through PowerShell (checked on Windows 11); no load average; disks **[to validate]** ([docs/hardware.md](../../docs/hardware.md#windows-native)).
+
 Machine setup per hardware: [docs/hardware.md](../../docs/hardware.md).
 
 ## `machine_status` tool
@@ -59,6 +61,7 @@ Everything stays on the machine: the mod makes no network request and reads no c
 | Runs `df -B1 --output=target,size,avail -- <diskPaths>` | free disk space of the paths you configure |
 | Runs `ps -eo rss=,comm=`, every 15 s | the 3 programs using the most RAM (all their processes added up) |
 | Reads `/proc/stat`, `/proc/loadavg`, `/proc/meminfo`, `/proc/device-tree/model` | CPU, load, RAM, board name |
+| Windows only, while the pane measures: runs one `powershell.exe -NoProfile -NonInteractive -Command <script>` (CIM classes, `Get-Process`), killed when the pane closes | CPU, RAM, page file, the 3 programs using the most RAM |
 
 Programs run with fixed arguments (never a shell), only while the panel is open, and only the GPU tool that exists on the machine.
 

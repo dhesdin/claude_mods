@@ -68,3 +68,11 @@
 - Pitfalls: usage-pace 0.3.0 still synced from the claude.ai account; teacher-guard synced copy still 0.2.0 before restart.
 - After a restart: usage-pace@synced gone, teacher-guard@synced 0.3.0. The stale copies came from a sync cache last refreshed on 2026-10-30, not from the account.
 - Status line checked on screen by the user.
+
+## 2026-11-03 (evening) : Windows 11 native install test
+- Done: fresh clone on Windows 11 Home (Git Bash, Claude Code 2.1.317, RTX 3070 Ti); `bash scripts/install.sh --lang en` installed the 6 mods; `bash scripts/user-settings.sh --rules --lang en` applied (backup settings.json.20261103-204526.bak); sample JSON rendered the status line.
+- Fixed: `.gitattributes` `* text=auto eol=lf` (autocrlf checked out CRLF: surface snapshots failed, CRLF .sh copied to ~/.claude); doctor, user-settings and check.sh use the first Python 3 that runs (`python3` is the Store alias here); user-settings on Git Bash writes C:/ paths, `bash <hook>`, `python -X utf8 -I` (cp1252 crash on emojis), and an `@C:/.../user/CLAUDE.md` import when Developer Mode forbids symlinks; install.sh recognises the C:\ marketplace path; `make dist` uses `--worktree-attributes` (a subtree archive missed the root .gitattributes and zipped CRLF).
+- Docs: Windows 11 section in docs/install.md, Windows native in docs/hardware.md, notes in mods.md, development.md, README, install-mods skill.
+- Pitfalls: 7 tests fail on Windows only (the test engine maps /proc and /h paths to C:\); no account mod synced on this PC before a restart; shellcheck not installed here.
+- Waiting: on-screen check of the 6 mods (sysmon GPU card, notify toast [to validate]); sysmon Windows CPU/RAM source not written (needs a spec decision).
+- sysmon Windows CPU/RAM source: one powershell.exe through $.process.spawn while the pane measures (CIM classes, JSON line per interval), machine_status runs it once; checked on screen by the user (CPU 0-8 %, 32 cores, RAM 20.2 / 31.8 GB, page file, top 3). GPU processes on Windows show the program name (backslash paths split too) and n/a GB (the driver gives no per-process memory); no disk card. Docs: spec 02, hardware.md, mods.md, install.md, sysmon README, CLAUDE.md status.

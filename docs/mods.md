@@ -28,7 +28,7 @@ A value set from the terminal applies when Claude Code restarts. Each mod's READ
 
 ## sysmon
 
-A "Machine" panel: GPU (NVIDIA; Jetson and AMD not yet validated on real hardware), CPU, RAM with the 3 programs using the most, disks, with what is loading the GPU. Measures only while the panel is open. Claude can also call its `machine_status` tool for a one-sentence summary. A GPU machine needs its driver tool (`nvidia-smi`...): [hardware.md](hardware.md).
+A "Machine" panel: GPU (NVIDIA; Jetson and AMD not yet validated on real hardware), CPU, RAM with the 3 programs using the most, disks, with what is loading the GPU. Measures only while the panel is open. Claude can also call its `machine_status` tool for a one-sentence summary. A GPU machine needs its driver tool (`nvidia-smi`...): [hardware.md](hardware.md). On native Windows, CPU and RAM come from PowerShell (no load average) and disks are **[to validate]**.
 
 - `/sysmon`: opens or closes the panel. Opened by itself, it waits for a terminal at least 144 columns wide.
 
