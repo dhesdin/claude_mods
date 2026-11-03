@@ -66,3 +66,4 @@
 ## 2026-11-03 : laptop valentin-vivobook updated
 - Done: git pull (6061b6a → 5b70aa7); `claude plugin disable usage-pace@synced`; `make user-settings MOD_LANG=fr` (status line installed, hook recopied); make doctor all set; sample JSON rendered the status line correctly.
 - Pitfalls: usage-pace 0.3.0 still synced from the claude.ai account; teacher-guard synced copy still 0.2.0 before restart.
+- After a restart: usage-pace@synced gone, teacher-guard@synced 0.3.0. The stale copies came from a sync cache last refreshed on 2026-10-30, not from the account.
