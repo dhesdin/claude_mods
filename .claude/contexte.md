@@ -1,9 +1,9 @@
 # Current context: claude-mods
 
-Updated: 2026-11-03 15:45 (valentin-vivobook restarted: synced copies refreshed)
+Updated: 2026-11-03 16:00 (status line checked on screen on valentin-vivobook)
 
 ## Current goal
-Status line `user/statusline.py` replaces the usage-pace mod; waiting for the user's on-screen check of the square bars, then the workstation.
+Status line `user/statusline.py` replaces the usage-pace mod; checked on screen on valentin-vivobook; the workstation is next.
 
 ## Done
 - user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, tokens in context after the ctx % (`· 24k`, total_input_tokens), time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
@@ -31,6 +31,5 @@ Status line `user/statusline.py` replaces the usage-pace mod; waiting for the us
 On the workstation: `git pull`, then `make user-settings MOD_LANG=fr STATUSLINE=1`, restart Claude Code, check the status line.
 
 ## Waiting for the user
-- On-screen check of the status line on valentin-vivobook.
 - Check teacher-guard 0.3 in teacher mode: asked for a function's code, Claude answers in words. usage-pace removed from the account (2026-11-01).
 - Windows question still open (native route, Windows sysmon sampler).
