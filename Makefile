@@ -81,7 +81,7 @@ $(addprefix uninstall-,$(MODS)): uninstall-%:
 # Built from the last commit (git archive): only tracked files, reproducible. Commit first.
 dist:
 	@mkdir -p dist/plugins
-	@for m in $(MODS); do git archive --format=zip --prefix=$$m/ -o dist/plugins/$$m.zip HEAD:plugins/$$m && echo "dist/plugins/$$m.zip"; done
+	@for m in $(MODS); do git archive --worktree-attributes --format=zip --prefix=$$m/ -o dist/plugins/$$m.zip HEAD:plugins/$$m && echo "dist/plugins/$$m.zip"; done
 	@echo "Upload each zip on claude.ai: Customize > Plugins > Add > Upload plugin (same name = new version)."
 
 check:

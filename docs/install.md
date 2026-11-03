@@ -17,9 +17,9 @@ Everything `/install-mods` does for you, step by step, with no AI involved. Ten 
 | --- | --- |
 | [Claude Code](https://code.claude.com/docs) 2.1.287 or later (tested on 2.1.314) | every mod |
 | signed in with a claude.ai account (not an API key), Claude Code 2.1.273 or later | the account route only |
-| `git`, `make` (or bash for `scripts/install.sh`), `python3` | cloning and installing |
-| Linux or WSL2 | sysmon (it reads `/proc`); the other mods run anywhere Claude Code runs |
-| bash (Linux, macOS, WSL2, Git Bash) | the scripts (`make doctor`, `make install`, `make dist`, `make user-settings`); on Windows without WSL2, use the account route with zips built on another machine |
+| `git`, `make` (or bash for `scripts/install.sh`), Python 3 (`python3`, or `python`) | cloning and installing |
+| Linux or WSL2 | sysmon CPU and RAM (it reads `/proc`); the other mods run anywhere Claude Code runs |
+| bash (Linux, macOS, WSL2, Git Bash) | the scripts (`make doctor`, `make install`, `make dist`, `make user-settings`); on Windows, the Git Bash Claude Code already uses is enough: [Windows 11](#windows-11-native-git-bash) |
 
 ## 2. Check your machine
 
@@ -94,6 +94,37 @@ Without `make`: `scripts/install.sh [--lang fr] [--scope user] [<mod>...]` takes
 claude plugin marketplace add "$PWD"
 claude plugin install sysmon@claude-mods        # one line per mod
 ```
+
+### Windows 11 (native, Git Bash)
+
+Tested on Windows 11 Home with Git Bash, Claude Code 2.1.317 and an NVIDIA GPU (2026-11-03). Run every command in **Git Bash**, from the clone. There is no `make`: call the scripts it would run.
+
+```bash
+git clone https://github.com/dhesdin/claude_mods.git && cd claude_mods
+bash scripts/doctor.sh                       # make doctor
+bash scripts/install.sh --lang fr            # make install MOD_LANG=fr (or name the mods)
+bash scripts/user-settings.sh --lang fr      # make user-settings MOD_LANG=fr (--rules, --statusline as on Linux)
+bash scripts/configure.sh sysmon             # unchanged
+```
+
+For the account route, build the zips without `make` (the same loop as `make dist`):
+
+```bash
+mkdir -p dist/plugins
+for m in plugins/*/; do m=$(basename "$m"); git archive --worktree-attributes --format=zip --prefix="$m/" -o "dist/plugins/$m.zip" "HEAD:plugins/$m"; done
+```
+
+What differs from Linux, handled by the scripts:
+
+| Point | On Windows |
+| --- | --- |
+| Python | `python3` is often the Microsoft Store alias, which only prints a message; the scripts use `python` when `python3` does not run. Without either: install Python from python.org |
+| Line endings | Git for Windows checks out CRLF (`core.autocrlf=true`); `.gitattributes` keeps every file LF. A clone made before it: `git add --renormalize .` once |
+| `settings.json` | paths written as `C:/...`; the hook runs as `bash C:/.../load-context.sh`; the status line as `python -X utf8 -I ...` (without `-X utf8` Python writes cp1252 and the emojis crash it) |
+| Global rules (`--rules`) | a symbolic link needs Windows **Developer Mode** (Settings > System > For developers). Without it, `~/.claude/CLAUDE.md` holds one import line, `@C:/.../user/CLAUDE.md`: same rules, one source |
+| sysmon | GPU card (`nvidia-smi` from the Windows driver), CPU and RAM through PowerShell; no load average; no disk card **[to validate]** ([hardware.md](hardware.md#windows-native)) |
+| notify | a PowerShell toast **[to validate]** |
+| Tests (`scripts/check.sh`) | 7 tests fail on Windows only: the test engine turns their recorded Linux paths into `C:\...`. CI (Linux) runs them ([development.md](development.md#tests)) |
 
 ## 5. Prepare the hardware (sysmon only)
 
@@ -200,4 +231,7 @@ Adding up project-hours across machines (optional, with a sync tool such as Sync
 | sysmon says "No supported GPU" | `make doctor`, then [docs/hardware.md](hardware.md) for your GPU |
 | The language went back to English | options are per machine: `/langmod fr` on that machine |
 | `/hours` shows only this machine's time | expected: each machine counts its own; to add them up, see [docs/mods.md](mods.md#project-hours) |
+| Windows: `Python est introuvable` / `Python was not found` | the Microsoft Store alias of `python3`: install Python from python.org; the scripts then use `python` |
+| Windows: the status line shows nothing or `status line: n/a` | `~/.claude/settings.json` `statusLine` must be `python -X utf8 -I C:/...`: run `bash scripts/user-settings.sh` again from this clone |
+| Windows: `check.sh` says surfaces differ but the lines look the same | CRLF checkout: `git add --renormalize .` |
 | The usage band stays empty | it needs a Claude subscription and appears after the first reply of the session |

@@ -41,7 +41,16 @@ if ! [[ "$window" =~ ^[0-9]+$ ]] || ((window < 100000 || window > 1000000)); the
   exit 2
 fi
 case "$lang" in en | fr | ja | zh) ;; *) echo "--lang: en, fr, ja or zh" >&2; exit 2 ;; esac
-command -v python3 >/dev/null || { echo "python3 is needed (it edits the JSON safely)" >&2; exit 1; }
+# A Python 3 that runs: on Windows `python3` is often the Microsoft Store alias, which only prints a message.
+py=""
+for c in python3 python; do
+  if "$c" -c 'import sys; sys.exit(sys.version_info < (3, 8))' >/dev/null 2>&1; then py="$c"; break; fi
+done
+[[ -n "$py" ]] || { echo "Python 3 is needed (python3 or python; it edits the JSON safely)" >&2; exit 1; }
+# Windows (Git Bash): settings.json gets C:/... paths, which every Windows program reads.
+win=0
+case "$(uname -s)" in MINGW* | MSYS* | CYGWIN*) win=1 ;; esac
+native() { if ((win)); then cygpath -m "$1"; else echo "$1"; fi; }
 
 stamp="$(date +%Y%m%d-%H%M%S)"
 say() { if ((dry)); then echo "  would: $*"; else echo "  $*"; fi; }
@@ -70,10 +79,13 @@ fi
 # 3. settings.json.
 settings="$dir/settings.json"
 [[ -f "$settings" ]] || ((dry)) || echo '{}' >"$settings"
-python3 -I - "$settings" "$window" "$hook" "$dry" "$stamp" "$line" "$lang" "$force_line" <<'PY'
+"$py" -I - "$settings" "$window" "$(native "$hook")" "$dry" "$stamp" "$(native "$line")" "$lang" "$force_line" "$py" "$win" <<'PY'
 import json, os, shlex, shutil, sys
 path, window, hook, dry, stamp = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4] == "1", sys.argv[5]
-line, lang, force_line = sys.argv[6], sys.argv[7], sys.argv[8] == "1"
+line, lang, force_line, py, win = sys.argv[6], sys.argv[7], sys.argv[8] == "1", sys.argv[9], sys.argv[10] == "1"
+# Windows: the hook runs through bash explicitly, and Python writes UTF-8 (the emojis) instead of the ANSI code page.
+hook_cmd = f"bash {shlex.quote(hook)}" if win else hook
+py_cmd = f"{py} -X utf8 -I" if win else f"{py} -I"
 data = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 before = json.dumps(data, sort_keys=True)
 changes = []
@@ -93,7 +105,7 @@ if "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE" in env:
 
 ours = lambda h: str(h.get("command", "")).endswith(("charger-contexte.sh", "load-context.sh"))
 wanted = {"matcher": "startup|resume|clear|compact",
-          "hooks": [{"type": "command", "command": hook, "timeout": 10, "statusMessage": "Loading the project's hand-off notes…"}]}
+          "hooks": [{"type": "command", "command": hook_cmd, "timeout": 10, "statusMessage": "Loading the project's hand-off notes…"}]}
 hooks = data.get("hooks") or {}
 others = [g for g in ({**g, "hooks": [h for h in g.get("hooks", []) if not ours(h)]} for g in hooks.get("SessionStart", [])) if g["hooks"]]
 if hooks.get("SessionStart", []) != others + [wanted]:
@@ -105,7 +117,7 @@ current = data.get("statusLine")
 if current and "statusline.py" not in str(current.get("command", "")) and not force_line:
     print("  statusLine: kept your own (--statusline replaces it)")
 else:
-    put("statusLine", {"type": "command", "command": f"python3 -I {shlex.quote(line)} {lang}", "refreshInterval": 60})
+    put("statusLine", {"type": "command", "command": f"{py_cmd} {shlex.quote(line)} {lang}", "refreshInterval": 60})
 
 if json.dumps(data, sort_keys=True) == before:
     print(f"  {path}: up to date")
@@ -127,8 +139,25 @@ PY
 if ((rules)); then
   target="$repo/user/CLAUDE.md"
   link="$dir/CLAUDE.md"
+  # Windows without Developer Mode cannot make a symbolic link (and Git Bash's `ln -s` silently copies):
+  # CLAUDE.md then holds one import line (@path), which Claude Code follows. Same effect, one source.
+  import="@$(native "$target")"
+  can_link=1
+  if ((win)); then
+    probe="$dir/.link-probe.$stamp"
+    MSYS=winsymlinks:nativestrict ln -s "$target" "$probe" 2>/dev/null && rm -f "$probe" || can_link=0
+  fi
   if [[ -L "$link" && "$(readlink "$link")" == "$target" ]]; then
     echo "  $link: already linked to $target"
+  elif ((!can_link)) && [[ -f "$link" && ! -L "$link" ]] && grep -qxF "$import" "$link"; then
+    echo "  $link: already imports $target"
+  elif ((!can_link)); then
+    [[ -e "$link" ]] && { echo "  $link (replaced, backed up):"; sed 's/^/    /' "$link" | head -20; }
+    say "write $link: $import (no symbolic links here: Windows Developer Mode is off)"
+    if ((!dry)); then
+      [[ -e "$link" || -L "$link" ]] && mv "$link" "$link.$stamp.bak" && echo "  backup: $link.$stamp.bak"
+      printf '%s\n' "$import" >"$link"
+    fi
   else
     if [[ -e "$link" || -L "$link" ]] && ! cmp -s "$link" "$target"; then
       echo "  $link differs from $target:"
@@ -137,7 +166,7 @@ if ((rules)); then
     say "link $link -> $target"
     if ((!dry)); then
       [[ -e "$link" || -L "$link" ]] && mv "$link" "$link.$stamp.bak" && echo "  backup: $link.$stamp.bak"
-      ln -s "$target" "$link"
+      MSYS=winsymlinks:nativestrict ln -s "$target" "$link"
     fi
   fi
 fi

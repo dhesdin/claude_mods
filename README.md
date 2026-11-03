@@ -47,6 +47,8 @@ make install MOD_LANG=fr         # every mod on this machine (or: make install s
 scripts/configure.sh project-hours priorityProjects='sip/edge=3'   # any option, see docs/mods.md
 ```
 
+Windows 11 without WSL2: no `make`, run the same scripts in Git Bash (`bash scripts/install.sh --lang fr`...): [docs/install.md](docs/install.md#windows-11-native-git-bash).
+
 Or, for every machine at once: `make dist`, then upload each `dist/plugins/<mod>.zip` on claude.ai (Customize > Plugins > Add > Upload plugin).
 
 Step by step, with what you should see and troubleshooting: **[docs/install.md](docs/install.md)**. Preparing a GPU machine (NVIDIA, WSL2, Jetson, AMD, Raspberry Pi): **[docs/hardware.md](docs/hardware.md)**.

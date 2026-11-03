@@ -52,6 +52,7 @@ Tests use `claude-code/testing`: the test registers hooks that stand for the eng
 - A Text holding nested Texts is found with its concatenated text.
 - Options for one test: `test(name, { options: { language: 'fr' } }, body)`.
 - Hardware-dependent parsers are tested against recorded output; mark samples not yet seen on real hardware `[to validate]`.
+- On native Windows, the test engine resolves `fs.read` paths to Windows paths (`/h/Sync` becomes `C:\h\Sync`), so stubs keyed by Linux paths (`/proc/meminfo`...) miss: 7 tests of notify, project-hours and sysmon fail there only. Run the tests on Linux, WSL2 or in CI.
 
 ## Type-check
 

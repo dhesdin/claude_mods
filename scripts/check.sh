@@ -11,6 +11,18 @@ cd "$(dirname "$0")/.."
 TS_VERSION=5.6.3
 BIOME_VERSION=2.5.15
 biome() { npx -y "@biomejs/biome@$BIOME_VERSION" "$@"; }
+# A Python 3 that runs: on Windows `python3` is often the Microsoft Store alias, which only prints a message.
+python3() {
+  local c
+  for c in python3 python; do
+    if command "$c" -c 'import sys; sys.exit(sys.version_info < (3, 8))' >/dev/null 2>&1; then
+      command "$c" "$@"
+      return
+    fi
+  done
+  echo "Python 3 is needed (python3 or python)" >&2
+  return 1
+}
 
 if [[ "${1:-}" == "--fix" ]]; then
   biome check --write --colors=off .

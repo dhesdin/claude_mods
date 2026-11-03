@@ -55,7 +55,10 @@ installed() { grep -qF "$1@$marketplace" <<<"$plugins"; }
 synced() { grep -qF "$1@synced" <<<"$plugins"; }
 
 setup() {
-  if "$reader" plugin marketplace list 2>/dev/null | grep -qF "$repo"; then
+  # Windows (Git Bash): Claude Code lists the folder as C:\..., not /c/...
+  local native="$repo"
+  if command -v cygpath >/dev/null; then native="$(cygpath -w "$repo")"; fi
+  if "$reader" plugin marketplace list 2>/dev/null | grep -qF -e "$repo" -e "$native"; then
     echo "marketplace already added: $repo"
   else
     "$claude" plugin marketplace add --scope "$scope" "$repo"

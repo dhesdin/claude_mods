@@ -18,6 +18,10 @@ The facts come from the repository, not from memory: `docs/mods.md` (each mod, i
 - Never put a mod both on the account and on this machine: `make install` skips a mod that already comes from the account.
 - Options hold paths and project names, never secrets. Do not read other files of the person to guess values: ask.
 
+## Windows
+
+On native Windows (the doctor shows `MINGW`/`MSYS`): run every script with `bash scripts/<name>.sh` (no `make`), and follow the Windows 11 section of `docs/install.md`. If Python is missing (only the Microsoft Store alias), the person installs it from python.org. For `--rules` without Developer Mode, the script writes an import line instead of a link: say so. sysmon shows CPU and RAM as `n/a` there.
+
 ## Steps
 
 1. **Check the machine.** Run `scripts/doctor.sh` from the repository root. Summarize in a few lines: system, Claude Code version, GPU and the source sysmon will use, the mods already there (`installed`, `account`, `-`), anything under "Next".

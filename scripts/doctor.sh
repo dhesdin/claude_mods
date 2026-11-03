@@ -64,13 +64,23 @@ fi
 ok "sysmon will use" "$backend (gpuBackend = auto)"
 
 echo "== Tools"
-for t in git make python3 df notify-send; do if has "$t"; then ok "$t" "found"; else ok "$t" "missing"; fi; done
-[[ "$(uname -s)" == Linux ]] && ! has notify-send && next+=("notify needs notify-send: sudo apt install libnotify-bin (or your distribution's libnotify package)")
+for t in git make df; do if has "$t"; then ok "$t" "found"; else ok "$t" "missing"; fi; done
+# A Python 3 that runs: on Windows `python3` is often the Microsoft Store alias, found but unusable.
+py=""
+for c in python3 python; do
+  if "$c" -c 'import sys; sys.exit(sys.version_info < (3, 8))' >/dev/null 2>&1; then py="$c"; break; fi
+done
+if [[ -n "$py" ]]; then ok "python 3" "$py"; else ok "python 3" "missing"; next+=("Python 3 is needed for make user-settings and the status line"); fi
+if [[ "$(uname -s)" == Linux ]]; then
+  if has notify-send; then ok "notify-send" "found"; else ok "notify-send" "missing"; next+=("notify needs notify-send: sudo apt install libnotify-bin (or your distribution's libnotify package)"); fi
+elif [[ "$(uname -s)" =~ ^(MINGW|MSYS|CYGWIN) ]]; then
+  if has powershell.exe; then ok "powershell.exe" "found (notify)"; else ok "powershell.exe" "missing (notify)"; fi
+fi
 has make || next+=("without make, use scripts/install.sh (same options)")
 
 echo "== User settings (make user-settings)"
 cfg="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-window="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("autoCompactWindow","unset") if d.get("autoCompactEnabled",True) else "auto-compaction off")' "$cfg/settings.json" 2>/dev/null || echo unset)"
+window="$("${py:-python3}" -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("autoCompactWindow","unset") if d.get("autoCompactEnabled",True) else "auto-compaction off")' "$cfg/settings.json" 2>/dev/null || echo unset)"
 ok "compaction window" "$window"
 if grep -q 'load-context.sh' "$cfg/settings.json" 2>/dev/null && [[ -x "$cfg/hooks/load-context.sh" ]]; then ok "hand-off notes hook" "installed"; else ok "hand-off notes hook" "missing"; fi
 if grep -q 'statusline.py' "$cfg/settings.json" 2>/dev/null && [[ -f "$cfg/statusline.py" ]]; then
@@ -78,6 +88,7 @@ if grep -q 'statusline.py' "$cfg/settings.json" 2>/dev/null && [[ -f "$cfg/statu
 else ok "status line" "missing"; fi
 if [[ -L "$cfg/CLAUDE.md" ]]; then
   if [[ -e "$cfg/CLAUDE.md" ]]; then ok "global rules" "linked to $(readlink "$cfg/CLAUDE.md")"; else ok "global rules" "BROKEN link"; next+=("$cfg/CLAUDE.md points to a missing file: make user-settings RULES=1"); fi
+elif [[ -f "$cfg/CLAUDE.md" ]] && grep -qE '^@.*user/CLAUDE\.md$' "$cfg/CLAUDE.md"; then ok "global rules" "imports $(grep -m1 -E '^@' "$cfg/CLAUDE.md" | cut -c2-)"
 elif [[ -f "$cfg/CLAUDE.md" ]]; then ok "global rules" "own file (not linked to this repository)"; else ok "global rules" "none"; fi
 [[ "$window" == 300000 && "$(grep -c 'load-context.sh' "$cfg/settings.json" 2>/dev/null)" != 0 ]] && cmp -s "$repo/user/statusline.py" "$cfg/statusline.py" || next+=("per-machine settings: make user-settings (see docs/install.md)")
 
