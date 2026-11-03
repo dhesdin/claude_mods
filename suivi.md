@@ -62,3 +62,7 @@
 - Pitfalls: the first status line (from PS1) used jq and would have shown nothing; usage-pace still comes from the claude.ai account until removed there (disabled on this machine with `claude plugin disable usage-pace@synced`).
 - teacher-guard 0.3: the instruction forbids code the user could copy (snippet, corrected line, diff, even short, even if asked); v0.2 still gave code in replies. An instruction, not a filter.
 - Status line: tokens in context after the ctx percentage (context_window.total_input_tokens, the figure used_percentage is computed from).
+
+## 2026-11-03 : laptop valentin-vivobook updated
+- Done: git pull (6061b6a → 5b70aa7); `claude plugin disable usage-pace@synced`; `make user-settings MOD_LANG=fr` (status line installed, hook recopied); make doctor all set; sample JSON rendered the status line correctly.
+- Pitfalls: usage-pace 0.3.0 still synced from the claude.ai account; teacher-guard synced copy still 0.2.0 before restart.
