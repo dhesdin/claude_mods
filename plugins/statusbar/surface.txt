@@ -1,0 +1,7 @@
+types ./types/index.d.ts declares on $: nothing (no EngineInterface member)
+types ./types/index.d.ts declares state: statusbar.limits, statusbar.context, statusbar.info, statusbar.tick, statusbar.hidden
+./register.tsx hooks: session.start, session.measure, command.run{command=statusbar}, ui.render{component=AbovePrompt} (default matcher key: plugin)
+./register.tsx answers its own command: command.run{command=statusbar}
+./register.tsx calls: $.clock.every, $.clock.now, $.command.register, $.process.run, $.session.cwd, $.session.model, $.session.root, $.session.usage, $.state.get, $.state.set, $.ui.resolve
+./register.tsx state writes: statusbar.context, statusbar.hidden, statusbar.info, statusbar.limits, statusbar.tick
+./register.tsx state reads: statusbar.context, statusbar.hidden, statusbar.info, statusbar.limits, statusbar.tick

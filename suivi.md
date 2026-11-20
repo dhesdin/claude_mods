@@ -76,3 +76,9 @@
 - Pitfalls: 7 tests fail on Windows only (the test engine maps /proc and /h paths to C:\); no account mod synced on this PC before a restart; shellcheck not installed here.
 - Waiting: on-screen check of the 6 mods (sysmon GPU card, notify toast [to validate]); sysmon Windows CPU/RAM source not written (needs a spec decision).
 - sysmon Windows CPU/RAM source: one powershell.exe through $.process.spawn while the pane measures (CIM classes, JSON line per interval), machine_status runs it once; checked on screen by the user (CPU 0-8 %, 32 cores, RAM 20.2 / 31.8 GB, page file, top 3). GPU processes on Windows show the program name (backslash paths split too) and n/a GB (the driver gives no per-process memory); no disk card. Docs: spec 02, hardware.md, mods.md, install.md, sysmon README, CLAUDE.md status.
+
+## 2026-11-20 : statusbar, the status line in the desktop app
+- Problem: the Code tab of the Claude desktop app does not draw the `statusLine` setting (the status line docs are terminal-only; the desktop docs never mention it), while mod bands and panes do show there.
+- Done: mod `statusbar` (spec 07): AbovePrompt band with the status line's four lines (model, folder, branch; ctx; 5h; 7d with pace), same colors, drawn on every surface except the terminal (option `showInTerminal`), `/statusbar` hides it. Figures from `$.session.usage()`, `session.measure`, `$.session.model()/root()/cwd()`, branch by `git branch --show-current` after each turn. 5 tests pass; installed on valentin-vivobook from the clone (`make install statusbar MOD_LANG=fr`).
+- Checked on screen by the user in the desktop app.
+- Pitfalls: a leftover `plugins/usage-pace/` (git-ignored generated types only) makes the docs coverage check crash locally; remove it by hand. The string `$.session.model()` returns is formatted by `modelName` ("claude-opus-5-5" → "Opus 5.5"): to confirm on screen.

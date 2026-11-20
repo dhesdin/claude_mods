@@ -44,6 +44,7 @@ A hook has no direct system access. Reading a file, starting a process, drawing,
 | project-hours | yes | yes | yes |
 | notify | yes | yes (laptop) | yes |
 | project-memory | yes | yes (reminder seen) | yes |
+| statusbar | yes (07: the status line in the desktop app) | yes (desktop app, laptop) | yes |
 
 ## Build order
 

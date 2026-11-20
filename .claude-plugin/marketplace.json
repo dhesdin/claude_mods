@@ -3,7 +3,7 @@
   "owner": {
     "name": "ValentinD"
   },
-  "description": "Personal Claude Code mods: machine monitor, teacher mode, display language, project hours, notifications",
+  "description": "Personal Claude Code mods: machine monitor, teacher mode, display language, project hours, notifications, status band for the desktop app",
   "plugins": [
     {
       "name": "sysmon",
@@ -34,6 +34,11 @@
       "name": "project-memory",
       "source": "./plugins/project-memory",
       "description": "Reminder to update the hand-off notes before compaction"
+    },
+    {
+      "name": "statusbar",
+      "source": "./plugins/statusbar",
+      "description": "The status line for the desktop app: model, folder, branch, context, 5-hour and weekly usage, pace"
     }
   ]
 }

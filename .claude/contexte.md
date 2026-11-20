@@ -1,13 +1,14 @@
 # Current context: claude-mods
 
-Updated: 2026-11-03 23:30 (Windows install and sysmon Windows committed, not pushed)
+Updated: 2026-11-20 (statusbar mod: the status line in the desktop app)
 
 ## Current goal
-Windows 11 native support. Install docs done (approved by the user). sysmon CPU/RAM on Windows done and checked on screen by the user.
+statusbar (spec 07) draws the status line's four lines as a band in the desktop app, whose Code tab does not draw `statusLine`; checked on screen on valentin-vivobook, to install on the workstation.
 
-Previous: Status line `user/statusline.py` replaces the usage-pace mod; checked on screen on valentin-vivobook; the workstation is next.
+Previous: Windows 11 native support. Install docs done (approved by the user). sysmon CPU/RAM on Windows done and checked on screen by the user. Before that: status line `user/statusline.py` replaces the usage-pace mod.
 
 ## Done
+- 2026-11-20: mod statusbar (AbovePrompt band, hidden in the terminal unless showInTerminal, /statusbar hides it); installed from the clone on valentin-vivobook; checked on screen in the desktop app.
 - user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, tokens in context after the ctx % (`· 24k`, total_input_tokens), time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
 - scripts/user-settings.sh copies it to ~/.claude/statusline.py and sets statusLine (`python3 -I ... <lang>`, refreshInterval 60); keeps a status line of one's own unless --statusline (make: STATUSLINE=1); --lang (make: MOD_LANG).
 - teacher-guard TEACHER MODE checked next to the custom status line (laptop).
@@ -28,6 +29,7 @@ Previous: Status line `user/statusline.py` replaces the usage-pace mod; checked 
 - Rules and notes are loaded by Claude Code itself (user/CLAUDE.md, SessionStart hook), not by a mod.
 
 ## Known pitfalls
+- A leftover git-ignored `plugins/usage-pace/` (generated types) makes scripts/check.sh docs coverage crash locally: delete it by hand.
 - Synced account plugins (~/.claude/plugins/synced/) refresh only at a Claude Code start: a machine shows deleted or old account versions until it restarts.
 - origin is SSH (git@github.com:dhesdin/claude_mods.git) on the laptop: HTTPS asked for a username the shell cannot type. CI green on b69d1b4.
 - Auto mode may refuse Claude editing ~/.claude/settings.json hooks and ~/.claude/CLAUDE.md: the user runs make user-settings.
@@ -35,9 +37,9 @@ Previous: Status line `user/statusline.py` replaces the usage-pace mod; checked 
 - No Node.js, shellcheck or gh on the workstation; Biome lint runs in CI only there. CI status: GitHub API `commits/<sha>/check-runs`.
 
 ## Next action
-sysmon Windows checked on screen and documented (spec 02, hardware.md, mods.md, install.md, README, CLAUDE.md). Everything Windows is uncommitted: commit when the user asks. GPU process names fixed (split on \ too). Possible follow-up: disk card on Windows (df / diskPaths).
+On the workstation: `git pull`, `make install statusbar MOD_LANG=fr`, `/reload-plugins` in the desktop app; also `make user-settings MOD_LANG=fr STATUSLINE=1`, restart Claude Code, check the status line.
 
-Workstation, still pending: On the workstation: `git pull`, then `make user-settings MOD_LANG=fr STATUSLINE=1`, restart Claude Code, check the status line.
+Windows work is committed (b3ba8ba, e7c36cd). Possible follow-up: disk card on Windows (df / diskPaths).
 
 ## Waiting for the user
 - Check teacher-guard 0.3 in teacher mode: asked for a function's code, Claude answers in words. usage-pace removed from the account (2026-11-01).

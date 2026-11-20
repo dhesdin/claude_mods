@@ -10,8 +10,9 @@ One page for everything a user can see or set. Each mod is independent: install,
 | [project-hours](#project-hours) | Claude Code time per project and per week, alert when a priority project goes quiet | `/hours`, `/hours 4`, `/hours panel` |
 | [notify](#notify) | desktop notification when Claude finishes a reply or waits for you | none |
 | [project-memory](#project-memory) | reminder to update the project's hand-off notes before the automatic compaction | none |
+| [statusbar](#statusbar) | the status line in the desktop app: model, folder, branch, context, usage, pace | `/statusbar`: hide or show the band |
 
-The 5-hour and weekly usage with the pace is the status line, not a mod (a plugin cannot set it): `make user-settings`, see [docs/install.md](install.md#the-status-line).
+The 5-hour and weekly usage with the pace is the status line, not a mod (a plugin cannot set it): `make user-settings`, see [docs/install.md](install.md#the-status-line). The desktop app does not draw the status line: there, **statusbar** draws the same lines.
 
 Two of them write to the model on purpose, briefly: **project-memory** (one reminder per compaction cycle) and **sysmon** (only when Claude calls its tool). The others cost no tokens.
 
@@ -107,3 +108,16 @@ When the context reaches `handoffTokens`, Claude is told once to update `.claude
 | Option | Default | Effect |
 | --- | --- | --- |
 | `handoffTokens` | `250000` | context size of the reminder; keep it under the auto-compact window (`0` = never) |
+
+## statusbar
+
+The status line's four lines in a band above the prompt, for the Claude desktop app (and IDEs), whose Code tab does not draw the `statusLine` setting: model, folder and git branch; context bar, % and tokens; 5-hour usage and time to reset; weekly usage, time to reset and pace (`→ ~82%`, or 💀 and the day and time of the limit). Same colors as the status line. Hidden in the terminal, which has the real status line. Figures come from Claude Code itself; without a subscription the usage lines are left out.
+
+- `/statusbar`: hides the band for this session, or shows it again.
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `language` | `en` | `en`, `fr`, `ja`, `zh` |
+| `showInTerminal` | `false` | draw the band in the terminal too |
+| `paceMinHours` | `3` | hours after the weekly reset before the pace is projected |
+| `refreshSeconds` | `60` | how often the countdowns and the model are redrawn between replies; `0` = only after each reply |

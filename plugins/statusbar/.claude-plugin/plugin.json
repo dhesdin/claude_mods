@@ -1,0 +1,40 @@
+{
+  "name": "statusbar",
+  "version": "0.1.0",
+  "description": "The status line for the desktop app: model, folder, branch, context, 5-hour and weekly usage, weekly pace",
+  "author": {
+    "name": "ValentinD"
+  },
+  "homepage": "https://github.com/dhesdin/claude_mods/tree/main/plugins/statusbar",
+  "repository": "https://github.com/dhesdin/claude_mods",
+  "license": "MIT",
+  "keywords": ["status", "usage", "context", "rate-limit", "desktop"],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Display language of the band (also settable for every mod at once with /langmod)",
+      "options": ["en", "fr", "ja", "zh"],
+      "default": "en"
+    },
+    "showInTerminal": {
+      "type": "boolean",
+      "title": "Show in the terminal too",
+      "description": "Off: drawn only in the desktop app and IDEs, since the terminal has the status line",
+      "default": false
+    },
+    "paceMinHours": {
+      "type": "number",
+      "title": "Minimum hours before projecting the pace",
+      "description": "Hours elapsed since the weekly reset before a projection is shown",
+      "default": 3
+    },
+    "refreshSeconds": {
+      "type": "number",
+      "title": "Refresh (s)",
+      "description": "How often the countdowns and the model are redrawn between turns; 0 = only after each turn",
+      "default": 60
+    }
+  }
+}

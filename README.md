@@ -12,6 +12,7 @@ Small, independent mods for Claude Code. Each one is a plugin you install, confi
 | [notify](plugins/notify) | Desktop notification when Claude finishes a reply or waits for you, with the project's name | none | [spec](docs/specs/05-notify.md) |
 | [project-memory](plugins/project-memory) | Reminder to update the project's hand-off notes before the automatic compaction | none | [spec](docs/specs/06-project-memory.md) |
 | [project-hours](plugins/project-hours) | Claude Code time per project and per week (open sessions only), alert when a priority project goes quiet; optional sync between machines | `/hours`, `/hours 4`, `/hours panel` | [spec](docs/specs/04-project-hours.md) |
+| [statusbar](plugins/statusbar) | The status line in the desktop app: model, folder, branch, context, 5-hour and weekly usage, pace (hidden in the terminal) | `/statusbar` hides or shows the band | [spec](docs/specs/07-statusbar.md) |
 
 **Every option of every mod, and how to set it: [docs/mods.md](docs/mods.md).** In short: `/config` in Claude Code, or `scripts/configure.sh <mod> key=value` from the repository. Options are per machine.
 
