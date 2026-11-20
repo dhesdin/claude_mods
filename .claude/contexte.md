@@ -8,6 +8,7 @@ statusbar (spec 07) draws the status line's four lines as a band in the desktop 
 Previous: Windows 11 native support. Install docs done (approved by the user). sysmon CPU/RAM on Windows done and checked on screen by the user. Before that: status line `user/statusline.py` replaces the usage-pace mod.
 
 ## Done
+- Laptop (2026-11-20): statusbar installed locally (`make install statusbar`, statusbar@claude-mods, language=fr); the other mods stay @synced from the account.
 - 2026-11-20: mod statusbar (AbovePrompt band, hidden in the terminal unless showInTerminal, /statusbar hides it); installed from the clone on valentin-vivobook; checked on screen in the desktop app.
 - user/statusline.py: model, folder, branch; ctx, 5h, 7j bars of 10 squares (green < 50, yellow 50-75, orange 75-90, red >= 90), % in the same color, tokens in context after the ctx % (`· 24k`, total_input_tokens), time to reset, weekly pace (`→ ~72%`, or 💀 and the day and time of the limit).
 - scripts/user-settings.sh copies it to ~/.claude/statusline.py and sets statusLine (`python3 -I ... <lang>`, refreshInterval 60); keeps a status line of one's own unless --statusline (make: STATUSLINE=1); --lang (make: MOD_LANG).
