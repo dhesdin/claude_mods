@@ -1,6 +1,6 @@
 # Current context: claude-mods
 
-Updated: 2026-11-20 (statusbar mod: the status line in the desktop app)
+Updated: 2026-11-20 (statusbar installed on the Windows PC)
 
 ## Current goal
 statusbar (spec 07) draws the status line's four lines as a band in the desktop app, whose Code tab does not draw `statusLine`; checked on screen on valentin-vivobook, to install on the workstation.
@@ -22,6 +22,8 @@ Previous: Windows 11 native support. Install docs done (approved by the user). s
 - 2026-11-03 Windows : .gitattributes `* text=auto eol=lf` (autocrlf=true checked out CRLF, broke surface snapshots); doctor/user-settings/check.sh find a Python 3 that runs (python3 is the Store alias here, python works); user-settings on Git Bash writes C:/ paths, `bash <hook>`, `python -X utf8 -I` (cp1252 crash on emojis), and without Developer Mode ~/.claude/CLAUDE.md = `@C:/.../user/CLAUDE.md` import instead of a symlink; install.sh recognises the C:\ marketplace path.
 
 - 2026-11-03 sysmon Windows : hooks/system.ts windowsScript/parseWindows/parseWindowsLines (one powershell.exe via $.process.spawn while the pane measures, one JSON line per interval: raw idle counter + 100 ns clock -> existing cpuPercent, AvailableKBytes, page file, cores, top 3 by WorkingSet every 15 s; CIM classes, not localized counter paths); register.tsx: hasProc once at the first shown refresh, sampler started after the await (no double start), stopped by stop(); isWindowsOff after it ends; machine_status without a live sample = one PowerShell run (2 samples 500 ms); Snapshot.isWindows?: Load line = cores only, no swap alert. Tests: 2 new pass (spawn stub must return { value: { code, signal } }); the 2 old /proc tests still fail on Windows only (known artefact).
+
+- 2026-11-20 Windows PC: pull to 3379672; statusbar installed with `bash scripts/install.sh statusbar --lang fr` (no make); band checked on screen in the desktop app.
 
 ## Recent decisions
 - sysmon Windows: a long-running PowerShell, not one per cycle (cold start ~1.8 s, warm sample ~560 ms, ~130 ms per loop sample).

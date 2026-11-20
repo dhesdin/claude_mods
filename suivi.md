@@ -83,3 +83,6 @@
 - Checked on screen by the user in the desktop app.
 - Pitfalls: a leftover `plugins/usage-pace/` (git-ignored generated types only) makes the docs coverage check crash locally; remove it by hand. The string `$.session.model()` returns is formatted by `modelName` ("claude-opus-5-5" → "Opus 5.5"): to confirm on screen.
 - Laptop: statusbar installed from the clone too (`make install statusbar MOD_LANG=fr`, then `scripts/configure.sh statusbar language=fr`: install left the 3 userConfig options unset); the other mods stay @synced from the account.
+
+## 2026-11-20 (Windows PC)
+- git pull (statusbar mod); `bash scripts/install.sh statusbar --lang fr` on Windows 11 (no make); band checked on screen in the desktop app.
